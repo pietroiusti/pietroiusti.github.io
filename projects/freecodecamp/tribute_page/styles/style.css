@@ -1,11 +1,12 @@
 body {
-    background-color: #015a88
+    background-color: #55606c;
+    color: black;
 }
-
 h1 {
     font-family: 'Bungee Shade', cursive;
+    margin-bottom: 20px;
 }
 
 img {
-    margin-top: 50px;
+    border-radius: 2%;
 }
