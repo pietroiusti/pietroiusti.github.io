@@ -1,22 +1,22 @@
-html {
-    background-color: #000000;
-
-}
-body {
-    width: 900px;
-    margin: 0 auto;
-    padding: 0 20px 20px 20px;
-    background-color: #55606c;
-    color: black;
-    border: 3px solid black;
-    font-size: 16px;
-}
 h1 {
+    padding: 0;
+    margin: -20px 20px 20px 20px;
     font-family: 'Bungee Shade', cursive;
-    padding: 20px 0 30px 0;
-    margin: 0;
 }
 
 img {
-    border-radius: 2%;
+    width: 600px;
+    display: block;
+    margin: 20px auto;
+    border-radius: 2%;  
+}
+
+p {
+    margin: 30px auto;
+    width: 800px;
+}
+
+.jumbotron {
+    width: 900px;
+    margin: 0 auto;
 }
