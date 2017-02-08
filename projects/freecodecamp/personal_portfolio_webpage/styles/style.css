@@ -1,0 +1,28 @@
+html {
+
+}
+body {
+    background-color: #45efce;
+    padding-top: 50px;
+}
+
+
+.starter-template {
+    padding: 40px 15px;
+    text-align: center;
+}
+
+#about {
+    margin-top: 50px;
+}
+
+#developerImg {
+    width: 50%;
+    border-radius: 2%;
+    display: block;
+    margin: 0 auto;
+} 
+
+#text-about {
+    padding: 20px 50px;
+}
