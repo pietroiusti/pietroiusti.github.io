@@ -26,3 +26,9 @@ body {
 #text-about {
     padding: 20px 50px;
 }
+
+#projects {
+    margin-top: 0;
+    margin-bottom: 30px;
+    padding-top: 0;
+}
