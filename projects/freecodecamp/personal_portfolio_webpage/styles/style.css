@@ -2,10 +2,14 @@ html {
 
 }
 body {
-    background-color: #45efce;
+    background-color: #3FBF79;
     padding-top: 50px;
 }
 
+h1 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
 
 .starter-template {
     padding: 40px 15px;
@@ -33,6 +37,16 @@ body {
     padding-top: 0;
 }
 
+i:hover {
+   /*color: #45efce;*/ 
+    color: #3FBF79;
+}
+
+i {
+    padding: 0 50px;
+}
+
+/* chang background of icon while cursor is over 
 .fa-github {
    height: 70px;
    width: 70px;
@@ -41,4 +55,9 @@ body {
 }
 .fa-github:hover {
    background-color: #45efce; 
+}
+*/
+
+#contactsIcons {
+    text-align: center; 
 }
