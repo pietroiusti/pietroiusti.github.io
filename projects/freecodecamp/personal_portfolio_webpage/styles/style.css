@@ -37,6 +37,16 @@ h1 {
     padding-top: 0;
 }
 
+#calculatorImg {
+    width: 100px;
+}
+#breakoutImg {
+    width: 193px; 
+}
+#eventlocatorImg {
+    width: 225px;
+}
+
 i:hover {
    /*color: #45efce;*/ 
     color: #3FBF79;
@@ -61,3 +71,9 @@ i {
 #contactsIcons {
     text-align: center; 
 }
+
+
+/* change thumbnails font color when over */
+.thumbnail:hover .caption {
+    color: #3FBF79;
+} 
