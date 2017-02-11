@@ -32,3 +32,13 @@ body {
     margin-bottom: 30px;
     padding-top: 0;
 }
+
+.fa-github {
+   height: 70px;
+   width: 70px;
+   border-radius: 50%;
+   color: black;
+}
+.fa-github:hover {
+   background-color: #45efce; 
+}
