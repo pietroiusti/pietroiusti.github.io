@@ -46,14 +46,13 @@ h1 {
 #eventlocatorImg {
     width: 225px;
 }
-
+i {
+    transition: color 1s ease;
+    padding: 0 50px;
+}
 i:hover {
    /*color: #45efce;*/ 
     color: #3FBF79;
-}
-
-i {
-    padding: 0 50px;
 }
 
 /* chang background of icon while cursor is over 
@@ -71,9 +70,10 @@ i {
 #contactsIcons {
     text-align: center; 
 }
-
-
-/* change thumbnails font color when over */
+/* change thumbnails font color when over, with transition */
+.thumbnail .caption {
+    transition: color 1s ease;
+}
 .thumbnail:hover .caption {
     color: #3FBF79;
 } 
