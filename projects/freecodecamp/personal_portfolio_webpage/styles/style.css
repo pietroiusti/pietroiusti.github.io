@@ -8,8 +8,12 @@ body {
 
 
 h1 {
+    font-family: 'Sansita', sans-serif;
     margin-top: 0;
     margin-bottom: 25px;
+}
+h3 {
+    font-family: 'Sansita', sans-serif;
 }
 
 .starter-template {
