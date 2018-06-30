@@ -29,32 +29,11 @@
 	     line-height: 60px; /* Vertically center the text there */
 	 }
 	 #main {
-	     position: absolute;
-	     top: 20%;
-	     margin-left: auto;
-	     margin-right: auto;
-	     left: 0;
-	     right: 0;
+	     margin: 10%;
 	 }
 	 #emacs {
 	     width: 30px;
 	     height: 30px;
-	 }
-	 #nav{ 
-	     position: absolute;
-	     bottom: 40%;
-	     margin-left: auto;
-	     margin-right: auto;
-	     left: 0;
-	     right: 0;
-	 }
-	 .navEntries {
-	     margin: 0 3%;
-	     cursor: pointer;
-	     -webkit-user-select: none; /* Safari */        
-	     -moz-user-select: none; /* Firefox */
-	     -ms-user-select: none; /* IE10+/Edge */
-	     user-select: none; 
 	 }
 	</style>
     </head>
@@ -67,10 +46,6 @@
 	    <a href="mailto:giulio.pietroiusti@gmail.com"
 	       style="text-decoration: none; color: grey;"<i class="far fa-envelope fa-5x
 								    fa-spin" style="color: grey"><i></a>
-	</div>
-
-	<div id="nav">
-	    <span class="navEntries" id="contactButton">Contact</span> <span class="navEntries" id="otherButton">Other</span>
 	</div>
 
 	<footer class="footer">
@@ -86,16 +61,3 @@
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     </body>
 </html>
-
-<script>
- let main = document.getElementById('main');
- document.getElementById('otherButton').addEventListener('click touchstart', function(){
-     main.innerHTML = "<span>There's nothing here...</span>";
- });
-
- document.getElementById('contactButton').addEventListener('click touchstart', function(){
-     main.innerHTML = '<a href="mailto:giulio.pietroiusti@gmail.com" style="text-decoration: none; color: grey;"<i class="far fa-envelope fa-5x fa-spin" style="color: grey"><i></a>';
- });
-</script>
-
-
