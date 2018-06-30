@@ -89,11 +89,11 @@
 
 <script>
  let main = document.getElementById('main');
- document.getElementById('otherButton').addEventListener('click', function(){
+ document.getElementById('otherButton').addEventListener('click touchstart', function(){
      main.innerHTML = "<span>There's nothing here...</span>";
  });
 
- document.getElementById('contactButton').addEventListener('click', function(){
+ document.getElementById('contactButton').addEventListener('click touchstart', function(){
      main.innerHTML = '<a href="mailto:giulio.pietroiusti@gmail.com" style="text-decoration: none; color: grey;"<i class="far fa-envelope fa-5x fa-spin" style="color: grey"><i></a>';
  });
 </script>
