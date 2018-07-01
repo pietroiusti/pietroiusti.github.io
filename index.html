@@ -35,6 +35,20 @@
 	     width: 30px;
 	     height: 30px;
 	 }
+	 #nav {
+	     position: absolute;
+	     bottom: 0;
+	     margin-left: auto;
+	     margin-right: auto;
+	     left: 0;
+	     right: 0;
+	     margin: 0 0 20% 0;*/
+	 }
+	 .navEntries {
+	     margin: 0 3%;
+	     cursor: pointer;
+	     color: #007bff;
+	 }
 	</style>
     </head>
 
@@ -45,7 +59,11 @@
 	<div id="main">
 	    <a href="mailto:giulio.pietroiusti@gmail.com"
 	       style="text-decoration: none; color: grey;"<i class="far fa-envelope fa-5x
-								    fa-spin" style="color: grey"><i></a>
+								    fa-spin" style="color: grey"></i></a>
+	</div>
+
+	<div id="nav">
+	    <span class="navEntries" id="contactButton">Contact</span> <span class="navEntries" id="otherButton">Other</span>
 	</div>
 
 	<footer class="footer">
@@ -61,3 +79,29 @@
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     </body>
 </html>
+
+<script>
+ let main = document.getElementById('main');
+ let contactButton = document.getElementById('contactButton');
+ let otherButton = document.getElementById('otherButton');
+
+ let otherContent = document.createTextNode('There is nothing here...');
+ let contactContent = '<a href="mailto:giulio.pietroiusti@gmail.com" style="text-decoration: none; color: grey;"<i class="far fa-envelope fa-5x fa-spin" style="color: grey"></i></a>';
+
+ let shown = 'contact';
+
+ otherButton.addEventListener('click', function(){
+     if (shown != 'other') {
+	 main.innerHTML = '';
+	 main.appendChild(otherContent);
+	 shown = 'other';
+     }
+ });
+
+ contactButton.addEventListener('click', function(){
+     if (shown != 'contact') {
+	 main.innerHTML = contactContent;
+	 shown = 'contact';
+     }
+ });
+</script>
