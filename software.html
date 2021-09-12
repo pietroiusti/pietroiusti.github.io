@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -31,39 +31,42 @@
       #main {
 	  margin: 10%;
       }
+      #description {
+	  width: 70%;
+      }
       #links {
-	  margin-top: 10%;
-	  background-color: #f2f3fa;
+	  margin-top: 15%;
+      }
+      #backlink {
+	  margin-top: 15%;
       }
       #emacs {
 	  width: 20px;
 	  height: 20px;
       }
+      .item{
+	  background-color: #f2f3fa;
+      }
     </style>
   </head>
-
   <body class="text-center">
-    <a href="mailto:giulio.pietrousti@gmail.com" style="color:white">contact</a>
-    
+
+
     <div id="main">
-      <p>Hi, I'm Giulio. You can reach me here:
-	<a href="mailto:giulio.pietroiusti@gmail.com"
-	   style="text-decoration: none; color: grey;"><i class="far fa-envelope fa-2x
-								 fa-spin"
-							  style="color: grey"></i></a>
-      </p>
-
-      <div id="links">
-	<a href="./academia.html">academia</a>
-      </div>
-
-      <div id="links">
-	<a href="./software.html">software</a>
-      </div>
-    </div>
 
 
+      <div align="center">
+	
+	<p class="item"><a href="https://www.github.com/pietroiusti/janus-key">janus-key</a></p>
 
+	<p class="item"><a href="https://pietroiusti.github.io/canvas_life/life.html">A
+	component-based game of life written in javascript</a></p>
+	
+	<p id="backlink"><a href="./index.html">←back</a></p>
+      </div>  <!-- container -->
+      
+    </div> <!-- main -->
+    
     <footer class="footer">
       <div class="container">
 	<span class="text-muted">Made with <a href="https://www.gnu.org/software/emacs/"><img id="emacs" src="./emacs.png"></a></span>
@@ -74,5 +77,6 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
 </body>
 </html>
