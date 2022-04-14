@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Giulio Pietroiusti's Programming Projects</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/d8be3321c4.js" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="header">
+      <!-- <div><a href="./about.html">About</a></div> -->
+      <div id="envelope"><a href="mailto:giulio.pietroiusti@gmail.com"
+			    style="text-decoration: none; color: grey;"><i class="far fa-envelope fa-1x"></i></a></div>
+    </div>
+
+
+    <h2>Self-study</h2>
+
+    <div id="selfStudyList">
+
+      <div class="selfStudyItem">
+	<div class="left">
+	  <div class="name">The C Programming Language | <a href="https://github.com/pietroiusti/The_C_Programming_Language"><i class="fa-brands fa-github"></i></a>
+	  </div>
+	  <div class="technologies">
+	  </div>
+	  <!-- <div class="thumbnail"><img src="./k&r.jpg" width="160" height="224" alt="K&R"/></div> -->
+	</div>
+	
+	<div class="right">
+	  <div class="shortDescription">
+	  </div>
+	  <div class="longDescription">
+	    In order to learn C, I have read, among other books, the
+	    iconic <i>K&R</i>. These
+	    are my solutions to the exercises.
+	  </div>
+	</div>
+      </div>
+      
+      <hr>
+      
+      <div class="selfStudyItem">
+	<div class="left">
+	  <div class="name">Eloquent Javascript | <a href="https://github.com/pietroiusti/eloquent_javascript_third_edition"><i class="fa-brands fa-github"></i></a>
+	  </div>
+	  <div class="technologies">
+	  </div>
+	  <!-- <div class="thumbnail"><img src="./eloquent.jpg" width="160" height="224" alt="Eloquent Javascript"/></div> -->
+	</div>
+
+	<div class="right">
+	  <div class="shortDescription">
+	  </div>
+	  <div class="longDescription">
+	    With <i>Eloquent Javascript</i> I decided to take a
+	    quite rigid approach: doing every single exercise and
+	    looking at the solution only after I've actually solved
+	    it. It was tough. It took me a year, but I know I have
+	    learned a lot. These are my solutions.
+	  </div>
+	</div>
+      </div>
+
+      <hr>
+
+      <div class="selfStudyItem">
+	<div class="left">
+	  <div class="name">Algorithmic Thinking | <a href="https://github.com/pietroiusti/algorithmic_thinking"><i class="fa-brands fa-github"></i></a>
+	  </div>
+	  <div class="technologies">	    
+	  </div>
+	  <!-- <div class="thumbnail"><img src="algorithmic-thinking.png" width="160" height="224" alt="multiplayer-chess"/></div> -->
+	</div>
+
+	<div class="right">
+	  <div class="shortDescription">
+	  </div>
+	  <div class="longDescription">
+	    Zingaro's <i>Algorithmic Thinking</i> is a
+	    problem-solving-oriented book on algorithms. I've learned
+	    why we might want to use techniques like memoization and
+	    dynamic programming, besides data structures like hash
+	    tables, trees and graphs. Here are my notes.
+	  </div>
+	</div>
+      </div>
+
+      <hr>
+      
+      <div class="selfStudyItem">
+	<div class="left">
+	  <div class="name">The Little Schemer | <a href="https://github.com/pietroiusti/the_little_schemer"><i class="fa-brands fa-github"></i></a>
+	  </div>
+	</div>
+
+	<div class="right">
+	  <div class="longDescription">
+	    My (ongoing) translation of The Little Schemer from Scheme
+	  into Emacs Lisp — and some notes.</div>
+	</div>
+      </div>
+
+    </div> <!-- selfStudyList -->
+
+    <h2 id="projectH2">Projects</h2>
+
+    <div id="projectList">
+
+      <div class="project">
+	<div class="left">
+	  <div class="name">janus-key | <a href="https://github.com/pietroiusti/janus-key"><i class="fa-brands fa-github"></i></a>
+	  </div>
+	  <div class="technologies">C ⸱ Linux Input Event Interface
+	  </div>
+	  <div class="thumbnail"><img src="./janus-key.png" width="320" height="180" alt="janus-key" />
+	  </div>
+	</div>
+
+	<div class="right">
+	  <div class="shortDescription">A key remapper for GNU/Linux
+	    that provides keys with a double function.</div>	    
+	  <div class="longDescription">I am a daily Emacs user and
+	    using Emacs means a persistent usage of modifiers; not the
+	    best treatment for your hands. In order to improve
+	    ergonomics, I came up with the idea of turning normal keys
+	    into modifiers only when pressed down, keeping their
+	    original functionality when tapped. janus-key allows to
+	    assign any key two functions, one when tapped, and another
+	    when held down and used in combination with other keys. As
+	    far as I know, janus-key is the first piece of software of
+	    its kind that it's both graphical interface independent —
+	    besides X, it works on Wayland, and on the tty — and
+	    systemd independent. I first implemented <a href="https://github.com/pietroiusti/xtramodifiers"> this idea in python</a>,
+	    but it was too good an opportunity to write my first
+	    “real” C program. I use it everyday!
+	  </div>
+	</div>
+      </div>
+
+      <hr>
+
+      <div class="project">
+	<div class="left">
+	  <div class="name">Freelosophy | <a href="https://freelosophy.github.io"><i class="fa-solid fa-link"></i></a> |
+	    Private Repo (Ask me for the code!)
+	  </div>
+	  <div class="technologies">Node.js ⸱ Express.js ⸱ EJS ⸱ App
+	    Engine
+	  </div>
+	  <div class="thumbnail"><img src="./freelosophy.png" width="320" height="180" alt="freelosophy" />
+	  </div>
+	</div>
+
+	<div class="right">
+	  <div class="shortDescription">A commenting platform for
+	    philosophy academic papers. <a href="https://dailynous.com/2022/01/10/new-site-for-publicly-commenting-on-philosophy-papers/">Here</a> is a recent article about it.
+	  </div>
+	  <div class="longDescription">My friend Filippo wasn't happy
+	    about the major internet archive for philosophy papers
+	    lacking the possibility of commenting. I realized that we
+	    could fill that gap ourselves. We could just prompt the
+	    user for the paper-ID, use that ID to ask the archive API
+	    for — or perhaps scrape? — the paper data, display the
+	    data to the user, and allow the user to store and retreive
+	    comments in a database. It turned out that the archive did
+	    not have a API... <!-- Something I've learned: cursor pagination; using a
+				   html parser, rather than regular expressions, makes your
+				   scraping life way easier. -->
+	  </div>
+	</div>
+      </div>
+
+      <hr>
+
+      <div class="project">
+	<div class="left">
+	  <div class="name">Canvas Life | <a href="https://pietroiusti.github.io/canvas_life/life.html"><i class="fa-solid fa-link"></i></a>
+	    | <a href="https://github.com/pietroiusti/canvas_life"><i class="fa-brands fa-github"></i></a>
+	  </div>
+	  <div class="technologies">JavaScript ⸱ Canvas
+	  </div>
+	  <div class="thumbnail"><img src="./canvas-life.png" width="320" height="180" alt="canvas-life" />
+	  </div>
+	</div>
+	
+	<div class="right">
+	  <div class="shortDescription">Conway's Game of Life. Built
+	    with canvas and components.
+	  </div>
+	  <div class="longDescription">
+	    Marijn Haverbeke, in his <i>Eloquent Javascript</i>,
+	    builds a pixel editor based on components without using
+	    any library. That code was the perfect ground for
+	    implementing a Conway's Game of Life. The project allowed
+	    me to familiarize with Canvas, basic grid computations and
+	    component-based thinking. <!-- Something I have learned: you don't need a
+					   two-dimension array to represent a grid. -->
+	  </div>
+	</div>
+      </div>
+
+      <hr>
+
+
+      <div class="project">
+	<div class="left">
+	  <div class="name">draw-tree | <a href="https://github.com/pietroiusti/draw-tree"><i class="fa-brands fa-github"></i></a>
+	  </div>
+	  <div class="technologies">Emacs Lisp
+	  </div>
+	  <div class="thumbnail"><img src="./conscells.png" width="320" height="180" alt="draw-tree" />
+	  </div>
+	</div>
+	
+	<div class="right">
+	  <div class="shortDescription">Emacs Lisp cons cells's structure visualizer ported from Scheme.
+	  </div>
+	  <div class="longDescription">
+	    Marijn Haverbeke, in his <i>Eloquent Javascript</i>,
+	    builds a pixel editor based on components without using
+	    any library. That code was the perfect ground for
+	    implementing a Conway's Game of Life. The project allowed
+	    me to familiarize with Canvas, basic grid computations and
+	    component-based thinking. <!-- Something I have learned: you don't need a
+					   two-dimension array to represent a grid. -->
+	  </div>
+	</div>
+      </div>
+
+
+
+      <!-- <div class="project"> -->
+      <!-- 	<div class="left"> -->
+      <!-- 	  <div class="name">Multiplayer Chess | <a href="https://multi-player-chess.herokuapp.com/"><i class="fa-solid fa-link"></i></a> | <a href="https://github.com/pietroiusti/chess"><i class="fa-brands fa-github"></i></a> -->
+      <!-- 	  </div> -->
+      <!-- 	  <div class="technologies">Node.js ⸱ WebSocket -->
+      <!-- 	  </div> -->
+      <!-- 	  <div class="thumbnail"><img src="./chess.png" width="320" height="180" alt="multiplayer-chess"/> -->
+      <!-- 	  </div> -->
+      <!-- 	</div> -->
+
+      <!-- 	<div class="right"> -->
+      <!-- 	  <div class="shortDescription">A toy project I wrote to -->
+      <!-- 	    learn WebSockets. -->
+      <!-- 	  </div> -->
+      <!-- 	  <div class="longDescription"> -->
+      <!-- 	    A basic multiplayer chess using WebSocket. The user can -->
+      <!-- 	    join or create a new room. Logic is handled with <a href="https://github.com/jhlywa/chess.js">chess.js</a> and, for the GUI, I have used <a href="https://chessboardjs.com/">chessboard.js</a> -->
+	    <!-- 
+		 and GUI are handled, respectively, by <a href="https://github.com/jhlywa/chess.js">chess.js</a> and <a href="https://chessboardjs.com/">chessboard.js</a>. -->
+	  </div>   
+	</div>
+      </div>
+
+
+    </div>
+  </body>
+</html>
