@@ -1,0 +1,1038 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2022-11-02 Wed 23:45 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP. Foreword&#x2013;1.1.</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP. Foreword&#x2013;1.1.
+<br />
+<span class="subtitle">2022-11-02 Wed</span>
+</h1>
+<p>
+Memorably, computer science &#x2014; the subject matter of the book &#x2014; is
+presented as a non-science whose signficance has little to do with
+computers (see also the <a href="https://youtu.be/-J_xL4IGhJA?list=PLE18841CABEA24090&amp;t=26">lecture</a>). Just as memorably, computer science
+is presented as a branch of <i>epistemology</i>, that is, the study of
+<i>knowledge</i> (which, tipically, is considered part of <i>philosophy</i>). In
+particular, computer science is <i>procedural</i> epistemology. We deal
+here with the systematization of imperative, <i>how-to</i>, knowledge, as
+opposed to ``declarative'' knowledge. The computer scientist deals,
+indeed, with a complexity that resembles that of the human mind &#x2014;
+notice the epigraph from Locke. Much of his job is dominating the
+``intellectual complexity'' of software systems.
+</p>
+
+<p>
+Here is a bullet-point summary starting from the foreword up to
+section 1.1 included, and my solutions of the exercises. As expected,
+these first pages present fundamental concepts and building
+blocks. I'm using Emacs Lisp, for the moment. I'll probably switch to
+Racket at some point.
+</p>
+
+<div id="outline-container-org7380ec5" class="outline-2">
+<h2 id="org7380ec5">Foreword (by Alan J. Perlis)</h2>
+<div class="outline-text-2" id="text-org7380ec5">
+<ul class="org-ul">
+<li>The subject matter of this book involves three foci of phenomena
+<ul class="org-ul">
+<li>the human mind;</li>
+<li>collection of computer programs;</li>
+<li>the computer.</li>
+</ul></li>
+
+<li><i>Idioms</i>: ``standard program structures of whose corrected we have
+becamse sure''.</li>
+
+<li><i>Algorithms</i>: programs that ``perform a precise mathematical
+function such as sorting or finding the maximum of a sequence of
+numbers , determining primality, or finding the square root.''</li>
+</ul>
+
+<blockquote>
+<p>
+A programmer should acquire good algorithms and idioms. (xiii)
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org7524016" class="outline-2">
+<h2 id="org7524016">Preface to the First Edition</h2>
+<div class="outline-text-2" id="text-org7524016">
+<ul class="org-ul">
+<li>The authors express two major concerns:
+<ol class="org-ol">
+<li>They want to establish the idea ``idea that a computer language
+is not just a way of getting a computer to perform operations but
+rather that it is <i>a novel formal medium for expressing ideas
+about methodology</i>'' (my emphasis).</li>
+
+<li>The essential material of interest here are the <i>techniques used
+to</i> <i>control the intellectual complexity of large software
+systems</i>; not: matters of syntax of particular languages, clever
+algorithms in special contexts, mathematical analysis of
+algorithms, or foundations of computing.</li>
+</ol></li>
+
+<li>Computer science is not science and its significance has very little
+to do with computers.</li>
+
+<li><i>Procedural Epistemology</i>: ``the study of the structure of knowledge
+from an imperative point of view, as opposed to a more declarative
+point of view&#x2026;''.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org04f281a" class="outline-2">
+<h2 id="org04f281a">1. Building Abstractions with Procedures</h2>
+<div class="outline-text-2" id="text-org04f281a">
+<ul class="org-ul">
+<li>A <i>Computational process</i> is an abstract thing that inhabits a computer.</li>
+
+<li><i>Data</i> are other abstract things manipulated by processes.</li>
+
+<li>A <i>program</i> is a pattern of rules that direct the evolution of a process.</li>
+
+<li>Programs are composed from expressions in <i>programming languages</i>.</li>
+
+<li>Good design is <i>modular</i>.</li>
+
+<li>Lisp <i>interpreter</i>: ``a machine that carries out processes described
+in the Lisp language''.</li>
+
+<li>``&#x2026;Lisp descriptions of processes, called <i>procedures</i>, can
+themselves be represented and manipulated as Lisp data. The
+importance of this is that there are powerful program-design
+techniques that rely on the ability to blur the traditional
+distinction between ``passive'' data and ``active'' processes.''</li>
+</ul>
+</div>
+
+<div id="outline-container-org7ac608b" class="outline-3">
+<h3 id="org7ac608b">The elements of programming</h3>
+<div class="outline-text-3" id="text-org7ac608b">
+<ul class="org-ul">
+<li>A powerful programming language enables us to describe processes and
+organize our ideas about them, not merely to instruct a computer to
+perform some operations.</li>
+
+<li>To organize our ideas about processes well we must be able to
+combine simple ideas to give life to more complex ones. We can do so
+through three mechanisms provided by a powerful programming
+language:
+<ul class="org-ul">
+<li><b>Primitive expressions</b></li>
+<li><b>Means of combinations</b></li>
+<li><b>Means of abstractions</b></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="outline-container-org75c2a40" class="outline-4">
+<h4 id="org75c2a40">Expressions</h4>
+<div class="outline-text-4" id="text-org75c2a40">
+<ul class="org-ul">
+<li>``You type an <i>expression</i>, and the interpreter responds by
+displaying the result of its <i>evaluating</i> that expression.''</li>
+
+<li><i>Combinations</i>;</li>
+<li><i>Operator</i>;</li>
+<li><i>Operands</i>;</li>
+<li><i>Arguments</i>.</li>
+
+<li><i>read-eval-print loop</i>: ``the intepreter always operates in the same
+basic cycle: It reads an expression from the terminal, evaluates the
+expression, and prints the result''.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org3c671b3" class="outline-4">
+<h4 id="org3c671b3">Naming and the Environment</h4>
+<div class="outline-text-4" id="text-org3c671b3">
+<ul class="org-ul">
+<li>A programming language provides means to use names to refer to
+computational object. ``We say that the name identifies a <i>variable</i>
+whose <i>value</i> is the object.''</li>
+
+<li>`` <code>Define</code> is our language's simples means of abstraction.</li>
+
+<li><i>Environment</i>.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org7e6c5f4" class="outline-4">
+<h4 id="org7e6c5f4">Evaluating Combinations</h4>
+<div class="outline-text-4" id="text-org7e6c5f4">
+<ul class="org-ul">
+<li><p>
+The interpreter evaluates combinations by following a procedure:
+</p>
+<blockquote>
+<ul class="org-ul">
+<li>To evaluate a combination, do the following:
+<ol class="org-ol">
+<li>Evaluate the subexpressions of the combination;</li>
+<li>Apply the procedure that is the value of the leftmost
+subexpression (the operator) to the arguments that are the values
+of the other subexpressions (the operands).</li>
+</ol></li>
+</ul>
+</blockquote></li>
+
+<li>The evaluation rule is <i>recursive</i>.</li>
+
+<li><p>
+We can view the evaluation in terms of a tree (See p. 10).
+</p>
+
+
+<div id="org237fbcf" class="figure">
+<p><img src="./figure1-1.gif" alt="figure1-1.gif" />
+</p>
+</div></li>
+
+<li>Tree accumulation.</li>
+
+<li><i>Special forms</i> constitute exceptions to the general evaluation
+rule. <code>Define</code> is a special form.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0ec9517" class="outline-4">
+<h4 id="org0ec9517">Compound Procedures</h4>
+<div class="outline-text-4" id="text-org0ec9517">
+<ul class="org-ul">
+<li><i>Procedure definitions</i>: a much more powerful abstraction technique.</li>
+
+<li><i>Compound procedures</i>.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org13cc304" class="outline-4">
+<h4 id="org13cc304">The Substitution Model for Procedure Application</h4>
+<div class="outline-text-4" id="text-org13cc304">
+<ul class="org-ul">
+<li>Application process for compound procedures:
+<ul class="org-ul">
+<li>To apply a compound procedure to arguments, evaluate the body of
+the procedure with each formal parameter replaced by the
+corresponding argument.</li>
+</ul></li>
+
+<li><i>Substitution model</i> for procedure application: a model to determine
+the ``meaning'' of procedure application (in this chapter);
+<ul class="org-ul">
+<li>This is not how interpreters actually work;</li>
+<li>The substitution model is the first of a sequence of increasingly
+elaborated models presented in this book of how intepreters
+work. Chapter 5 will present a complete implemetation of an
+interpreter an compiler.</li>
+</ul></li>
+
+<li>Lisp uses <i>applicative-order</i> evaluation: the interpreter evaluates
+the operator and the operands and then applies the resulting
+procedure to the resulting arguments &#x2014; the procedure (followed by
+the intepreter to evaluate a combination) described above.</li>
+
+<li>An alternative evaluation mode: <i>normal-order</i> evaluation.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org823661a" class="outline-4">
+<h4 id="org823661a">Conditional Expressions and Predicates</h4>
+<div class="outline-text-4" id="text-org823661a">
+<ul class="org-ul">
+<li><code>cond</code></li>
+<li><code>if</code></li>
+<li><code>and</code></li>
+<li><code>or</code></li>
+<li><code>not</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgdf8265d" class="outline-4">
+<h4 id="orgdf8265d">Exercise 1.1</h4>
+<div class="outline-text-4" id="text-orgdf8265d">
+<p>
+Exercise:
+</p>
+<blockquote>
+<p>
+Below is a sequence of expressions. What is the result printed by the
+interpreter in response to each expression? Assume that the sequence
+is to be evaluated in the order in which it is presented.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">10
+(+ 5 3 4)
+(- 9 1)
+(/ 6 2)
+(+ (* 2 4) (- 4 6))
+(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">a</span> 3)
+(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">b</span> (+ a 1))
+(+ a b (* a b))
+(= a b)
+(<span style="color: #b9ca4a;">if</span> (<span style="color: #b9ca4a;">and</span> (&gt; b a) (&lt; b (* a b)))
+    b
+    a)
+(<span style="color: #b9ca4a;">cond</span> ((= a 4) 6)
+      ((= b 4) (+ 6 7 a))
+      (<span style="color: #b9ca4a;">else</span> 25))
+(+ 2 (<span style="color: #b9ca4a;">if</span> (&gt; b a) b a))
+(* (<span style="color: #b9ca4a;">cond</span> ((&gt; a b) a)
+         ((&lt; a b) b)
+         (<span style="color: #b9ca4a;">else</span> -1))
+   (+ a 1))
+</pre>
+</div>
+</blockquote>
+
+<p>
+Answer:
+</p>
+<div class="org-src-container">
+<pre class="src src-elisp">10
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">10</span>
+
+(+ 5 3 4)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">12</span>
+
+(- 9 1)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">8</span>
+
+(/ 6 2)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">3</span>
+
+(+ (* 2 4) (- 4 6))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">6</span>
+</pre>
+</div>
+
+<p>
+The authors, p. 8 fn. 8, say that the response to evaluating
+definitions is ``highly implementation-dependent''.
+</p>
+
+<p>
+I gather that Scheme's <code>define</code>, when used for variables, is
+equivalent for Elisp's <code>setq</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="color: #b9ca4a;">setq</span> a 3)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">3</span>
+
+(<span style="color: #b9ca4a;">setq</span> b (+ a 1))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">4</span>
+
+(+ a b (* a b))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">19</span>
+</pre>
+</div>
+
+<p>
+I gather that Scheme's <code>=</code>, when used for variables, is
+equivalent for Elisp's <code>eq</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(eq a b)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">nil</span>
+
+(<span style="color: #b9ca4a;">if</span> (<span style="color: #b9ca4a;">and</span> (&gt; b a) (&lt; b (* a b)))
+    b
+  a)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">4</span>
+
+(<span style="color: #b9ca4a;">cond</span> ((= a 4) 6)
+      ((= b 4) (+ 6 7 a))
+      (else 25))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">16</span>
+
+(+ 2 (<span style="color: #b9ca4a;">if</span> (&gt; b a) b a))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">6</span>
+
+(* (<span style="color: #b9ca4a;">cond</span> ((&gt; a b) a)
+         ((&lt; a b) b)
+         (else -1))
+   (+ a 1))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">16</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org02f85b1" class="outline-4">
+<h4 id="org02f85b1">Exercise 1.2</h4>
+<div class="outline-text-4" id="text-org02f85b1">
+<p>
+Exercise:
+</p>
+<blockquote>
+<p>
+Translate the following expression into prefix form
+</p>
+
+<p>
+\(\frac{5 + 4 + (2 - (3 - (6 + \frac{4}{5})))}{3(6 - 2)(2 - 7)}\)
+</p>
+</blockquote>
+
+<p>
+Answer: 
+</p>
+<div class="org-src-container">
+<pre class="src src-elisp">(/ (+ 5 
+      4 
+      (- 2
+         (- 3
+            (+ 6
+               (/ 4 5))))) 
+   (* 3 
+      (- 6 2) 
+      (- 2 7))) 
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5bcf936" class="outline-4">
+<h4 id="org5bcf936">Exercise 1.3</h4>
+<div class="outline-text-4" id="text-org5bcf936">
+<p>
+Exercise:
+</p>
+<blockquote>
+<p>
+Define a procedure that takes three numbers as arguments and returns
+the sum of the squares of the two larger numbers.
+</p>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<p>
+This was my first solution:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">foo</span> (a b c)
+  (+ (square (<span style="color: #b9ca4a;">if</span> (&gt; a b) a b))
+     (square (<span style="color: #b9ca4a;">if</span> (&gt; c
+                    (<span style="color: #b9ca4a;">if</span> (&gt; a b) b a))
+                    c
+                    (<span style="color: #b9ca4a;">if</span> (&gt; a b) b a)))))
+</pre>
+</div>
+
+<p>
+That works, although it is not ideal, because the combination <code>(&gt; a
+b)</code> is evaluated three times&#x2026;
+</p>
+</div>
+</div>
+<div id="outline-container-orgd54a343" class="outline-4">
+<h4 id="orgd54a343">Exercise 1.4</h4>
+<div class="outline-text-4" id="text-orgd54a343">
+<p>
+Exercise:
+</p>
+<blockquote>
+<p>
+Observe that our model of evaluation allows for combinations whose
+operators are compound expressions. Use this observation to describe
+the behavior of the following procedure:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">a-plus-abs-b</span> a b)
+  ((<span style="color: #b9ca4a;">if</span> (&gt; b 0) + -) a b))
+</pre>
+</div>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<p>
+Behavior: If <code>b</code> is greater than 0, then apply <code>+</code> to <code>a</code> and <code>b</code>,
+that is, add <code>b</code> to <code>a</code>. Otherwise, apply <code>-</code> to <code>a</code> and <code>b</code>, that is,
+to subtract <code>b</code> from <code>a</code>.
+</p>
+
+<p>
+But subtracting a negative number, means adding it!  So, behavior: Add
+the absolute value of <code>b</code> to <code>a</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org4167e11" class="outline-4">
+<h4 id="org4167e11">Exercise 1.5</h4>
+<div class="outline-text-4" id="text-org4167e11">
+<p>
+Exercise:
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle has invented a test to determine whether the interpreter
+he is faced with is using applicative-order evaluation or normal-order
+evaluation. He defines the following two procedures:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">p</span>) (p))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">test</span> x y)
+  (<span style="color: #b9ca4a;">if</span> (= x 0)
+      0
+      y))
+</pre>
+</div>
+
+<p>
+Then he evaluates the expression
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(test 0 (p))
+</pre>
+</div>
+
+<p>
+What behavior will Ben observe with an interpreter that uses
+applicative-order evaluation? What behavior will he observe with an
+interpreter that uses normal-order evaluation? Explain your
+answer. (Assume that the evaluation rule for the special form if is
+the same whether the interpreter is using normal or applicative order:
+The predicate expression is evaluated first, and the result determines
+whether to evaluate the consequent or the alternative expression.)
+</p>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<p>
+In the case of applicative-order evaluation, ``the interpreter first
+evaluates the operator and operands and then applies the resulting
+procedure to the resulting arguments'' (p. 16). This means that the
+interpreter will evaluate <code>test</code>, then <code>0</code> and then <code>(p)</code>. <code>test</code>
+evaluates to a procedure. <code>0</code> evaluates to <code>0</code>. But <code>(p)</code> evaluates to
+<code>(p)</code>, which evaluates to <code>(p)</code>, which evaluates to (p)', which&#x2026; <i>ad
+infinitum</i>. So, the interpreter enters an infinite evaluation; it will
+never be able to apply the procedure denoted by <code>test</code>, because it
+will never be able to compute the second argument.
+</p>
+
+<p>
+In the case of normal-order evaluation, operands are not evaluated
+until their values are needed. <code>(test 0 (p))</code> would be turned into <code>0</code>
+and then evaluated. And '0' evaluates to 0.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orge873db8" class="outline-3">
+<h3 id="orge873db8">1.1.7 Example: Square Roots by Newton’s Method</h3>
+<div class="outline-text-3" id="text-orge873db8">
+<ul class="org-ul">
+<li>Procedures are analogous to mathematical functions: ``[t]hey specify a
+value that is determined by one or more parameters''. (21-22)</li>
+
+<li>However, procedures are different from mathematical functions in
+some respects. A mathematical function can tell us, say, whether a
+certain number is the square root of <code>x</code> or not. That, however, does
+not describe a <i>procedure</i>. It does not tell us <i>how to find</i> the
+square root of <code>x</code>.</li>
+
+<li>More generally, mathematics is usually concerned with ``declarative
+knowledge'', whereas computer science is concerned with ``imperative
+knowledge''.</li>
+
+<li>Iteration can be accomplished by calling a procedure. We don't need
+any looping construct.</li>
+</ul>
+</div>
+<div id="outline-container-orge048311" class="outline-4">
+<h4 id="orge048311">Exercise 1.6</h4>
+<div class="outline-text-4" id="text-orge048311">
+<p>
+Exercise: 
+</p>
+
+<blockquote>
+<p>
+Alyssa P. Hacker doesn't see why <code>if</code> needs to be provided as a
+special form. ``Why can't I just define it as an ordinary procedure in
+terms of <code>cond</code>?'' she asks. Alyssa's friend Eva Lu Ator claims this
+can indeed be done, and she defines a new version of <code>if</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">new-if</span> predicate then-clause else-clause)
+  (<span style="color: #b9ca4a;">cond</span> (predicate then-clause)
+        (<span style="color: #b9ca4a;">else</span> else-clause)))
+</pre>
+</div>
+
+<p>
+Eva demonstrates the program for Alyssa:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(new-if (= 2 3) 0 5)
+5
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(new-if (= 1 1) 0 5)
+0
+</pre>
+</div>
+
+<p>
+Delighted, Alyssa uses <code>new-if</code> to rewrite the square-root program:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sqrt-iter</span> guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter (improve guess x)
+                     x)))
+</pre>
+</div>
+
+<p>
+What happens when Alyssa attempts to use this to compute square roots? Explain.
+</p>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<p>
+<code>cond</code> is a <i>special form</i>. <code>if</code>, too, is a special form. <code>new-if</code>,
+instead, is not a special form. It is an ordinary <i>combination</i>.
+</p>
+
+<p>
+Now, the evaluation of a combination entails the evaluation of both
+the <i>operator</i> and the <i>operands</i>. With Eva's <code>new-if</code>, then,
+<code>sqrt-iter</code> calls itself <i>ad infinitum</i> and a stack overflow occurs.
+</p>
+
+<p>
+In fact, if we replace the <code>new-if</code> &#x2014; a combination &#x2014; with the
+<code>cond</code> &#x2014; a special form &#x2014; it would evaluate to, then things will
+work as originally intended.
+</p>
+</div>
+</div>
+<div id="outline-container-org30fe435" class="outline-4">
+<h4 id="org30fe435">Exercise 1.7</h4>
+<div class="outline-text-4" id="text-org30fe435">
+<blockquote>
+<p>
+The <code>good-enough?</code> test used in computing square roots will not be
+very effective for finding the square roots of very small
+numbers. Also, in real computers, arithmetic operations are almost
+always performed with limited precision. This makes our test
+inadequate for very large numbers. Explain these statements, with
+examples showing how the test fails for small and large numbers. An
+alternative strategy for implementing <code>good-enough?</code> is to watch how
+guess changes from one iteration to the next and to stop when the
+change is a very small fraction of the guess. Design a square-root
+procedure that uses this kind of end test. Does this work better for
+small and large numbers?
+</p>
+</blockquote>
+
+<p>
+Answer: 
+</p>
+
+<p>
+This is a pretty small number: \(0.00025\). It's square root is
+\(\sqrt{0.00025} = 0.0158113883\) (I have used a calculator).
+</p>
+
+<p>
+Let's try to apply our test to the right answer divided by two.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs">(good-enough? (/ 0.0158113883 2) 0.00025)
+</pre>
+</div>
+<p>
+The test returns true; that is, it's telling us that half of the right
+answer is good enough. I take that as a failure.
+</p>
+
+<p>
+When we are dealing with very small numbers, then the \(0.001\) used in
+our test is too big for our purposes.
+</p>
+
+<p>
+This is a pretty big number: \(7894561230.0123456789\). The square root
+of this number is \(\sqrt{7894561230.0123456789} = 88851.3434339\) (I
+have used a calculator).
+</p>
+
+<p>
+Let's see whether are test consider the right answer as good
+enough&#x2026;
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(good-enough? 88851.3434339 7894561230.0)
+</pre>
+</div>
+
+<p>
+This evaluate to <code>nil</code>&#x2026;  The problem seems to lie in the application
+of (the procedure named by) <code>square</code>, which gives a rather imprecise
+result.
+</p>
+
+<p>
+This is the body of <code>good-enough?</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(&lt; (abs (- (square 88851.3434339) 7894561230.0)) 0.001)
+</pre>
+</div>
+<p>
+It evaluates to <code>nil</code>, because the difference between the square of
+the guess and the radicant is greater than 0.001. However, the
+<i>actual</i> square of the radicant does not differ from the radicant of a
+value greater than 0.001.
+</p>
+
+
+<p>
+Here is my version of an improved version of <code>good-enough?</code> following
+the authors' suggestion:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">good-enough-improved?</span> (new-guess old-guess)
+  (&lt; (abs (- (abs old-guess) (abs new-guess))) (/ old-guess 10000000.0)))
+
+(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">sqrt-iter2</span> (new-guess old-guess x)
+  (<span style="color: #b9ca4a;">if</span> (good-enough-improved? new-guess old-guess)
+      new-guess
+    (sqrt-iter2 (improve new-guess x) new-guess x)))
+
+(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">sqrt2</span> (x)
+  (sqrt-iter2 1.0 x x))
+</pre>
+</div>
+
+<p>
+My version seems to work much better for small numbers:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(sqrt 0.00025) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 0.033869844451165365</span>
+               <span style="color: #969896; font-style: italic;">;;    </span><span style="color: #969896; font-style: italic;">bad!</span>
+(sqrt2 0.00025) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 0.015811388300841896</span>
+                <span style="color: #969896; font-style: italic;">;;    </span><span style="color: #969896; font-style: italic;">As good as the built-in emacs lisp sqrt function!</span>
+</pre>
+</div>
+
+<p>
+But there doesn't seem to be difference with big numbers:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(sqrt 7894561230.0)  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">88851.34343385023</span>
+(sqrt2 7894561230.0) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">88851.34343385023</span>
+</pre>
+</div>
+<p>
+This is so, I think, because, even if <code>good-enough?</code> returns <code>nil</code>
+when it shouldn't, <code>improve</code> is called until we get something that
+differs from the radicant for less than 0.001&#x2026; is this correct?
+</p>
+</div>
+</div>
+
+<div id="outline-container-org02bbf9f" class="outline-4">
+<h4 id="org02bbf9f">Exercise 1.8</h4>
+<div class="outline-text-4" id="text-org02bbf9f">
+<p>
+Exercise:
+</p>
+
+<blockquote>
+<p>
+Newton’s method for cube roots is based on the fact that if \(y\) is an
+approximation to the cube root of \(x\), then a better approximation is
+given by the value \(\frac{x/y^2 + 2y}{3}\). Use this formula to
+implement a cube-root procedure analogous to the square-root
+procedure. (In 1.3.4 we will see how to implement Newton’s method in
+general as an abstraction of these square-root and cube-root
+procedures.)
+</p>
+</blockquote>
+
+<p>
+Answer: 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">cuberoot</span> (x)
+  (cuberoot-iter2 1.0 x x))
+
+(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">cuberoot-iter</span> (new-guess old-guess x)
+  (<span style="color: #b9ca4a;">if</span> (good-enough-improved? new-guess old-guess)
+      new-guess
+    (cuberoot-iter2 (improve-cr new-guess x) new-guess x)))
+
+(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">improve-cr</span> (guess x)
+  (/ (+ (/ x (square guess))
+        (* 2 y))
+     3))
+
+
+</pre>
+</div>
+
+<div style="text-align: center;">
+<a href="https://pietroiusti.github.io/blog/posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Please, send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> if you have any comment.</p> <p class="creator">Created with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)</p>
+</div>
+</body>
+</html>
