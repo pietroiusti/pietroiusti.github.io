@@ -1,0 +1,49 @@
+#+options: html-link-use-abs-url:nil html-postamble:auto
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t
+#+OPTIONS: toc:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head:
+#+html_head_extra:
+#+subtitle:
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)
+#+latex_header:
+#+toc:nil
+
+
+* A philosopher reads SICP
+Last June I finally completed my phd in philosophy. Some weeks before
+my graduation, it was clear to me that I would have not continued with
+academic philosophy. Instead I would have tried to find a job as a
+programmer. Lucky to be assisted by the right persons, I found one
+pretty quickly. I happily write software full time now.
+
+My programming journey began in 2015 with the great Harvard's CS50x.
+Since then I have consistently allocated some time to learn the
+fundamentals of programming and of computer science. I am, though,
+still far from an acceptable understanding of the discipline.
+
+A couple of days ago I bought a physical copy of the Wizard Book. Yes,
+the legendary [[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and Interpretation of Computer Programs]], aka
+SICP, by Harold Abelson and Gerald Jay Sussman with Julie Sussman. The
+original one; the one in LISP. I've already gone through some tough
+books and their exercises. [[https://github.com/pietroiusti/eloquent_javascript_third_edition][Eloquent JavaScript]] and [[https://github.com/pietroiusti/The_C_Programming_Language][K&R]] come to
+mind. SICP, however, is particularly intimidating, especially given
+its ``[[https://gigamonkeys.com/code-quarterly/2011/hal-abelson/][tremendous amount]]'' of maths.
+
+I'm intentioned to read it and do most of the exercises. I'm taking
+the occasion to start this blog; partly as a way to keep myself
+motivated. Like others in the past --- hey [[https://eli.thegreenplace.net/tag/sicp][Eli Bendersky]], what a
+story! --- I'll post my progress with the book.
+
+It seems that many have failed along the path towards wizardry. Wish
+me luck.
