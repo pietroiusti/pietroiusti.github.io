@@ -444,3 +444,8 @@ $2^4$. ~(h 2)~ is $4$, which is $2^2$. My answer, then, is that ~(h
 n)~ computes $n^{(h (1- n)))}$ where `(h (1- n))` is the application
 of ~h~ to ~n~ minus 1.
 
+#+begin_export html
+<div style="text-align: center;">
+<a href="https://pietroiusti.github.io/blog/posts.html">←</a>
+</div>
+#+end_export
