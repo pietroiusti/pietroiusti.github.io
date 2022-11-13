@@ -21,7 +21,7 @@
 Two meanings of `recursive' are distinguished. On the one hand, this
 word can be used to refer to /processes/ that display a certain type
 of evolution. On the other hand, this word can be used to refer to
-procedures that display a certain syntactic feature. A recursive
+/procedures/ that display a certain syntactic feature. A recursive
 procedure does not always generate a recursive process.
 
 Moreover, recursive processes are distinguished from /iterative/
