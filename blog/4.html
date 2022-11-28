@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2022-11-29 Tue 00:25 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP. 1.2.2</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP. 1.2.2
+<br />
+<span class="subtitle">2022-11-28 Mon</span>
+</h1>
+<p>
+Section 1.2.2 introduces <i>tree recursion</i>, ``[a]nother common pattern
+of computation''. Fibonacci numbers are a famous example of
+it. Another example is provided by a way of computing the number of
+ways in which we can make change of $1.00, given half-dollars,
+quarters, dimes, nickels, and pennies.
+</p>
+
+<div id="outline-container-orga2b48c2" class="outline-2">
+<h2 id="orga2b48c2">Exercises 1.11</h2>
+<div class="outline-text-2" id="text-orga2b48c2">
+<p>
+Exercise:
+</p>
+
+<blockquote>
+<p>
+A function f is defined by the rule that \(f(n) = n\) if \(n <3\) and
+\(f(n) = f(n−1) + 2f(n−2) + 3f(n−3)\) if \(n \geq 3\). Write a procedure
+that computes \(f\) by means of a recursive process. Write a procedure
+that computes \(f\) by means of an iterative process.
+</p>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<p>
+Writing a procedure that computes \(f\) by means of a recursive process
+is quite straightforward.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">f</span> (n)
+  (<span style="color: #b9ca4a;">cond</span>
+   ((&lt; n 3) n)
+   (t (+ (f (- n 1))
+         (* 2 (f (- n 2)))
+         (* 3 (f (- n 3)))))))
+
+(f 0)  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">0</span>
+(f 1)  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">1</span>
+(f 2)  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">2</span>
+(f 3)  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">4</span>
+(f 4)  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">11</span>
+(f 5)  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">25</span>
+</pre>
+</div>
+
+<p>
+Writing a (recursive) procedure that computes \(f\) by means of an
+iterative process is less straightforward.
+</p>
+
+<p>
+My thought process: up to \(2\) we know the answer; the answer is the
+very same input. For a number \(n\) greater than \(2\), we are able to
+compute the answer if we know the result for the inputs \(n - 1\), \(n -
+2\), and \(n - 3\). In the case of number \(3\) &#x2014; the first number
+greater than \(2\) &#x2014; we do know the answer for the inputs \(3 - 1\),
+\(3 - 2\), and \(3 - 3\). They are, respectively, \(2\), \(1\), and \(0\). Given
+that we know that, then we can compute the value of the function given
+input \(3\): &#x2026;.  But now we have the enough knowledge to compute the
+value of the function given the input \(4\). And once we know that, we
+can compute the value of the function given the input \(5\), etc.
+</p>
+
+<p>
+So we can use a counter that starts from \(0\) and iterate until we have
+completed the right number of ``loops'', keeping track of the three
+relevant values that allows us to compute the value of the process at
+that time.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">f2</span> (n)
+  (f-iter 0 n 0 1 2))
+
+(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">f-iter</span> (counter max-count A B C)
+  (<span style="color: #b9ca4a;">if</span> (&lt; counter max-count) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">keep iterating</span>
+      (<span style="color: #b9ca4a;">if</span> (&lt; counter 3)
+          (f-iter (1+ counter) max-count 0 1 2)
+        (f-iter (1+ counter) max-count B C (+ (* 3 A)
+                                              (* 2 B)
+                                              C)))
+    (<span style="color: #b9ca4a;">if</span> (&lt; counter 3)
+        counter
+      (+ (* 3 A)
+         (* 2 B)
+         C))))
+
+(f2 0) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">0</span>
+(f2 1) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">1</span>
+(f2 2) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">2</span>
+(f2 3) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">4</span>
+(f2 4) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">11</span>
+(f2 5) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">25</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4ff42b8" class="outline-2">
+<h2 id="org4ff42b8">Exercise 1.12</h2>
+<div class="outline-text-2" id="text-org4ff42b8">
+<p>
+Exercise:
+</p>
+<blockquote>
+<p>
+The following pattern of numbers is called Pascal’s triangle.
+</p>
+
+<pre class="example">
+        1
+      1   1
+    1   2   1
+  1   3   3   1
+1   4   6   4   1
+       ...
+</pre>
+
+<p>
+The numbers at the edge of the triangle are all 1, and each number
+inside the triangle is the sum of the two numbers above it. Write a
+procedure that computes elements of Pascal’s triangle by means of a
+recursive process.
+</p>
+</blockquote>
+
+<p>
+Answer:
+You can think of the triangle just as a bunch of lines/rows, each of
+which is one element more than the previous one.
+</p>
+
+<pre class="example">
+a
+b, c
+d, e, f
+g, h, i, j
+...
+</pre>
+
+<p>
+What helped me to find a solution was using a row[col] notation.
+</p>
+<pre class="example">
+0[0]
+1[0], 1[1]
+2[0], 2[1], 2[2]
+3[0], 3[1], 3[2], 3[3]
+4[0], 4[1], 4[2], 4[3], 4[4]
+</pre>
+<p>
+We can immediately notice two things:
+</p>
+<ul class="org-ul">
+<li>First, col=0 means we are dealing with the first element of a
+row. And the first element of a row is always a 1.</li>
+<li>Second, when row=col we are dealing with the last element of a
+row. And the last element of a row is always a 1.</li>
+</ul>
+
+<p>
+So, we need a way to find the value of those elements where neither
+row≠col nor col=0. Saying that an element equals the sum of the two
+numbers ``above'' it is equivalent to say that an element with inidex
+i at row r equals the sum of two elements at row r-1, more
+specifically the sum of those two elements the first one of which has
+index i-1 and the second one of which has index i.
+</p>
+
+<p>
+We have enough rules
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="color: #969896; font-style: italic;">;;</span><span style="color: #969896; font-style: italic;">(tartaglia row col)</span>
+<span style="color: #969896; font-style: italic;">;;</span>
+<span style="color: #969896; font-style: italic;">;;</span><span style="color: #969896; font-style: italic;">col=0   ==&gt; 1</span>
+<span style="color: #969896; font-style: italic;">;;</span><span style="color: #969896; font-style: italic;">col=row ==&gt; 1</span>
+<span style="color: #969896; font-style: italic;">;;</span><span style="color: #969896; font-style: italic;">else    ==&gt; (+ (tartaglia (1- row)(1- col))</span>
+<span style="color: #969896; font-style: italic;">;;               </span><span style="color: #969896; font-style: italic;">(tartaglia (1- row) col))</span>
+</pre>
+</div>
+
+<p>
+We can write our procedure!
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #b9ca4a;">defun</span> <span style="color: #e78c45;">tartaglia</span> (r c)
+  (<span style="color: #b9ca4a;">cond</span>
+   ((= c 0) 1)
+   ((= r c) 1)
+   (t (+ (tartaglia (1- r)(1- c))
+         (tartaglia (1- r) c)))))
+
+(tartaglia 0 0)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 1</span>
+(tartaglia 1 0) (tartaglia 1 1)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 1, 1</span>
+(tartaglia 2 0) (tartaglia 2 1) (tartaglia 2 2)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 1, 2, 1</span>
+(tartaglia 3 0) (tartaglia 3 1) (tartaglia 3 2) (tartaglia 3 3)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 1, 3, 3, 1</span>
+(tartaglia 4 0) (tartaglia 4 1) (tartaglia 4 2) (tartaglia 4 3) (tartaglia 4 4)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">1, 4, 6, 4, 1</span>
+</pre>
+</div>
+
+<p>
+It works!
+</p>
+
+<p>
+As an extra, here is a quick js iterative way of computing the elements:
+</p>
+<div class="org-src-container">
+<pre class="src src-js"><span style="color: #b9ca4a;">function</span> <span style="color: #e78c45;">tartaglia</span>(<span style="color: #e7c547;">n</span>) {
+  <span style="color: #b9ca4a;">let</span> <span style="color: #e7c547;">previousLine</span> = [1, 1,];
+  <span style="color: #b9ca4a;">for</span> (<span style="color: #b9ca4a;">let</span> <span style="color: #e7c547;">i</span> = 0; i &lt; n; i++) {
+    <span style="color: #b9ca4a;">if</span> (i == 0) {
+      console.log( [1] )
+    } <span style="color: #b9ca4a;">else</span> <span style="color: #b9ca4a;">if</span> (i == 1) {
+      console.log( [1, 1] );
+    } <span style="color: #b9ca4a;">else</span> {
+      previousLine = line(previousLine);
+      console.log(previousLine);
+    }    
+  }  
+}
+
+<span style="color: #969896; font-style: italic;">//</span><span style="color: #969896; font-style: italic;">Compute line given previous one</span>
+<span style="color: #b9ca4a;">function</span> <span style="color: #e78c45;">line</span>(<span style="color: #e7c547;">arr</span>) {
+  <span style="color: #b9ca4a;">let</span> <span style="color: #e7c547;">result</span> = [1, ];
+  <span style="color: #b9ca4a;">for</span> (<span style="color: #b9ca4a;">let</span> <span style="color: #e7c547;">i</span> = 0; i &lt; arr.length-1; i++) {
+    result.push(arr[i] + arr[i+1]);
+  }
+  result.push(1);
+  <span style="color: #b9ca4a;">return</span> result;
+}
+
+tartaglia(5);
+<span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">=&gt;</span>
+<span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">[ 1 ]</span>
+<span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">[ 1, 1 ]</span>
+<span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">[ 1, 2, 1 ]</span>
+<span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">[ 1, 3, 3, 1 ]</span>
+<span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">[ 1, 4, 6, 4, 1 ]</span>
+</pre>
+</div>
+
+
+
+<div style="text-align: center;">
+<a href="https://pietroiusti.github.io/blog/posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Please, send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> if you have any comment.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)</span></p>
+</div>
+</body>
+</html>
