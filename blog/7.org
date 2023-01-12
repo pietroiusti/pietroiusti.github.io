@@ -1,0 +1,165 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP. 1.2.5
+#+subtitle: 2023-01-12 Thu
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)
+#+latex_header:
+
+A famous algorithm to compute the greatest common divisor (GCD) of two
+integers is presented, the so-called /Euclid's Algorithm/:
+
+#+begin_src scheme
+  (define (gcd a b)
+    (if (= b 0)
+        a
+        (gcd b (remainder a b))))
+#+end_src
+
+* Exercise 1.20
+
+Exercise:
+#+begin_quote
+Exercise 1.20: The process that a procedure generates is of course
+dependent on the rules used by the interpreter. As an example,
+consider the iterative gcd procedure given above. Suppose we were to
+interpret this procedure using normal-order evaluation, as discussed
+in 1.1.5. (The normal-order-evaluation rule for if is described in
+Exercise 1.5.) Using the substitution method (for normal order),
+illustrate the process generated in evaluating (gcd 206 40) and
+indicate the remainder operations that are actually performed. How
+many remainder operations are actually performed in the normal-order
+evaluation of (gcd 206 40)? In the applicative-order evaluation?
+#+end_quote
+
+Answer:
+
+Let us repeat some concepts previously met.
+
+*Evaluation of a combination (applicative order)*: The interpreter
+evaluates a combination by:
+1. Evaluating the subexpressions of the combination (recursion!);
+2. Applying the procedure that is the value of the leftmost
+   subexpression (the operator) to the arguments that are the values
+   of the other subexpressions (the operands).
+
+But what does it mean to apply a procedure?
+
+*Procedure application*: for primitive procedures we can assume that
+the mechanism is built into the interpreter. For compound procedures,
+it means evaluating the body of the procedure with each formal
+parameter *replaced* by the corresponding argument. Given the
+replacing, this is known as ``substitution model''.
+
+Now, there is an alternative evaluation method: *Evaluation of a
+combination (normal order evaluation)*: evaluate the operands only
+when their values are needed. If these latter are not needed, then
+just substitute operands expressions for parameters (``fully expand
+and then reduce'').
+
+Here is ~gcd~ in Emacs Lisp:
+#+begin_src emacs-lisp
+  (defun gcd (a b)
+    (if (= b 0)
+        a
+      (gcd b (% a b))))
+#+end_src
+
+Here is the illustrastion of the process generated in evaluating ~(gcd
+206 40)~ in the ``normal order''. 18 ~remainder~ (~%~ in Emacs Lisp)
+operations are performed.
+#+begin_src emacs-lisp
+  ;; normal order evaluation
+
+  (gcd 206 40)
+  (if (= 40 0)
+      206
+    (gcd 40 (% 206 40)))
+
+  (gcd 40 (% 206 40)))
+  (if (= (% 206 40) 0) ;;1
+      40
+    (gcd (% 206 40) (% 40 (% 206 40))))
+
+  (gcd (% 206 40) (% 40 (% 206 40)))
+  (if (= (% 40 (% 206 40)) 0) ;; 2, 3
+      (% 206 40)
+    (gcd (% 40 (% 206 40)) (% (% 206 40) (% 40 (% 206 40)))))
+
+  (gcd (% 40 (% 206 40)) (% (% 206 40) (% 40 (% 206 40))))
+  (if (= (% (% 206 40) (% 40 (% 206 40))) 0) ;; 4, 5, 6, 7
+      (% 40 (% 206 40))
+    (gcd (% (% 206 40) (% 40 (% 206 40)))
+         (% (% 40 (% 206 40)) (% (% 206 40) (% 40 (% 206 40)))))))
+
+  (gcd (% (% 206 40) (% 40 (% 206 40)))
+       (% (% 40 (% 206 40)) (% (% 206 40) (% 40 (% 206 40)))))
+  (if (= (% (% 40 (% 206 40)) (% (% 206 40) (% 40 (% 206 40)))) 0) ;; 8, 9, 10, 11, 12, 13, 14
+        (% (% 206 40) (% 40 (% 206 40)))
+      (gcd (% (% 40 (% 206 40)) (% (% 206 40) (% 40 (% 206 40))))
+           (% (% (% 206 40) (% 40 (% 206 40))) (% (% 40 (% 206 40)) (% (% 206 40) (% 40 (% 206 40)))))))
+
+  (% (% 206 40) (% 40 (% 206 40))) ;; 15, 16, 17, 18
+
+  2
+#+end_src
+
+Here is the illustrastion of the process generated in evaluating ~(gcd
+206 40)~ in the ``applicative order''. 4 ~remainder~ (~%~ in Emacs
+Lisp) operations are performeed.
+#+begin_src emacs-lisp
+  ;; applicative order evaluation
+  (defun gcd (a b)
+    (if (= b 0)
+        a
+      (gcd b (% a b))))
+
+  (gcd 206 40)
+  (if (= 40 0)
+      206
+    (gcd 40 (% 206 40)))
+
+  (gcd 40 (% 206 40)) ; 1
+  (gcd 40 6)
+  (if (= 6 0)
+      40
+    (gcd 6 (% 40 6)))
+
+  (gcd 6 (% 40 6)) ; 2
+  (gcd 6 4)
+  (if (= 4 0)
+      6
+    (gcd 4 (% 6 4)))
+
+  (gcd 4 (% 6 4)) ; 3
+  (gcd 4 2)
+  (if (= 2 0)
+      4
+    (gcd 2 (% 4 2)))
+
+  (gcd 2 (% 4 2)) ; 4
+  (gcd 2 0)
+  (if (= 0 0)
+      2
+    (gcd 0 (% 2 0)))
+
+  2
+#+end_src
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="https://pietroiusti.github.io/blog/posts.html">←</a>
+</div>
+#+end_export
