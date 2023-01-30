@@ -169,12 +169,6 @@ This is the series of procedure calls:
   7
 #+end_src
 
-#+begin_export html
-<div style="text-align: center;">
-<a href="https://pietroiusti.github.io/blog/posts.html">←</a>
-</div>
-#+end_export
-
 * Exercise 1.22
 #+begin_quote
 Most Lisp implementations include a primitive called runtime that
