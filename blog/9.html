@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-02-05 Sun 19:07 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP. 1.3/1.3.1</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP. 1.3/1.3.1
+<br />
+<span class="subtitle">2023-02-05 Sun</span>
+</h1>
+
+<div id="outline-container-org5beb5b3" class="outline-2">
+<h2 id="org5beb5b3">1.3 Formulating Abstractions with Higher-Order Procedures</h2>
+<div class="outline-text-2" id="text-org5beb5b3">
+<p>
+Procedures, we already know, are <i>abstractions</i>. The <code>cube</code> procedure,
+for example, is abstracting from the particular number we are
+calculating the cube of:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">cube</span> x) (* x x x))
+</pre>
+</div>
+
+<p>
+Without <code>cube</code>, if we had, say, to compute the cube of 3, we could use
+<code>(* 3 3 3)</code>. But
+</p>
+<blockquote>
+<p>
+&#x2026;our language would lack the ability to express the concept of
+cubing. One of the things we should demand from a powerful programming
+language is the ability to build abstractions by assigning names to
+common patterns and then to work in terms of the abstractions
+directly. Procedures provide this ability.
+</p>
+</blockquote>
+
+<p>
+Procedures need not take numbers only as their arguments. Procedures
+can take other procedures. Procedures that take other procedures as
+arguments are called <i>higher-order procedures</i>. They are an even more
+powerful abstraction mechanism.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org67b8924" class="outline-2">
+<h2 id="org67b8924">1.3.1 Procedures as Arguments</h2>
+<div class="outline-text-2" id="text-org67b8924">
+<p>
+The following higher-order procedure is presented:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sum</span> term a next b)
+(<span style="color: #b9ca4a;">if</span> (&gt; a b)
+    0
+    (+ (term a)
+       (sum term (next a) next b))))
+</pre>
+</div>
+
+<p>
+With it, we can the express different concepts that ``share a common
+underlying patter''.
+</p>
+
+<p>
+We can use <code>sum</code> to define a procedures that computes the sum of the
+integers from <code>a</code> to <code>b</code>; or a procedure that computes the sum of the
+cubes of the integers from <code>a</code> to <code>b</code>; or even the sum of the
+following sequence: \(\frac{1}{1 \cdot 3} + \frac{1}{5 \cdot 7} +
+\frac{1}{9 \cdot 11} + \dots\). The concepts of these procedures are
+all instances of a more general concept, the concept expressed by
+<code>sum</code>: adding the results of the application of a certain procedure
+(<code>term</code>) to those items between <code>a</code> and <code>b</code>, picked out by starting
+from <code>a</code> and stepping forward according to application of <code>next</code> to
+the current item.
+</p>
+</div>
+<div id="outline-container-orgc1aa134" class="outline-4">
+<h4 id="orgc1aa134">Exercise 1.29</h4>
+<div class="outline-text-4" id="text-orgc1aa134">
+<blockquote>
+<p>
+Simpson’s Rule is a more accurate method of numerical integration than
+the method illustrated above. Using Simpson’s Rule, the integral of a
+function \(f\) between a and b is approximated as
+</p>
+
+<p>
+\(\frac{h}{3} (y_0 + 4y_1 + 2y_2 + 4y_3 + 2y_4 + ... + 2y_{n-2} +
+2y_{n-1} + y_n)\),
+</p>
+
+<p>
+where \(h = (b - a) / n\), for some even integer \(n\), and \(y_k = f(a +
+kh)\). (Increasing \(n\) increases the accuracy of the approximation.)
+Define a procedure that takes as arguments \(f\), \(a\), \(b\), and \(n\) and
+returns the value of the integral, computed using Simpson's Rule. Use
+your procedure to integrate <code>cube</code> between 0 and 1 (with \(n = 100\) and
+\(n = 1000\)), and compare the results to those of the <code>integral</code>
+procedure shown above.
+</p>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">#lang sicp
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sum</span> term a next b)
+  (<span style="color: #b9ca4a;">if</span> (&gt; a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">cube</span> x) (* x x x))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">integral</span> f a b n)
+
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">f-mod</span> x)
+    (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">f2</span> x)
+      (* 2 (f x)))
+    (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">f4</span> x)
+      (* 4 (f x)))
+    (<span style="color: #b9ca4a;">cond</span> ((= x a) (f x))
+          ((= (- (/ x (/ (- b a) n)) a) n) (f x))
+          ((= (remainder (- (/ x (/ (- b a) n)) a) 2) 0) (f2 x))
+          (<span style="color: #b9ca4a;">else</span> (f4 x))))
+
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">next</span> x)
+    (+ x
+       (/ (- b a) n)))
+
+  (* (/ (/ (- b a) n) 3)
+     (sum f-mod
+          a
+          next
+          (+ a (* n (/ (- b a) n))))))
+
+(integral cube 0 1 100)<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 1/4</span>
+(integral cube 0 1 1000)<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 1/4</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1078b8e" class="outline-4">
+<h4 id="org1078b8e">Exercise 1.30</h4>
+<div class="outline-text-4" id="text-org1078b8e">
+<p>
+Exercise:
+</p>
+<blockquote>
+<p>
+The sum procedure above generates a linear recursion. The procedure
+can be rewritten so that the sum is performed iteratively. Show how to
+do this by filling in the missing expressions in the following
+definition:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sum</span> term a next b)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">iter</span> a result)
+    (<span style="color: #b9ca4a;">if</span> &#10216;??&#10217;
+        &#10216;??&#10217;
+        (iter &#10216;??&#10217; &#10216;??&#10217;)))
+  (iter &#10216;??&#10217; &#10216;??&#10217;))
+</pre>
+</div>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sum</span> term a next b)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">iter</span> a result)
+    (<span style="color: #b9ca4a;">if</span> (&gt; a b)
+        result
+        (iter (next a) (+ (term a) result))))
+  (iter a 0))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc6c38d9" class="outline-4">
+<h4 id="orgc6c38d9">Exercise 1.31</h4>
+<div class="outline-text-4" id="text-orgc6c38d9">
+<p>
+Exercise:
+</p>
+<blockquote>
+<ol class="org-ol">
+<li><p>
+The sum procedure is only the simplest of a vast number of similar
+abstractions that can be captured as higher-order procedures.[fn: The
+intent of Exercise 1.31 through Exercise 1.33 is to demonstrate the
+expressive power that is attained by using an appropriate abstraction
+to consolidate many seemingly disparate operations. However, though
+accumulation and filtering are elegant ideas, our hands are somewhat
+tied in using them at this point since we do not yet have data
+structures to provide suitable means of combination for these
+abstractions. We will return to these ideas in 2.2.3 when we show how
+to use sequences as interfaces for combining filters and accumulators
+to build even more powerful abstractions. We will see there how these
+methods really come into their own as a powerful and elegant approach
+to designing programs.] Write an analogous procedure called product
+that returns the product of the values of a function at points over a
+given range. Show how to define factorial in terms of product. Also
+use product to compute approximations to π using the formula&#x2026;
+</p>
+
+<p>
+\(\frac{\pi}{4} = \frac{2 \cdot 4 \cdot 4 \cdot 6 \cdot 6 \cdot 8 \cdot
+   \dots}{3 \cdot 3 \cdot 5 \cdot 5 \cdot 7 \cdot 7 \cdot \dots}\)
+</p></li>
+
+<li>If your product procedure generates a recursive process, write
+one that generates an iterative process. If it generates an
+iterative process, write one that generates a recursive process.</li>
+</ol>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<p>
+Here is <code>product</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">product</span> term a next b)
+  (<span style="color: #b9ca4a;">if</span> (&gt; a b)
+      1
+      (* (term a) (product term (next a) next b))))
+</pre>
+</div>
+
+<p>
+Here is <code>factorial</code> defined in terms of <code>product</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">factorial</span> n)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">inc</span> x) (+ 1 x))
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">indentity</span> x) x)
+  (product identity 1 inc n))  
+</pre>
+</div>
+
+<p>
+Here is one way of computing an approximation to \(\pi\).
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">product*</span> begin end)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">identity</span> x) x)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">inc2</span> x) (+ 2 x))
+  (product identity begin inc2 end))
+
+(* (/ (* 2 (product* 4 8) (product* 4 6))
+      (square (product* 3 7)))
+   4.0)
+</pre>
+</div>
+
+<p>
+My <code>product</code> procedure generates a recursive process (\(\Theta(n)\) in
+time and space). Here is a <code>product</code> that generates an iterative
+process (\(\Theta(n)\) in time, \(\Theta(1)\) in space &#x2014; assuming tail
+call optimization).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">product</span> term a next b)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">iter</span> a result)
+    (<span style="color: #b9ca4a;">if</span> (&gt; a b)
+        result
+        (iter (next a) (* (term a) result))))
+  (iter a 1))
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orge070e8c" class="outline-4">
+<h4 id="orge070e8c">Exercise 1.32</h4>
+<div class="outline-text-4" id="text-orge070e8c">
+<blockquote>
+<ol class="org-ol">
+<li><p>
+Show that <code>sum</code> and <code>product</code> (Exercise 1.31) are both special cases
+of a still more general notion called <code>accumulate</code> that combines a
+collection of terms, using some general accumulation function:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(accumulate combiner null-value term a next b)
+</pre>
+</div>
+
+<p>
+<code>Accumulate</code> takes as arguments the same term and range specifications
+as <code>sum</code> and <code>product</code>, together with a <code>combiner</code> procedure (of two
+arguments) that specifies how the current term is to be combined with
+the accumulation of the preceding terms and a null-value that
+specifies what base value to use when the terms run out. Write
+accumulate and show how sum and product can both be defined as simple
+calls to accumulate.
+</p></li>
+
+<li>If your accumulate procedure generates a recursive process, write
+one that generates an iterative process. If it generates an
+iterative process, write one that generates a recursive process.</li>
+</ol>
+</blockquote>
+
+<p>
+Answer:
+</p>
+
+<p>
+By looking at the recursive version of <code>sum</code> and <code>product</code>, we can
+observe that only certain elements in the two bodies are
+different. Those elements are:
+</p>
+<ul class="org-ul">
+<li>The first expression after the if;</li>
+<li>The procedure applied in the tail call;</li>
+</ul>
+
+<p>
+As far as I can tentatively see, this means that the concepts
+expressed <code>sum</code> and <code>product</code> belong to a more general concept.
+</p>
+
+<p>
+This latter concept <i>abstracts</i> over the two parts of the body
+mentioned. The first abstraction is an abstraction over a numeric
+value. The second abstraction is an abstraction over a procedure.
+</p>
+
+<p>
+This is the procedure I would write to express the concept <code>sum</code> and
+<code>product</code> are instances of:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate</span> combiner null-value term a next b)
+  (<span style="color: #b9ca4a;">if</span> (&gt; a b)
+      null-value
+      (combiner (term a)
+                (accumulate combiner null-value term (next a) next b))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(sum identity 1 inc 5) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 15</span>
+(accumulate + 0 identity 1 inc 5) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 15</span>
+
+(product identity 2 inc 9) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 362880</span>
+(accumulate * 1 identity 2 inc 9) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; 362880</span>
+</pre>
+</div>
+
+<p>
+My <code>accumulate</code> generate a recursive process. Here is an iterative
+version:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate</span> combiner null-value term a next b)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">iter</span> a result)
+    (<span style="color: #b9ca4a;">if</span> (&gt; a b)
+        result
+        (iter (next a) (combiner (term a) result))))
+  (iter a null-value))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb51f6bd" class="outline-4">
+<h4 id="orgb51f6bd">Exercese 1.33</h4>
+<div class="outline-text-4" id="text-orgb51f6bd">
+<p>
+Exercise:
+</p>
+<blockquote>
+<p>
+You can obtain an even more general version of <code>accumulate</code> (Exercise
+1.32) by introducing the notion of a <code>filter</code> on the terms to be
+combined. That is, combine only those terms derived from values in the
+range that satisfy a specified condition. The resulting
+<code>filtered-accumulate</code> abstraction takes the same arguments as
+accumulate, together with an additional predicate of one argument that
+specifies the filter. Write <code>filtered-accumulate</code> as a procedure. Show
+how to express the following using <code>filtered-accumulate</code>:
+</p>
+<ol class="org-ol">
+<li>the sum of the squares of the prime numbers in the interval <code>a</code> to <code>b</code>
+(assuming that you have a <code>prime?</code> predicate already written)</li>
+<li>the product of all the positive integers less than \(n\) that are
+relatively prime to $n$j (i.e., all positive integers \(i < n\) such
+that \(GCD(i,n)=1\)).</li>
+</ol>
+</blockquote>
+
+
+<p>
+Answer:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">filtered-accumulate</span> combiner filter null-value term a next b)
+(<span style="color: #b9ca4a;">cond</span> ((&gt; a b) null-value)
+      ((filter a) (combiner (term a)
+                            (filtered-accumulate combiner filter null-value term (next a) next b)))
+      (<span style="color: #b9ca4a;">else</span> (filtered-accumulate combiner filter null-value term (next a) next b))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sum-of-the-squares-of-primes</span> a b)
+  (filtered-accumulate + prime? 0 square a inc2 b))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">product-int-less-than-rel-prime-to</span> n)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">rel-prime-to-n</span> x)
+    (= (gcd x n)
+       1))
+  (filtered-accumulate * rel-prime-to-n 1 1 inc1 (- n 1)))
+</pre>
+</div>
+
+
+<div style="text-align: center;">
+<a href="https://pietroiusti.github.io/blog/posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Please, send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> if you have any comment.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)</span></p>
+</div>
+</body>
+</html>
