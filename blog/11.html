@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-03-01 Wed 23:32 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP. 2.1&#x2013;2.1.2</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP. 2.1&#x2013;2.1.2
+<br />
+<span class="subtitle">2023-03-01 Wed</span>
+</h1>
+<p>
+We have arrived at the second chapter, which is entitled <i>Building
+Abstractions with Data</i>.
+</p>
+
+<div id="outline-container-org1ed1358" class="outline-2">
+<h2 id="org1ed1358">2.1 Introduction to Data Abstraction</h2>
+<div class="outline-text-2" id="text-org1ed1358">
+<p>
+We can abstract not only with procedures, but also with (compound)
+data. The notion for the latter is called <i>data abstraction</i>.
+</p>
+
+<p>
+Using data abstraction, systems are divided into two parts. There is a
+part that <i>uses</i> data and there is a part that <i>defines</i> data.
+</p>
+
+<p>
+The part that uses data makes no assumptions about the data that are
+not necessary for the task at hand. We say that this part operates on
+``abstract data''.
+</p>
+
+<p>
+The part that defines the data does so in a way which is independent
+from the way data will be used by the other part of the system. We say
+that the defining-data part defines a ``concrete'' data
+representation.
+</p>
+
+<p>
+The interface between the two parts consists of a set of two kinds
+procedures. We call them <i>selectors</i> and <i>constructors</i>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc89b5bd" class="outline-2">
+<h2 id="orgc89b5bd">2.1.1 Example: Arithmetic Operations for Rational Numbers</h2>
+<div class="outline-text-2" id="text-orgc89b5bd">
+<p>
+Let us exemplify the idea of data abstraction using rational numbers.
+</p>
+
+<p>
+A rational number is an entity made of a numerator and a denominator.
+</p>
+
+<p>
+We don't have, at the moment, a way to construct a rational number,
+given a numerator and a denominator. But suppose we <i>assume</i> we
+do. Not only that. We are also going to assume that given a rational
+number, we have a way to extract the numerator and a way to extract
+the denominator; and that we have a procedure for each of those three
+things (<code>make-rat</code> &#x2014; the constructor &#x2014;, <code>numer</code>, and <code>denom</code> &#x2014;
+the selectors).
+</p>
+
+<p>
+Even without implementing those procedures, we can express in terms of
+them the procedurs for adding, subtracting, etc.:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">add-rat</span> x y)
+  (make-rat (+ (* (numer x) (denom y))
+               (* (numer y) (denom x)))
+            (* (denom x) (denom y))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sub-rat</span> x y)
+  (make-rat (- (* (numer x) (denom y))
+               (* (numer y) (denom x)))
+            (* (denom x) (denom y))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">mul-rat</span> x y)
+  (make-rat (* (numer x) (numer y))
+            (* (denom x) (denom y))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">div-rat</span> x y)
+  (make-rat (* (numer x) (denom y))
+            (* (denom x) (numer y))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">equal-rat?</span> x y)
+  (= (* (numer x) (denom y))
+     (* (numer y) (denom x))))
+</pre>
+</div>
+
+<p>
+We have said that a rational number is an entity made of two
+things. But how do we make a thing made of two things? It turns out
+that Scheme provides us with a procedure that allows us to stick two
+things together into a <i>pair</i>. I'm talking of the magical <code>cons</code>. Once
+you have made with pair with <code>cons</code>, you can extract the first element
+with <code>car</code> and the second element with <code>cdr</code>. Data objects constructed
+from pairs are called <i>list-structured</i> data.
+</p>
+
+<p>
+So, here is what we can do:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-rat</span> n d) (cons n d))
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">numer</span> x) (car x))
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">denom</span> x) (cdr x))
+</pre>
+</div>
+
+<p>
+Actually better:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-rat</span> n d)
+  (<span style="color: #b9ca4a;">let</span> ((g (gcd n d)))
+    (cons (/ n g)
+          (/ d g))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org49178fe" class="outline-2">
+<h2 id="org49178fe">Exercise 2.1</h2>
+<div class="outline-text-2" id="text-org49178fe">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define a better version of make-rat that handles both positive and
+negative arguments. Make-rat should normalize the sign so that if the
+rational number is positive, both the numerator and denominator are
+positive, and if the rational number is negative, only the numerator
+is negative.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-rat</span> n d)
+  (<span style="color: #b9ca4a;">let</span> ((g (gcd n d)))
+    (<span style="color: #b9ca4a;">if</span> (<span style="color: #b9ca4a;">or</span> (<span style="color: #b9ca4a;">and</span> (&gt; n 0) (&gt; d 0))
+            (<span style="color: #b9ca4a;">and</span> (&lt; n 0) (&lt; d 0)))
+        (cons (/ (abs n) (abs g)) 
+              (/ (abs d) (abs g)))
+        (cons (- (/ (abs n) (abs g)))
+              (/ (abs d) (abs g))))))
+
+(print-rat (make-rat 2 4))  <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt;  1/2  </span>
+(print-rat (make-rat -2 4)) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; -1/2</span>
+(print-rat (make-rat 2 -4)) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; -1/2</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgef0d083" class="outline-2">
+<h2 id="orgef0d083">2.1.2 Abstractions Barriers</h2>
+<div class="outline-text-2" id="text-orgef0d083">
+<blockquote>
+<p>
+In general, the underlying idea of data abstraction is to identify for
+each type of data object a basic set of operations in terms of which
+all manipulations of data objects of that type will be expressed, and
+then to use only those operations in manipulating the data.
+</p>
+</blockquote>
+
+<p>
+We can think of a system in which data abstraction is employed as
+divided into levels by ``abstraction barriers''. Above one abstraction
+barrier there is a level which includes those programs that use the
+the data abstraction which is implemented by those programs in the
+level below the barrier.
+</p>
+
+<p>
+Here is how we can represent the structure of the rational-number
+system:
+</p>
+<pre class="example">
+   *Figure 2.1:* Data-abstraction barriers in the rational-number
+   package.
+
+                +------------------------------------+
+        --------| Programs that use rational numbers |--------
+                +------------------------------------+
+                  Rational numbers in promblem domain
+                    +---------------------------+
+        ------------|   add-rat  sub-rat  ...   |-------------
+                    +---------------------------+
+           Rational numbers as numerators and denominators
+                      +------------------------+
+        --------------| make-rat  numer  denom |--------------
+                      +------------------------+
+                      Rational numbers as pairs
+                          +----------------+
+        ------------------| cons  car  cdr |------------------
+                          +----------------+
+                    However pairs are implemented
+
+(Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007))
+</pre>
+
+<p>
+This simple idea has many advantages&#x2026;
+</p>
+</div>
+</div>
+<div id="outline-container-org6586d58" class="outline-2">
+<h2 id="org6586d58">Exercise 2.2</h2>
+<div class="outline-text-2" id="text-org6586d58">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Consider the problem of representing line segments in a plane. Each
+segment is represented as a pair of points: a starting point and an
+ending point. Define a constructor <code>make-segment</code> and selectors
+<code>start-segment</code> and <code>end-segment</code> that define the representation of
+segments in terms of points. Furthermore, a point can be represented
+as a pair of numbers: the \(x\) coordinate and the \(y\)
+coordinate. Accordingly, specify a constructor <code>make-point</code> and
+selectors <code>x-point</code> and <code>y-point</code> that define this
+representation. Finally, using your selectors and constructors, define
+a procedure <code>midpoint-segment</code> that takes a line segment as argument
+and returns its midpoint (the point whose coordinates are the average
+of the coordinates of the endpoints). To try your procedures, you’ll
+need a way to print points:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">print-point</span> p)
+  (newline)
+  (display <span style="color: #70c0b1;">"("</span>)
+  (display (x-point p))
+  (display <span style="color: #70c0b1;">","</span>)
+  (display (y-point p))
+  (display <span style="color: #70c0b1;">")"</span>))
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">constructor</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-segment</span> s e) (cons s e))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">selectors</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">start-segment</span> x) (car x))
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">end-segment</span> x) (cdr x))
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">constructor</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-point</span> x y) (cons x y))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">selectors</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">x-point</span> x) (car x))
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">y-point</span> x) (cdr x))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">mid-point-segment</span> line)
+  (make-point (/ (+ (x-point (start-segment line))
+                    (x-point (end-segment line)))
+                 2)
+              (/ (+ (y-point (start-segment line))
+                    (y-point (end-segment line)))
+                 2)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">print-point</span> p)
+  (newline)
+  (display <span style="color: #70c0b1;">"("</span>)
+  (display (x-point p))
+  (display <span style="color: #70c0b1;">","</span>)
+  (display (y-point p))
+  (display <span style="color: #70c0b1;">")"</span>))
+
+(print-point (mid-point-segment (make-segment (make-point 2 2) (make-point 6 4))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0968354" class="outline-2">
+<h2 id="org0968354">Exercise 2.3</h2>
+<div class="outline-text-2" id="text-org0968354">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Implement a representation for rectangles in a plane. (Hint: You may
+want to make use of Exercise 2.2.) In terms of your constructors and
+selectors, create procedures that compute the perimeter and the area
+of a given rectangle. Now implement a different representation for
+rectangles. Can you design your system with suitable abstraction
+barriers, so that the same perimeter and area procedures will work
+using either representation?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+I'm assuming the sides of the rectangle and the axes are parallel.
+</p>
+
+<p>
+Sides are represented by segments whose points whose order is
+clockwise, E.g., left-side: (bottom-point . top-point), top-side:
+(left-point . right-point).
+</p>
+
+<ul class="org-ul">
+<li>1st representation:</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-rec</span> left-side top-side)
+  (cons left top))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> rec)
+  (<span style="color: #b9ca4a;">let</span> ((top-left-point (cdr (car rec)))
+        (top-right-point (car (cdr rec))))
+    (abs (- (x-point top-right-point)
+            (x-point top-left-point)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">width</span> rec)
+  (<span style="color: #b9ca4a;">let</span> ((bottom-left-point (car (car rec)))
+        (top-left-point (cdr (car rec))))
+    (abs (- (y-point top-left-point)
+            (y-point bottom-left-point)))))
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>2nd representation:</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-rec</span> right-side bottom-side)
+  (cons right-side bottom-side))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> rec)
+  (<span style="color: #b9ca4a;">let</span> ((bottom-left-point (cdr (cdr rec)))
+        (bottom-right-point (car (cdr rec))))
+    (abs (- (x-point bottom-right-point)
+            (x-point bottom-left-point)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">width</span> rec)
+  (<span style="color: #b9ca4a;">let</span> ((top-right-point (car (car rec)))
+        (bottom-right-point (car (cdr rec))))
+    (abs (- (y-point top-right-point)
+            (y-point bottom-right-point)))))
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Procedures which work with both representations:</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">perimeter</span> rec)
+  (* 2
+     (+ (length rec) (width rec))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">area</span> rec)
+  (* (length rec) (width rec)))
+</pre>
+</div>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Please, send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> if you have any comment.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)</span></p>
+</div>
+</body>
+</html>
