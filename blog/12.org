@@ -1,0 +1,358 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP. 2.1.3
+#+subtitle: 2023-03-14 Tue
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)
+#+latex_header:
+
+* 2.1.3 What Is Meant by Data?
+The operations ~add-rat~, ~sub-rat~ are defined in terms of the
+unspecified procedures ~make-rat~, ~numer~, ~denom~, but we can think
+of them as defined in terms of ``data objects'': rational numbers,
+numerators, and denominators, the behavior of which is specified by
+those unspecified procedures.
+
+Now, what is /data/?
+
+#+begin_quote
+In general, we can think of data as defined by some collection of
+selectors and constructors, together with specified conditions that
+these procedures must fulfill in order to be a valid representation.
+#+end_quote
+
+What does that mean? Two examples are given.
+
+The first one is, again, in connection with our rational numbers
+system: ~make-rat~, ~numer~, and ~denom~ must satisfy the condition
+and /only/ the condition that, for any integer n and any non-zero
+integer $d$, if $x$ is ~(make-rat n d)~, then $\frac{(numer ~
+x)}{(denom ~ x)} = \frac{n}{d}$
+
+The second example is in connection with the notion of /pair/: ~cons~,
+~car~, and ~cdr~ must satisfy the condition and /only/ the condition
+that, for any objects ~x~ and ~y~, if ~z~ is ~(cons x y)~ then ~(car
+z)~ is ~x~ and ~(cdr z)~ is ~y~.
+
+The authors are quite excited to present an implementation of ~cons~,
+~car~, and ~cdr~ that uses no data structure and only procedures.
+
+* Exercise 2.4
+*Exercise*:
+
+#+begin_quote
+Here is an alternative procedural representation of pairs. For this
+representation, verify that (car (cons x y)) yields x for any objects
+x and y.
+
+#+begin_src scheme
+  (define (cons x y)
+    (lambda (m) (m x y)))
+
+  (define (car z)
+    (z (lambda (p q) p)))
+#+end_src
+
+What is the corresponding definition of cdr? (Hint: To verify that
+this works, make use of the substitution model of 1.1.5.)
+#+end_quote
+
+*Answer*:
+
+~(car (cons x y))~ is the application ~car~ to the result of the
+application of ~cons~ to ~x~ and ~y~.
+
+The application of ~cons~ to ~x~ and ~y~ is ~(lambda (m) (m x y))~.
+
+So, the application of car to the application of ~cons~ to ~x~ and ~y~
+is ~(car (lambda (m) (m x y)))~.
+
+We can now take the body of ~car~ and replace each istance of ~z~ with
+~(car (lambda (m) (m x y)))~. This gives us:
+
+#+begin_src scheme
+  ((lambda (m) (m x y)) (lambda (p q) p))
+#+end_src
+
+This latter combination is the application of ~(lambda (m) (m x y))~
+to ~(lambda (p q) p)~.
+
+We can now take the body of the first lambda (the procedure we are
+applying) and replace each instance of ~m~ with the second lambda
+(that to which we are applying the first lambda). This gives us:
+
+#+begin_src scheme
+  ((lambda (p q) p) x y)
+#+end_src
+
+This latter combination is the application of ~(lambda (p q) p)~ to
+~x~ and ~y~. Which evaluates to ~x~.
+
+The corresponding definition of ~cdr~ is:
+#+begin_src scheme
+  (define (cdr z)
+    (z (lambda (p q) q)))
+#+end_src
+
+* Exercise 2.5
+*Exercise*:
+
+#+begin_quote
+Show that we can represent pairs of nonnegative integers using only
+numbers and arithmetic operations if we represent the pair $a$ and $b$
+as the integer that is the product $2^a3^b$. Give the corresponding
+definitions of the procedures ~cons~, ~car~, and ~cdr~.
+#+end_quote
+
+*Answer*:
+
+Given that the priority is torturing my brain with programming
+challenges and not with maths, I've asked ChatGPT what's the way to
+know the value of $a$ and $b$ given the product $2^a3^b$. It said
+that:
+#+begin_quote
+To find the value of b, you can repeatedly divide the integer by 3
+until it is no longer divisible by 3. The number of times you can
+divide by 3 is equal to the value of b. For example, if the integer is
+162, you can divide by 3 three times to get 18, and then once more to
+get 2. This means that b=4.
+
+To find the value of a, you can divide the resulting quotient from the
+previous step by 2 until it is no longer divisible by 2. The number of
+times you can divide by 2 is equal to the value of a. For example,
+using the same integer 162, we divided it by 3 four times to get 2. We
+can then divide 2 by 2 once to get 1. This means that a=1.
+
+Therefore, for an integer that is the product of 2^a and 3^b, you can
+find the values of a and b by dividing the integer by 3 repeatedly to
+find b, and then dividing the quotient by 2 repeatedly to find a.
+#+end_quote
+
+Now that I know the relevant maths bit:
+
+#+begin_src scheme
+  ;; from chapter 1 ******
+  (define (square x) (* x x))
+
+  (define (fast-expt b n)
+    (cond ((= n 0)
+           1)
+          ((even? n)
+           (square (fast-expt b (/ n 2))))
+          (else
+           (* b (fast-expt b (- n 1))))))
+
+  (define (even? n)
+    (= (remainder n 2) 0))
+  ;; *********************
+
+  (define (cons a b)
+    (* (fast-expt 2 a)
+       (fast-expt 3 b)))
+
+  (define (car x)
+    (define (car-iter x i)
+      (if (not (even? x))
+          i
+          (car-iter (/ x 2) (+ i 1))))
+    (car-iter x 0))
+
+  (define (cdr x)
+    (define (cdr-iter x i)
+      (if (not (= (remainder x 3) 0))
+          i
+          (cdr-iter (/ x 3) (+ i 1))))
+    (cdr-iter x 0))
+
+  (define my-pair (cons 3 2)) ;; my-pair is now 72
+  (car my-pair) ;; => 3
+  (cdr my-pair) ;; => 2
+
+  (cons 7 5)
+  (define another-pair (cons 7 5)) ;; another-pair is now 31104
+  (car another-pair) ;; => 7
+  (cdr another-pair) ;; => 5
+#+end_src
+
+* Exercise 2.6
+*Exercise*:
+
+#+begin_quote
+In case representing pairs as procedures wasn’t mind-boggling enough,
+consider that, in a language that can manipulate procedures, we can
+get by without numbers (at least insofar as nonnegative integers are
+concerned) by implementing 0 and the operation of adding 1 as
+
+#+begin_src scheme
+  (define zero (lambda (f) (lambda (x) x)))
+
+  (define (add-1 n)
+    (lambda (f) (lambda (x) (f ((n f) x)))))
+#+end_src
+
+This representation is known as /Church numerals/, after its inventor,
+Alonzo Church, the logician who invented the λ-calculus.
+
+Define one and ~two~ directly (not in terms of ~zero~ and
+~add-1~). (Hint: Use substitution to evaluate ~(add-1 zero)~). Give a
+direct definition of the addition procedure ~+~ (not in terms of
+repeated application of ~add-1~).
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define zero (lambda (f) (lambda (x) x)))
+
+  (define (add-1 n)
+    (lambda (f) (lambda (x) (f ((n f) x)))))
+
+  ;; Use substitution to evaluate (add-1 zero):
+  (add-1 zero)
+  (lambda (f)
+    (lambda (x)
+      (f
+       (((lambda (f)
+           (lambda (x) x))
+         f)
+        x))))
+  ;; =>
+  (lambda (f)
+    (lambda (x)
+      (f
+       ((lambda (x) x)
+        x))))
+  ;; => the following should be the def. of 1
+  (lambda (f)
+    (lambda (x)
+      (f x)))
+  ;; So:
+  (define one
+    (lambda (f)
+      (lambda (x)
+        (f x))))
+
+  ;; Let's now try to apply add-1 to what we think is 1,
+  ;; in order to get 2.
+  (lambda (f)
+    (lambda (x)
+      (f
+       (((lambda (f)
+           (lambda (x)
+             (f x))) f)
+        x))))
+  ;; =>
+  (lambda (f)
+    (lambda (x)
+      (f
+       ((lambda (x) (f x)) x))))
+  ;; =>
+  (lambda (f)
+    (lambda (x)
+      (f (f x))))
+  ;; This one above should be 2.
+  ;; So:
+  (define two
+    (lambda (f)
+      (lambda (x)
+        (f (f x)))))
+#+end_src
+
+So, we can think of Church's 0 is a ``two-lambda wall'' behind which
+there is the value passed to the second lambda. Any other Church
+numeral is a two-lambda wall behind which there is the application of
+the value (which is supposed to be a procedure) passed to the first
+lambda to the value passed to the second lambda.
+
+How to add two Church numberals? We can ``wrap'' one number into the
+other.
+
+If we pass f to a Church number we get a lambda that takes x and
+returns either x, some number n >= 1 of nested applications of f,
+whose innermost application is ~(f x)~. For example, If we pass f to
+the number 2 we get:
+#+begin_src scheme
+  (lambda (x)
+    (f (f x)))
+#+end_src
+Now suppose, we want to add 2 to, say 1. What we want is to produce a
+Church numera which is the expression above, wrapped into a lambda
+that takes f and where x is replaced by the value behind the double
+wall of 1. To ``unwrap'' a value we can pass f and then x, as already
+shwon in ~add-1~.
+
+#+begin_src scheme
+  (define add (lambda (n1)
+                (lambda (n2)
+                  (lambda (f)
+                    (lambda (x)
+                      ((n2 f) ((n1 f) x)))))))
+
+  ;; Or, the same thing:
+  (define (add n1 n2)
+    (lambda (f)
+      (lambda (x)
+        ((n2 f) ((n1 f) x)))))
+#+end_src
+
+
+#+begin_src scheme
+  ;; Lets try add 1 and 1
+  ;; 1 is (lambda (f) (lambda (x) (f x)))
+
+  (lambda (f)
+    (lambda (x)
+      (((lambda (f) (lambda (x) (f x))) f) (((lambda (f) (lambda (x) (f x))) f) x))))
+
+  (lambda (f)
+    (lambda (x)
+      ((lambda (x) (f x)) (((lambda (f) (lambda (x) (f x))) f) x))))
+
+  (lambda (f)
+    (lambda (x)
+      ((lambda (x) (f x)) ((lambda (x) (f x)) x))))
+
+  (lambda (f)
+    (lambda (x)
+      ((lambda (x) (f x)) (f x))))
+
+  (lambda (f)
+    (lambda (x)
+      ((lambda (x) (f x)) (f x))))
+
+  (lambda (f)
+    (lambda (x)
+      ((f (f x)))))
+
+  ;; Lets try add 1 and 2
+  ;; 1 is (lambda (f) (lambda (x) (f x)))
+  ;; 2 is (lambda (f) (lambda (x) (f (f x))))
+
+  (lambda (f)
+    (lambda (x)
+      (((lambda (f) (lambda (x) (f x))) f) (((lambda (f) (lambda (x) (f (f x)))) f) x))))
+
+  ;; it seems to work...
+
+  (lambda (f)
+    (lambda (x)
+      ((f (f (f x))))))
+#+end_src
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
