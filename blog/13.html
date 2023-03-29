@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-03-29 Wed 23:28 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP. 2.2&#x2013;2.2.1</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP. 2.2&#x2013;2.2.1
+<br />
+<span class="subtitle">2023-03-29 Wed</span>
+</h1>
+
+<div id="outline-container-orgab3d040" class="outline-2">
+<h2 id="orgab3d040">2.2 Hierarchical Data and the Closure Property</h2>
+<div class="outline-text-2" id="text-orgab3d040">
+<p>
+<code>Cons</code> is used to ``glue`` two things together into a <i>pair</i>. This
+allows us to construct compound data.
+</p>
+
+<p>
+We can represent a pair using the so-called <i>box-and-pointer
+notation</i>. This latter notation represents each object as a <i>pointer</i>
+to a box (the box for a pair is actually a double box):
+</p>
+
+<pre class="example">
+*Figure 2.2:* Box-and-pointer representation of `(cons 1 2)'.
+
+          +---+---+     +---+
+     ----&gt;| * | *-+----&gt;| 2 |
+          +-|-+---+     +---+
+            |
+            V
+          +---+
+          | 1 |
+          +---+
+
+[Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
+</pre>
+
+<blockquote>
+<p>
+We have already seen that cons can be used to combine not only numbers
+but pairs as well. [&#x2026;] As a consequence, pairs provide <i>a universal
+building block</i> from which we can construct all sorts of data
+structures. (p. 97, my emphasis)
+</p>
+</blockquote>
+
+<p>
+The authors refer to the ability to create pairs whose elements are
+pairs as the <i>closure property</i> of cons, borrowing the term from
+abstract algebra.
+</p>
+
+<blockquote>
+<p>
+Closure is the key to power in any means of combination because it
+permits us to create <i>hierarchical structures</i> &#x2014; structures made up
+of parts, which themselves are made up of parts, and so on. (p. 98)
+</p>
+</blockquote>
+</div>
+<div id="outline-container-org6a1d6cb" class="outline-3">
+<h3 id="org6a1d6cb">2.2.1 Representing Sequences</h3>
+<div class="outline-text-3" id="text-org6a1d6cb">
+<p>
+A sequence of pairs, formed by nested <code>conses</code>, like that above, is
+called <code>list</code>. Scheme provide the primitive <code>list</code> to create such
+sequences.
+</p>
+
+<pre class="example">
+(list &lt;a_1&gt; &lt;a_2&gt; ... &lt;a_n&gt;)
+</pre>
+<p>
+is equivalent to
+</p>
+<pre class="example">
+(cons ⟨a_1⟩
+      (cons ⟨a_2⟩
+            (cons ...
+                  (cons ⟨a_n⟩
+                   nil)...)))
+</pre>
+
+<p>
+Do not confuse <code>(list 1 2 3 4)</code> with <code>(1 2 3 4)</code>&#x2026;
+</p>
+
+<p>
+<code>car</code>, <code>cdr</code>, <code>cadr</code>, etc. are introduced. <code>nil</code> can be thought of as
+a sequence with no elements, the <code>empty list</code>.
+</p>
+
+<p>
+Some typical list operations:
+</p>
+
+<ul class="org-ul">
+<li><code>length</code>:
+<ul class="org-ul">
+<li><p>
+recursively: 
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> items)
+  (<span style="color: #b9ca4a;">if</span> (null? items)
+      0
+      (+ 1 (length (cdr items)))))
+</pre>
+</div></li>
+<li><p>
+iteratively  
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> items)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length-iter</span> a count)
+    (<span style="color: #b9ca4a;">if</span> (null? items)
+        count
+        (length-iter (cdr a) (+ 1 count))))
+  (length-iter items 0))
+</pre>
+</div></li>
+</ul></li>
+<li><p>
+<code>list-ref</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">list-ref</span> items n)
+  (<span style="color: #b9ca4a;">if</span> (= n 0)
+      (car items)
+      (list-ref (cdr items) (- n 1))))
+</pre>
+</div></li>
+<li><p>
+<code>append</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">append</span> list1 list2)
+  (<span style="color: #b9ca4a;">if</span> (null? list1)
+      l2
+      (cons (car list1)
+            (append (cdr list1) list2))))
+</pre>
+</div></li>
+<li><code>map</code>:</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">map</span> proc items)
+  (<span style="color: #b9ca4a;">if</span> (null? items)
+      nil
+      (cons (proc (car items))
+            (<span style="color: #b9ca4a;">map</span> proc (cdr items)))))
+</pre>
+</div>
+
+<p>
+These operations above exemplify the techniques of ``cdring down'' and
+``consing up''.
+</p>
+
+<p>
+<code>map</code> deserves some comments, for not only it represents a common
+pattern, but it also ``establishes a higher level of abstraction in
+dealing with lists''.
+</p>
+
+<p>
+Consider:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">scale-list</span> items factor)
+  (<span style="color: #b9ca4a;">if</span> (null? items)
+      nil
+      (cons (* (car items) factor)
+            (scale-list (cdr items) factor))))
+
+(scale-list (list 1 2 3 4 5) 10)
+(10 20 30 40 50)
+</pre>
+</div>
+
+<p>
+Now consider a definition of <code>scale-list</code> in terms of <code>map</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">scale-list</span> items factor)
+       (<span style="color: #b9ca4a;">map</span> (<span style="color: #b9ca4a;">lambda</span> (x) (* x factor))
+            items))
+</pre>
+</div>
+
+<p>
+The definition of <code>scale-list</code> in terms of <code>map</code> ``suppresses that
+level of detail and emphasizes that scaling transforms a list of
+elements to a list of results.'' ``&#x2026;this abstraction gives us the
+flexibility to change the low-level details of how sequences are
+implemented, while preserving the conceptual framework of operations
+that transform sequences to sequences.''
+</p>
+</div>
+</div>
+
+<div id="outline-container-org63de05f" class="outline-3">
+<h3 id="org63de05f">Exercise 2.17</h3>
+<div class="outline-text-3" id="text-org63de05f">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define a procedure last-pair that returns the list that contains only
+the last element of a given (nonempty) list:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(last-pair (list 23 72 149 34))
+(34)
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">last-pair</span> l)
+  (<span style="color: #b9ca4a;">if</span> (null? (cdr l))
+      l
+      (last-pair (cdr l))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org687b113" class="outline-3">
+<h3 id="org687b113">Exercise 2.18</h3>
+<div class="outline-text-3" id="text-org687b113">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define a procedure `reverse' that takes a list as argument and returns
+a list of the same elements in reverse order:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(reverse (list 1 4 9 16 25))
+(25 16 9 4 1)
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+My intuitive solution was interative:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">reverse</span> l)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">reverse-iter</span> l result)
+    (<span style="color: #b9ca4a;">if</span> (null? l)
+        result
+        (reverse-iter (cdr l) (cons (car l) result))))
+  (reverse-iter l (list)))
+</pre>
+</div>
+
+<p>
+After having solved the exercise iteratively, I've looked for a
+recursive solution on the web and I've found this one:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">reverse</span> l)
+  (<span style="color: #b9ca4a;">if</span> (null? l)
+      nil
+      (append (reverse (cdr l))
+              (list (car l)))))
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org99a49ff" class="outline-4">
+<h4 id="org99a49ff">Exercise 2.20</h4>
+<div class="outline-text-4" id="text-org99a49ff">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The procedures <code>+</code>, <code>*</code>, and <code>list</code> take arbitrary numbers of
+arguments. One way to <code>define</code> such procedures is to use define with
+<i>dotted-tail</i> notation. In a procedure definition, a parameter list
+that has a dot before the last parameter name indicates that, when the
+procedure is called, the initial parameters (if any) will have as
+values the initial arguments, as usual, but the final parameter’s
+value will be a <i>list</i> of any remaining arguments. For instance, given
+the definition
+</p>
+
+<pre class="example">
+(define (f x y . z) ⟨body⟩)
+</pre>
+
+<p>
+the procedure <code>f</code> can be called with two or more arguments. If we
+evaluate
+</p>
+
+<pre class="example">
+(f 1 2 3 4 5 6)
+</pre>
+
+<p>
+then in the body of <code>f</code>, <code>x</code> will be 1, <code>y</code> will be 2, and <code>z</code> will be
+the list <code>(3 4 5 6)</code>. Given the definition
+</p>
+
+<pre class="example">
+(define (g . w) ⟨body⟩)
+</pre>
+
+<p>
+the procedure g can be called with zero or more arguments. If we
+evaluate
+</p>
+
+<pre class="example">
+(g 1 2 3 4 5 6)
+</pre>
+
+<p>
+then in the body of g, w will be the list <code>(1 2 3 4 5 6)</code>.
+</p>
+
+<p>
+[
+fn: To define f and g using lambda we would write
+</p>
+<pre class="example">
+(define f (lambda (x y . z) ⟨body⟩))
+(define g (lambda w ⟨body⟩))
+</pre>
+<p>
+]
+</p>
+
+<p>
+Use this notation to write a procedure same-parity that takes one or
+more integers and returns a list of all the arguments that have the
+same even-odd parity as the first argument. For example,
+</p>
+
+<pre class="example">
+(same-parity 1 2 3 4 5 6 7)
+(1 3 5 7)
+
+(same-parity 2 3 4 5 6 7)
+(2 4 6)  
+</pre>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">iterative solution (three slightly different versions):</span>
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">same-parity1</span> i . rest)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">condition</span> i1 i2)
+    (= (remainder i1 2)
+       (remainder i2 2)))
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">same-party-inner</span> i l result)
+    (<span style="color: #b9ca4a;">if</span> (null? l)
+        result
+        (same-party-inner i
+                          (cdr l)
+                          (<span style="color: #b9ca4a;">if</span> (condition i (car l))
+                              (cons (car l) result)
+                              result))))
+  (cons i (reverse (same-party-inner i rest (list)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">same-parity2</span> i . rest)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">condition</span> i1 i2)
+    (= (remainder i1 2)
+       (remainder i2 2)))
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">same-party-inner</span> i l result)
+    (<span style="color: #b9ca4a;">if</span> (null? l)
+        result
+        (same-party-inner i
+                          (cdr l)
+                          (<span style="color: #b9ca4a;">if</span> (condition i (car l))
+                              (cons (car l) result)
+                              result))))
+  (reverse (same-party-inner i rest (list i))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">same-parity3</span> i . rest)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">condition</span> i1 i2)
+    (= (remainder i1 2)
+       (remainder i2 2)))
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">same-party-inner</span> i l result)
+    (<span style="color: #b9ca4a;">if</span> (null? l)
+        result
+        (same-party-inner i
+                          (cdr l)
+                          (<span style="color: #b9ca4a;">if</span> (condition i (car l))
+                              (append result (list (car l)))
+                              result))))
+  (same-party-inner i rest (list i)))
+
+(same-parity1 1 2 3 4 5 6 7) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(1 3 5 7)</span>
+(same-parity2 1 2 3 4 5 6 7) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(1 3 5 7)</span>
+(same-parity3 1 2 3 4 5 6 7) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(1 3 5 7)</span>
+
+</pre>
+</div>
+
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)</span></p>
+</div>
+</body>
+</html>
