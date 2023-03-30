@@ -88,10 +88,16 @@ hr {
 /*     margin: auto; */
 /* } */
 
+
+
 .left {
     flex: 40%;
     /* min-width:300px; */
     /* margin-top: 3%; */
+}
+
+.selfStudyItem .left {
+    max-width: 230px;
 }
 
 .right {
