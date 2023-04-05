@@ -1,0 +1,96 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP. Exercises 2.21 and 2.23
+#+subtitle: 2023-04-05 Wed
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)
+#+latex_header:
+
+Here are the solutions to exercises 2.21 and 2.23 which should have
+been included in the previous post (I'm skipping 2.22).
+
+* Exercise 2.21
+*Exercise*:
+#+begin_quote
+The procedure ~square-list~ takes a list of numbers as argument and
+returns a list of the squares of those numbers.
+
+#+begin_src scheme
+  (square-list (list 1 2 3 4))
+  (1 4 9 16)
+#+end_src
+
+Here are two different definitions of ~square-list~. Complete both of
+them by filling in the missing expressions:
+
+#+begin_src scheme
+  (define (square-list items) (if (null? items) nil (cons ⟨??⟩ ⟨??⟩)))
+
+  (define (square-list items) (map ⟨??⟩ ⟨??⟩))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (square-list items)
+    (if (null? items)
+        nil
+        (cons (square (car items))
+              (square-list (cdr items)))))
+
+  (define (square-list items)
+    (map square items))
+#+end_src
+
+* Exercise 2.23
+*Exercise*:
+
+#+begin_quote
+The procedure ~for-each~ is similar to ~map~. It takes as arguments a
+procedure and a list of elements. However, rather than forming a list
+of the results, ~for-each~ just applies the procedure to each of the
+elements in turn, from left to right. The values returned by applying
+the procedure to the elements are not used at all---~for-each~ is used
+with procedures that perform an action, such as printing. For example,
+
+#+begin_src scheme
+  (for-each (lambda (x) (newline) (display x)) (list 57 321 88))
+  57
+  321
+  88 
+#+end_src
+
+The value returned by the call to ~for-each~ (not illustrated above)
+can be something arbitrary, such as true. Give an implementation of
+~for-each~.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (for-each proc items)
+    (if (null? items)
+        true
+        (and (proc (car items))
+             (for-each proc (cdr items)))))
+#+end_src
+
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
