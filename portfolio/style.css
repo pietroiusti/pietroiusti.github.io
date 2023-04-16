@@ -79,6 +79,11 @@ hr {
     /* margin-bottom: 2px; */
 }
 
+.authors {
+    font-size: 12px;
+    padding-top: 10px;
+}
+
 .thumbnail {
     margin: auto;
     text-align: center;
