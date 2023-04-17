@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2023-03-29 Wed 23:28 -->
+<!-- 2023-04-17 Mon 23:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP. 2.2&#x2013;2.2.1</title>
@@ -198,12 +198,12 @@
 <div id="content" class="content">
 <h1 class="title">SICP. 2.2&#x2013;2.2.1
 <br />
-<span class="subtitle">2023-03-29 Wed</span>
+<span class="subtitle">2023-03-29 Wed (updated on 2023-04-17 Mon)</span>
 </h1>
 
-<div id="outline-container-orgab3d040" class="outline-2">
-<h2 id="orgab3d040">2.2 Hierarchical Data and the Closure Property</h2>
-<div class="outline-text-2" id="text-orgab3d040">
+<div id="outline-container-orgbb6abf2" class="outline-2">
+<h2 id="orgbb6abf2">2.2 Hierarchical Data and the Closure Property</h2>
+<div class="outline-text-2" id="text-orgbb6abf2">
 <p>
 <code>Cons</code> is used to ``glue`` two things together into a <i>pair</i>. This
 allows us to construct compound data.
@@ -253,15 +253,38 @@ of parts, which themselves are made up of parts, and so on. (p. 98)
 </p>
 </blockquote>
 </div>
-<div id="outline-container-org6a1d6cb" class="outline-3">
-<h3 id="org6a1d6cb">2.2.1 Representing Sequences</h3>
-<div class="outline-text-3" id="text-org6a1d6cb">
+<div id="outline-container-orgfe81aff" class="outline-3">
+<h3 id="orgfe81aff">2.2.1 Representing Sequences</h3>
+<div class="outline-text-3" id="text-orgfe81aff">
 <p>
-A sequence of pairs, formed by nested <code>conses</code>, like that above, is
-called <code>list</code>. Scheme provide the primitive <code>list</code> to create such
-sequences.
+A sequence is a structure; it is an ordered collection of data
+objects.
 </p>
 
+<p>
+We can build such a sequence in terms of pairs.There are many ways to
+build a sequence in terms of pairs.  One way to do it, a particularly
+straightforward one, is to represent a sequence as a what the authors
+call <i>list</i>. A list is defined as ``a chain pairs terminated by the
+end-of-the-list marker''.  More precisely: a list is a chain of one or
+more pairs, each of which is the <code>cdr</code> of the previous one, and the
+last one of which has <code>nil</code> as its <code>cdr</code>.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+</p>
+
+<p>
+Here is how we would represent the sequence 1,2,3,4 as a list:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(cons 1
+      (cons 2
+            (cons 3
+                  (cons 4 nil))))
+</pre>
+</div>
+
+<p>
+Scheme provide the primitive <code>list</code> to create such sequences.
+</p>
 <pre class="example">
 (list &lt;a_1&gt; &lt;a_2&gt; ... &lt;a_n&gt;)
 </pre>
@@ -293,7 +316,7 @@ Some typical list operations:
 <li><code>length</code>:
 <ul class="org-ul">
 <li><p>
-recursively: 
+recursive-process-evolving: 
 </p>
 <div class="org-src-container">
 <pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> items)
@@ -303,7 +326,7 @@ recursively:
 </pre>
 </div></li>
 <li><p>
-iteratively  
+iterative-process-evolving:
 </p>
 <div class="org-src-container">
 <pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> items)
@@ -331,7 +354,7 @@ iteratively
 <div class="org-src-container">
 <pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">append</span> list1 list2)
   (<span style="color: #b9ca4a;">if</span> (null? list1)
-      l2
+      list2
       (cons (car list1)
             (append (cdr list1) list2))))
 </pre>
@@ -394,9 +417,9 @@ that transform sequences to sequences.''
 </div>
 </div>
 
-<div id="outline-container-org63de05f" class="outline-3">
-<h3 id="org63de05f">Exercise 2.17</h3>
-<div class="outline-text-3" id="text-org63de05f">
+<div id="outline-container-org6a85df7" class="outline-3">
+<h3 id="org6a85df7">Exercise 2.17</h3>
+<div class="outline-text-3" id="text-org6a85df7">
 <p>
 <b>Exercise</b>:
 </p>
@@ -427,9 +450,9 @@ the last element of a given (nonempty) list:
 </div>
 </div>
 
-<div id="outline-container-org687b113" class="outline-3">
-<h3 id="org687b113">Exercise 2.18</h3>
-<div class="outline-text-3" id="text-org687b113">
+<div id="outline-container-orgcc4d5a0" class="outline-3">
+<h3 id="orgcc4d5a0">Exercise 2.18</h3>
+<div class="outline-text-3" id="text-orgcc4d5a0">
 <p>
 <b>Exercise</b>:
 </p>
@@ -478,9 +501,9 @@ recursive solution on the web and I've found this one:
 </div>
 </div>
 
-<div id="outline-container-org99a49ff" class="outline-4">
-<h4 id="org99a49ff">Exercise 2.20</h4>
-<div class="outline-text-4" id="text-org99a49ff">
+<div id="outline-container-orgf5cd81e" class="outline-4">
+<h4 id="orgf5cd81e">Exercise 2.20</h4>
+<div class="outline-text-4" id="text-orgf5cd81e">
 <p>
 <b>Exercise</b>:
 </p>
@@ -623,7 +646,19 @@ same even-odd parity as the first argument. For example,
 </div>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">The Racket documentation
+defines a list as ``a combination of pairs that creates a linked
+list. More precisely, a list is either the empty list null, or it is a
+pair whose first element is a list element and whose second element is
+a list.''</p></div></div>
+
+
 </div>
+</div></div>
 <div id="postamble" class="status">
 <p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)</span></p>
 </div>

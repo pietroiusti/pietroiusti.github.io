@@ -13,7 +13,7 @@
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
 #+title: SICP. 2.2--2.2.1
-#+subtitle: 2023-03-29 Wed
+#+subtitle: 2023-03-29 Wed (updated on 2023-04-17 Mon)
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)
 #+latex_header:
@@ -59,10 +59,30 @@ permits us to create /hierarchical structures/ --- structures made up
 of parts, which themselves are made up of parts, and so on. (p. 98)
 #+end_quote
 ** 2.2.1 Representing Sequences
-A sequence of pairs, formed by nested ~conses~, like that above, is
-called ~list~. Scheme provide the primitive ~list~ to create such
-sequences.
+A sequence is a structure; it is an ordered collection of data
+objects.
 
+We can build such a sequence in terms of pairs.There are many ways to
+build a sequence in terms of pairs.  One way to do it, a particularly
+straightforward one, is to represent a sequence as a what the authors
+call /list/. A list is defined as ``a chain pairs terminated by the
+end-of-the-list marker''.  More precisely: a list is a chain of one or
+more pairs, each of which is the ~cdr~ of the previous one, and the
+last one of which has ~nil~ as its ~cdr~.[fn::The Racket documentation
+defines a list as ``a combination of pairs that creates a linked
+list. More precisely, a list is either the empty list null, or it is a
+pair whose first element is a list element and whose second element is
+a list.'']
+
+Here is how we would represent the sequence 1,2,3,4 as a list:
+#+begin_src scheme
+  (cons 1
+	(cons 2
+	      (cons 3
+		    (cons 4 nil))))
+#+end_src
+
+Scheme provide the primitive ~list~ to create such sequences.
 #+begin_src
   (list <a_1> <a_2> ... <a_n>)
 #+end_src
@@ -83,14 +103,14 @@ a sequence with no elements, the ~empty list~.
 Some typical list operations:
 
 - ~length~:
-  - recursively: 
+  - recursive-process-evolving: 
     #+begin_src scheme
       (define (length items)
         (if (null? items)
             0
             (+ 1 (length (cdr items)))))
     #+end_src
-  - iteratively  
+  - iterative-process-evolving:
     #+begin_src scheme
       (define (length items)
         (define (length-iter a count)
@@ -110,7 +130,7 @@ Some typical list operations:
   #+begin_src scheme
     (define (append list1 list2)
       (if (null? list1)
-          l2
+          list2
           (cons (car list1)
                 (append (cdr list1) list2))))
   #+end_src
