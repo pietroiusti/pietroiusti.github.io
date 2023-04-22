@@ -1,0 +1,551 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP. 2.2
+#+subtitle: 2023-04-19 Wed
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)
+#+latex_header:
+
+* Hierarchical Data and the Closure Property
+
+Lists can be used to represents sequences whose elements may
+themselves be sequences.
+
+#+begin_src
+       Figure 2.5: Structure formed by `(cons (list 1 2) (list 3 4))'.
+
+                                                    (3 4)
+                                                      |
+                                                      V
+          ((1 2) 3 4)  +---+---+                  +---+---+     +---+---+
+                  ---->| * | *-+----------------->| * | *-+---->| * | / |
+                       +-|-+---+                  +-|-+---+     +-|-+---+
+                         |                          |             |
+                         V                          V             V
+                (1 2)  +---+---+     +---+---+    +---+         +---+
+                  ---->| * | *-+---->| * | / |    | 3 |         | 4 |
+                       +-|-+---+     +-|-+---+    +---+         +---+
+                         |             |
+                         V             V
+                       +---+         +---+
+                       | 1 |         | 2 |
+                       +---+         +---+
+#+end_src
+
+Sequences whose elements are sequences can be though of as /trees/.
+
+#+begin_src
+     Figure 2.6: The list structure in Figure 2-5 viewed as a tree.
+
+           ((1 2) 3 4)
+               /\\
+              /  | \
+          (1 2)  3 4
+           / \
+           1 2
+#+end_src
+
+#+begin_quote
+Recursion is a natural tool for dealing with tree structures, since we
+can often reduce operations on trees to operations on their branches,
+which reduce in turn to operations on the branches of the branches,
+and so on, until we reach the leaves of the tree. (p. 108)
+#+end_quote
+
+We can write a procedures that counts the number of leaves in tree,
+somewhat similarly to what we have done when writing ~length~ for
+counting the number of elements in a list...
+
+#+begin_src scheme
+  (define (count-leaves x)
+    (con ((null? x) 0)
+         ((not (pair? x)) 1)
+         (+ (count-leaves (car x))
+            (count-leaves (cdr x)))))
+#+end_src
+
+#+begin_quote
+Just as ~map~ is a powerful abstraction for dealing with sequences,
+~map~ together with recursion is a powerful abstraction for dealing
+with trees. (p. 112)
+#+end_quote
+
+The following function takes a tree whose leaves are numbers and
+returns it with each leaf multiplied by a factor:
+#+begin_src scheme
+  (define (scale-tree tree factor)
+    (cond ((null? tree) nil)
+          ((not (pair? tree)) (* tree factor))
+          (else (cons (scale-tree (car tree) factor)
+                      (scale-tree (cdr tree) factlr)))))
+#+end_src
+~scale-tree~ can be rewritten using map:
+#+begin_src scheme
+  (define (scale-tree tree factor)
+    (map (lambda (sub-tree)
+           (if (pair? subtree)
+               (scale-tree sub-tree factor)
+               (* sub-tree factor)))
+         tree))
+#+end_src
+
+* TODO Exercise 2.24
+*Exercise*:
+
+#+begin_quote
+Suppose we evaluate the expression ~(list 1 (list 2 (list 3
+4)))~. Give the result printed by the interpreter, the corresponding
+box-and-pointer structure, and the interpretation of this as a tree
+(as in Figure 2.6).
+#+end_quote
+
+*Answer*:
+
+* Exercise 2.25
+*Exercise*:
+
+
+#+begin_quote
+Give combinations of ~cars~ and ~cdrs~ that will pick 7 from each of
+the following lists:
+
+#+begin_src scheme
+  (1 3 (5 7) 9)
+  ((7))
+  (1 (2 (3 (4 (5 (6 7))))))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src emacs-lisp
+  (setq x '(1 3 (5 7) 9))
+  (car (cdr (car (cdr (cdr x))))) ;; => 7
+
+  (setq x '((7)))
+  (car (car x)) ;; => 7
+
+  (setq x '(1 (2 (3 (4 (5 (6 7)))))))
+  (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr x)))))))))))) ;; => 7
+#+end_src
+
+* Exercise 2.26
+*Exercise*:
+
+#+begin_quote
+Suppose we define x and y to be two lists:
+
+#+begin_src scheme
+  (define x (list 1 2 3))
+  (define y (list 4 5 6))
+#+end_src
+
+What result is printed by the interpreter in response to evaluating
+each of the following expressions:
+
+#+begin_src scheme
+  (append x y)
+  (cons x y)
+  (list x y)
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  ;; (append x y) => (1 2 3 4 5 6)
+  ;; (cons x y)   => ((1 2 3) 4 5 6)
+  ;; (list x y)   => ((1 2 3) (4 5 6))
+#+end_src
+
+* Exercise 2.27
+*Exercise*:
+#+begin_quote
+Modify your reverse procedure of Exercise 2.18 to produce a
+deep-reverse procedure that takes a list as argument and returns as
+its value the list with its elements reversed and with all sublists
+deep-reversed as well. For example,
+
+#+begin_src scheme
+  (define x
+    (list (list 1 2) (list 3 4)))
+
+  x
+  ((1 2) (3 4))
+
+  (reverse x)
+  ((3 4) (1 2))
+
+  (deep-reverse x)
+  ((4 3) (2 1))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+Modification of the iterative-process-evolving procedure previously provided:
+#+begin_src scheme
+  (define (deep-reverse x)
+    (define (iter x result)
+      (cond ((null? x) result)
+            ((not (pair? x)) x)
+            (else (iter (cdr x)
+                        (cons (iter (car x) nil) result))))) (iter x nil))
+#+end_src
+
+Modification of the recursive-process-evolving procedure previously
+provided:
+#+begin_src scheme
+  (define (deep-reverse t)
+    (cond ((null? t) nil)
+          ((pair? t) (append (list (deep-reverse (cdr t)))
+                             (list (deep-reverse (car t)))))
+          (else (list t))))
+#+end_src
+* Exercise 2.28
+*Exercise*:
+
+#+begin_quote
+Write a procedure ~fringe~ that takes as argument a tree (represented
+as a list) and returns a list whose elements are all the leaves of the
+tree arranged in left-to-right order. For example,
+
+#+begin_src scheme
+  (define x
+    (list (list 1 2) (list 3 4)))
+
+  (fringe x)
+  (1 2 3 4)
+
+  (fringe (list x x))
+  (1 2 3 4 1 2 3 4)
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (fringe t)
+    (cond ((null? t) nil)
+          ((pair? t) (append (fringe (car t))
+                             (fringe (cdr t))))
+          (else (list t))))
+#+end_src
+
+* Exercise 2.29
+*Exercise*:
+
+#+begin_quote
+A binary mobile consists of two branches, a left branch and a right
+branch. Each branch is a rod of a certain length, from which hangs
+either a weight or another binary mobile. We can represent a binary
+mobile using compound data by constructing it from two branches (for
+example, using ~list~):
+
+#+begin_src scheme
+  (define (make-mobile left right)
+    (list left right))
+#+end_src
+
+A branch is constructed from a ~length~ (which must be a number)
+together with a ~structure~, which may be either a number (representing
+a simple weight) or another mobile:
+
+#+begin_src scheme
+  (define (make-branch length structure)
+    (list length structure))
+#+end_src
+
+1. Write the corresponding selectors ~left-branch~ and ~right-branch~,
+   which return the branches of a mobile, and ~branch-length~ and
+   ~branch-structure~, which return the components of a branch.
+2. Using your selectors, define a procedure ~total-weight~ that returns
+   the total weight of a mobile.
+3. A mobile is said to be /balanced/ if the torque applied by its
+   top-left branch is equal to that applied by its top-right branch
+   (that is, if the length of the left rod multiplied by the weight
+   hanging from that rod is equal to the corresponding product for the
+   right side) and if each of the submobiles hanging off its branches
+   is balanced. Design a predicate that tests whether a binary mobile
+   is balanced.
+4. Suppose we change the representation of mobiles so that the
+   constructors are
+
+   #+begin_src scheme
+     (define (make-mobile left right)
+       (cons left right))
+
+     (define (make-branch length structure)
+       (cons length structure))
+   #+end_src
+
+   How much do you need to change your programs to convert to the new
+   representation?
+#+end_quote
+
+*Answer*:
+
+1:
+
+#+begin_src scheme
+  (define (make-mobile left right)
+    (list left right))
+
+  (define (make-branch length structure)
+    (list length structure))
+
+  (define (left-branch mobile)
+    (car mobile))
+
+  (define (right-branch mobile)
+    (car (cdr mobile)))
+
+  (define (branch-length branch)
+    (car branch))
+
+  (define (branch-structure branch)
+    (car (cdr branch)))
+
+#+end_src
+
+2:
+
+- The total weight of a mobile is the total weight of the left branch
+  plus the total weight of the left branch. (In this context,
+  something is a branch if its car is a pair.)
+
+- The total weight of branch whose branch structure is a mobile, is
+  the the total weight of the mobile. (We can check whether a the
+  branch structure of a mobile is a mobile by checking whether is a
+  pair).
+
+- The total weight of a branch whose branch structure is a weight, is
+  the the weight.
+
+With these three rules above we can write our function:
+#+begin_src scheme
+  (define (total-weight x)
+    (cond ((pair? (car x)) (+ (total-weight (left-branch x))
+                              (total-weight (right-branch x))))
+          ((pair? (branch-structure x)) (total-weight (branch-structure x)))
+          ((not (pair? (branch-structure x))) (branch-structure x))))
+#+end_src
+
+#+begin_src scheme
+  (make-mobile (make-branch 1 2) (make-branch 3 4)) ;; => ((1 2) (3 4))
+  (left-branch (make-mobile (make-branch 1 2) (make-branch 3 4))) ;; => (1 2)
+  (right-branch (make-mobile (make-branch 1 2) (make-branch 3 4))) ;; => (3 4)
+  (branch-structure (right-branch (make-mobile (make-branch 1 2) (make-branch 3 4)))) ;; => 4
+  (total-weight (make-mobile (make-branch 1 2) (make-branch 3 4))) ;; => 6
+  (total-weight (make-mobile (make-branch 1 2) (make-mobile (make-branch 1 2) (make-branch 3 4)))) ;; => 8
+  (total-weight (make-mobile (make-mobile (make-branch 1 2) (make-branch 3 4)) (make-mobile (make-branch 1 2) (make-branch 3 4)))) ;; => 12
+#+end_src
+
+3:
+
+#+begin_src scheme
+  (define (torque branch)
+    (* (branch-length branch)
+       (total-weight branch)))
+
+  (define (isBalanced mobile)
+    (cond ((not (pair? (branch-structure (right-branch mobile))))
+           (= (torque (left-branch mobile))
+              (torque (right-branch mobile))))
+          (else (and (= (torque (left-branch mobile))
+                        (torque (right-branch mobile)))
+                     (isBalanced (branch-structure (right-branch mobile)))))))
+
+  (isBalanced (make-mobile (make-branch 2 2) (make-branch 2 2))) ;; => #t
+  (isBalanced (make-mobile (make-branch 2 2) (make-branch 2 3))) ;; => #f
+
+  (isBalanced (make-mobile (make-branch 2 2)
+                           (make-branch 2 (make-mobile (make-branch 1 1)
+                                           (make-branch 1 1 ))))) ;; => #t
+  (isBalanced (make-mobile (make-branch 2 2)
+                           (make-branch 2 (make-mobile (make-branch 2 1)
+                                                       (make-branch 1 1 ))))) ;; => #f
+#+end_src
+
+4:
+
+If we changed the representation of mobiles so to have
+#+begin_src scheme
+  (define (make-mobile left right)
+    (cons left right))
+
+  (define (make-branch length structure)
+    (cons length structure))
+#+end_src
+then, we would only need to change the selectors ~right-branch~ and
+~branch-structure~:
+#+begin_src scheme
+  (define (right-branch mobile)
+    (cdr mobile))
+
+  (define (branch-structure branch)
+    (cdr branch))
+#+end_src
+
+Both ~left-branch~ and ~branch-length~ would still work, and neither
+~total-weight~ nor ~isBalanced~ depend on the details of how mobiles
+and branchs are constructed.
+
+* Exercise 2.30
+#+begin_quote
+Define a procedure ~square-tree~ analogous to the ~square-list~
+procedure of Exercise 2.21. That is, ~square-tree~ should behave as
+follows:
+
+#+begin_src scheme
+  (square-tree
+   (list 1
+         (list 2 (list 3 4) 5)
+         (list 6 7)))
+  (1 (4 (9 16) 25) (36 49))
+#+end_src
+
+Define square-tree both directly (i.e., without using any higher-order
+procedures) and also by using map and recursion.
+#+end_quote
+
+#+begin_src scheme
+  (define (square x) (* x x))
+
+  (define (square-tree tree)
+    (cond ((null? tree) nil)
+          ((not (pair? tree)) (square tree))
+          (else (cons (square-tree (car tree))
+                      (square-tree (cdr tree))))))
+
+  (define (square-tree tree)
+    (map (lambda (sub-tree)
+           (if (pair? sub-tree)
+               (square-tree sub-tree)
+               (square sub-tree)))
+         tree))
+#+end_src
+
+* Exercise 2.31
+*Exercise*:
+
+#+begin_quote
+Abstract your answer to Exercise 2.30 to produce a procedure tree-map
+with the property that square-tree could be defined as
+
+#+begin_src scheme
+  (define (square-tree tree)
+    (tree-map square tree))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+``Directly'':
+#+begin_src scheme
+  (define (tree-map proc tree)
+    (cond ((null? tree) nil)
+          ((not (pair? tree)) (proc tree))
+          (else (cons (tree-map proc (car tree))
+                      (tree-map proc (cdr tree))))))
+
+                      #+end_src
+
+Using map:
+#+begin_src scheme
+  (define (tree-map proc tree)
+    (map (lambda (sub-tree)
+           (if (pair? sub-tree)
+               (tree-map proc sub-tree)
+               (proc sub-tree)))
+         tree))
+#+end_src
+
+* Exercise 2.32
+*Exercise*:
+
+#+begin_quote
+We can represent a set as a list of distinct elements, and we can
+represent the set of all subsets of the set as a list of lists. For
+example, if the set is ~(1 2 3)~, then the set of all subsets is ~(() (3)
+(2) (2 3) (1) (1 3) (1 2) (1 2 3))~. Complete the following definition
+of a procedure that generates the set of subsets of a set and give a
+clear explanation of why it works:
+
+#+begin_src scheme
+  (define (subsets s)
+    (if (null? s)
+        (list nil)
+        (let ((rest (subsets (cdr s))))
+          (append rest (map ⟨??⟩ rest)))))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+The first guess was correct:
+#+begin_src scheme
+  (define (subsets s)
+    (if (null? s)
+        (list nil)
+        (let ((rest (subsets (cdr s))))
+          (append rest (map (lambda (x)
+                              (cons (car s) x))
+                            rest)))))
+#+end_src
+
+Let's have a look at the evolution of the process evolved by subsets
+(as a tree):
+#+begin_src
+                                           (subsets (list 1 2 3))
+                                                   |
+                                                 append
+                                      ____________/ \____________
+                                     /                           \
+                              (subsets '(2 3))                map consing 1
+                                    |                             |
+                                  append                  (subsets '(2 3))
+                       ____________/ \____________                |
+                      /                           \              ...
+              (subsets '(3))                 map consing 2
+       ____________/ \____________                |
+      /                           \         (subsets '(3))
+(subsets '())             map consing 3           |
+      |                           |              ...
+   '(nil)                  (subsets '())
+                                  |
+                               '(nil)
+#+end_src
+
+We can see that for each list with one element /a/, ~subsets~ will
+return, correctly, a list /l1/ whose members are the empty list and
+/a/:
+#+begin_src
+(a) => ( () (a) )
+#+end_src
+
+What if we add one element /b/ to the list with /a/? The right answer
+must be the list whose memembers are the members in /l1/ plus each
+member of /l1/ with /b/ in it:
+#+begin_src
+(a b) => ( () (a) (b) (a b))
+#+end_src
+This is exactly what ~subsets~ does: it returns the list (created by
+appending) all members of /l1/ and each each member of /l1/ with b in
+it (that is, the result of applying ~append~ to /l1/ and the map of
+/l1/ in which we cons ~b~ in each element of /l1/).
+
+What if we add one element /c/ to the list with /a/ and /b/?
+Analogously...
