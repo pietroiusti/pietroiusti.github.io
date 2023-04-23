@@ -12,8 +12,8 @@
 #+html_equation_reference_format: \eqref{%s}
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
-#+title: SICP. 2.2
-#+subtitle: 2023-04-19 Wed
+#+title: SICP. 2.2.2
+#+subtitle: 2023-04-23 Sun
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)
 #+latex_header:
@@ -76,32 +76,7 @@ counting the number of elements in a list...
             (count-leaves (cdr x)))))
 #+end_src
 
-#+begin_quote
-Just as ~map~ is a powerful abstraction for dealing with sequences,
-~map~ together with recursion is a powerful abstraction for dealing
-with trees. (p. 112)
-#+end_quote
-
-The following function takes a tree whose leaves are numbers and
-returns it with each leaf multiplied by a factor:
-#+begin_src scheme
-  (define (scale-tree tree factor)
-    (cond ((null? tree) nil)
-          ((not (pair? tree)) (* tree factor))
-          (else (cons (scale-tree (car tree) factor)
-                      (scale-tree (cdr tree) factlr)))))
-#+end_src
-~scale-tree~ can be rewritten using map:
-#+begin_src scheme
-  (define (scale-tree tree factor)
-    (map (lambda (sub-tree)
-           (if (pair? subtree)
-               (scale-tree sub-tree factor)
-               (* sub-tree factor)))
-         tree))
-#+end_src
-
-* TODO Exercise 2.24
+* Exercise 2.24
 *Exercise*:
 
 #+begin_quote
@@ -112,6 +87,36 @@ box-and-pointer structure, and the interpretation of this as a tree
 #+end_quote
 
 *Answer*:
+
+#+begin_src scheme
+  (list 1 (list 2 (list 3 4))) ;; => (1 (2 (3 4)))
+
+  ;; box-and-pointer structure:
+  ;;
+  ;;  ->[ | ]--->[ |/]
+  ;;     |        |
+  ;;     v        v
+  ;;     1       [ | ]--->[ |/]
+  ;;              |        |
+  ;;              v        v
+  ;;              2       [ | ]--->[ |/]
+  ;;                       |        |
+  ;;                       v        v
+  ;;                       3        4
+
+  ;; tree:
+  ;; 
+  ;;        .
+  ;;       / \
+  ;;      /   \
+  ;;     1     .
+  ;;          / \
+  ;;         /   \
+  ;;        2     .
+  ;;             / \
+  ;;            /   \
+  ;;           3     4
+#+end_src
 
 * Exercise 2.25
 *Exercise*:
@@ -403,7 +408,36 @@ Both ~left-branch~ and ~branch-length~ would still work, and neither
 ~total-weight~ nor ~isBalanced~ depend on the details of how mobiles
 and branchs are constructed.
 
+* Mapping over trees
+
+#+begin_quote
+Just as ~map~ is a powerful abstraction for dealing with sequences,
+~map~ together with recursion is a powerful abstraction for dealing
+with trees. (p. 112)
+#+end_quote
+
+The following function takes a tree whose leaves are numbers and
+returns it with each leaf multiplied by a factor:
+#+begin_src scheme
+  (define (scale-tree tree factor)
+    (cond ((null? tree) nil)
+          ((not (pair? tree)) (* tree factor))
+          (else (cons (scale-tree (car tree) factor)
+                      (scale-tree (cdr tree) factlr)))))
+#+end_src
+~scale-tree~ can be rewritten using ~map~:
+#+begin_src scheme
+  (define (scale-tree tree factor)
+    (map (lambda (sub-tree)
+           (if (pair? subtree)
+               (scale-tree sub-tree factor)
+               (* sub-tree factor)))
+         tree))
+#+end_src
+
 * Exercise 2.30
+*Exercise*:
+
 #+begin_quote
 Define a procedure ~square-tree~ analogous to the ~square-list~
 procedure of Exercise 2.21. That is, ~square-tree~ should behave as
@@ -420,6 +454,8 @@ follows:
 Define square-tree both directly (i.e., without using any higher-order
 procedures) and also by using map and recursion.
 #+end_quote
+
+*Answer*:
 
 #+begin_src scheme
   (define (square x) (* x x))
@@ -537,15 +573,21 @@ return, correctly, a list /l1/ whose members are the empty list and
 #+end_src
 
 What if we add one element /b/ to the list with /a/? The right answer
-must be the list whose memembers are the members in /l1/ plus each
+must be the list whose members are the members in /l1/ plus each
 member of /l1/ with /b/ in it:
 #+begin_src
 (a b) => ( () (a) (b) (a b))
 #+end_src
 This is exactly what ~subsets~ does: it returns the list (created by
-appending) all members of /l1/ and each each member of /l1/ with b in
+appending) of all members of /l1/ *and* each each member of /l1/ with b in
 it (that is, the result of applying ~append~ to /l1/ and the map of
 /l1/ in which we cons ~b~ in each element of /l1/).
 
 What if we add one element /c/ to the list with /a/ and /b/?
 Analogously...
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
