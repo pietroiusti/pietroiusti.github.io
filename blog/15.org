@@ -44,7 +44,7 @@ themselves be sequences.
                        +---+         +---+
 #+end_src
 
-Sequences whose elements are sequences can be though of as /trees/.
+Sequences whose elements are sequences can be thought of as /trees/.
 
 #+begin_src
      Figure 2.6: The list structure in Figure 2-5 viewed as a tree.
