@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-05-17 Wed 23:47 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP. 2.2.3</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP. 2.2.3
+<br />
+<span class="subtitle">2023-05-17 Wed</span>
+</h1>
+
+<div id="outline-container-org3cd1d07" class="outline-2">
+<h2 id="org3cd1d07">Sequences as Conventional Interfaces</h2>
+<div class="outline-text-2" id="text-org3cd1d07">
+<p>
+Data abstraction permits us to: i) design programs without dealing
+with details of data representation; ii) experiment with alternative
+representations. This section introduces another powerful design
+principle fro working with data structures: <i>conventional interfaces</i>.
+</p>
+
+<p>
+The authors presents two procedures that, on the surface, seem very
+difference. However, they notice, when looking at them more carefully,
+one can see great similarity. The first one computes the sum of the
+squares of the odd leaves of a tree. The second one constructs a list
+of all the even Fibonacci numbers up to <code>n</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sum-odd-squares</span> tree)
+  (<span style="color: #b9ca4a;">cond</span> ((null? tree) 0)
+        ((not (pair? tree))
+         (<span style="color: #b9ca4a;">if</span> (odd? tree) (square tree) 0))
+        (<span style="color: #b9ca4a;">else</span> (+ (sum-odd-squares
+                  (car tree))
+                 (sum-odd-squares
+                  (cdr tree))))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">even-fibs</span> n)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">next</span> k)
+    (<span style="color: #b9ca4a;">if</span> (&gt; k n)
+        nil
+        (<span style="color: #b9ca4a;">let</span> ((f (fib k)))
+          (<span style="color: #b9ca4a;">if</span> (even? f)
+              (cons f (next (+ k 1)))
+              (next (+ k 1))))))
+  (next 0))
+</pre>
+</div>
+
+<p>
+Although those two functions don't look very similar, at a certain
+level of abstraction, they are.
+</p>
+
+<p>
+The first procedure:
+</p>
+<ul class="org-ul">
+<li><b>enumerates</b> the leaves of a tree;</li>
+<li><b>filters</b> them, selecting the odd ones;</li>
+<li><b>squares</b> each of the selected ones; and</li>
+<li><b>accumulates</b> the result using +, starting with 0.</li>
+</ul>
+
+<p>
+The second procedure:
+</p>
+<ul class="org-ul">
+<li><b>enumerates</b> the integers from 0 to n;</li>
+<li><b>computes</b> the Fibonacci number for each integer;</li>
+<li><b>filters</b> them, selecting the even ones; and</li>
+<li><b>accumulates</b> the result using <code>cons</code>, starting with the empty list.</li>
+</ul>
+
+<p>
+These processes can be described in terms of ``signals flowing through
+a cascade of stages''.
+</p>
+
+<pre class="example">
+  +-------------+   +-------------+   +-------------+   +-------------+
+  | enumerate:  |--&gt;| filter:     |--&gt;| map:        |--&gt;| accumulate: |
+  | tree leaves |   | odd?        |   | square      |   | +, 0        |
+  +-------------+   +-------------+   +-------------+   +-------------+
+
+  +-------------+   +-------------+   +-------------+   +-------------+
+  | enumerate:  |--&gt;| map:        |--&gt;| filter:     |--&gt;| accumulate: |
+  | integers    |   | fib         |   | even?       |   | cons, ()    |
+  +-------------+   +-------------+   +-------------+   +-------------+
+
+(Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007))
+</pre>
+
+<p>
+However, our two procedures fail to exhbit the signal-flow structure
+just described. If they did show such a structure, then we would
+achieve greater conceptual clarity. The authors show how to do it.
+<code>Filter</code>, <code>accumulate</code>, (and <code>enumerate-tree</code> and <code>even-fibs</code>) are
+therefore introduced.
+</p>
+
+<blockquote>
+<p>
+The key to organizing programs so as to more clearly reflect the
+signal-flow structure is to concentrate on the “signals” that flow
+from one stage in the process to the next. If we represent these
+signals as lists, then we can use list operations to implement the
+processing at each of the stages (p. 115)
+</p>
+</blockquote>
+
+<blockquote>
+<p>
+The value of expressing programs as sequence operations is that this
+helps us make program designs that are modular, that is, designs that
+are constructed by combining relatively independent pieces. (p. 117)
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">filter</span> predicate sequence)
+  (<span style="color: #b9ca4a;">cond</span> ((null? sequence) nil)
+        ((predicate (car sequence))
+         (cons (car sequence)
+               (filter predicate 
+                       (cdr sequence))))
+        (<span style="color: #b9ca4a;">else</span>  (filter predicate 
+                       (cdr sequence)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate</span> op initial sequence)
+  (<span style="color: #b9ca4a;">if</span> (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op 
+                      initial 
+                      (cdr sequence)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">enumerate-interval</span> low high)
+  (<span style="color: #b9ca4a;">if</span> (&gt; low high)
+      nil
+      (cons low 
+            (enumerate-interval 
+             (+ low 1) 
+             high))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">enumerate-tree</span> tree)
+  (<span style="color: #b9ca4a;">cond</span> ((null? tree) nil)
+        ((not (pair? tree)) (list tree))
+        (<span style="color: #b9ca4a;">else</span> (append 
+               (enumerate-tree (car tree))
+               (enumerate-tree (cdr tree))))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sum-odd-squares</span> tree)
+  (accumulate 
+   +
+   0
+   (<span style="color: #b9ca4a;">map</span> square
+        (filter odd?
+                (enumerate-tree tree)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">list-fib-squares</span> n)
+  (accumulate 
+   cons
+   nil
+   (<span style="color: #b9ca4a;">map</span> square
+        (<span style="color: #b9ca4a;">map</span> fib
+             (enumerate-interval 0 n)))))
+
+(<span style="color: #b9ca4a;">define</span> 
+  (product-of-squares-of-odd-elements sequence)
+  (accumulate 
+   *
+   1
+   (<span style="color: #b9ca4a;">map</span> square (filter odd? sequence))))
+</pre>
+</div>
+
+<blockquote>
+<p>
+Modular construction is a powerful strategy for controlling complexity
+in engineering design. (p. 117)
+</p>
+</blockquote>
+
+<blockquote>
+<p>
+Sequences, implemented here as lists, serve as a conventional
+interface that permits us to combine processing modules. (p. 118)
+</p>
+</blockquote>
+
+<p>
+The authors then present <i>nested mappings</i> as an example of extending
+``the sequence paradigm to include many computation that are commonly
+expressed using nested loops''.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org715b054" class="outline-2">
+<h2 id="org715b054">Exercise 2.33</h2>
+<div class="outline-text-2" id="text-org715b054">
+<p>
+<b>Exercise</b>:
+</p>
+
+<p>
+Fill in the missing expressions to complete the following definitions
+of some basic list-manipulation operations as accumulations:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">map</span> p sequence)
+  (accumulate (<span style="color: #b9ca4a;">lambda</span> (x y) &#10216;??&#10217;) 
+              nil sequence))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">append</span> seq1 seq2)
+  (accumulate cons &#10216;??&#10217; &#10216;??&#10217;))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> sequence)
+  (accumulate &#10216;??&#10217; 0 sequence))
+</pre>
+</div>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+To warmup, here is how you can use accumulate to return the list
+itself:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">list-identity</span> sequence)
+  (accumulate (<span style="color: #b9ca4a;">lambda</span> (x y) (cons x y)) nil sequence))
+</pre>
+</div>
+
+<p>
+Given <code>list-identity</code>, it's easy to write <code>map</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">map</span> p sequence)
+  (accumulate (<span style="color: #b9ca4a;">lambda</span> (x y) (cons (p x) y)) nil sequence))
+</pre>
+</div>
+
+<p>
+Append:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">append</span> seq1 seq2)
+  (accumulate cons seq2 seq1))
+</pre>
+</div>
+
+<p>
+Length:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> sequence)
+  (accumulate (<span style="color: #b9ca4a;">lambda</span> (x y) (+ 1 y)) 0 sequence))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbc51a09" class="outline-2">
+<h2 id="orgbc51a09">Exercise 2.35</h2>
+<div class="outline-text-2" id="text-orgbc51a09">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Redefine count-leaves from 2.2.2 as an accumulation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">count-leaves</span> t)
+  (accumulate <span style="color: #7aa6da;">&lt;??&gt;</span>
+              <span style="color: #7aa6da;">&lt;??&gt;</span>
+              (<span style="color: #b9ca4a;">map</span> <span style="color: #7aa6da;">&lt;??&gt;</span> <span style="color: #7aa6da;">&lt;??&gt;</span>)))
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+The following solution uses <code>map</code> to <code>fringe</code> each member of <code>t</code> which
+is a pair, producing a list of atoms and one-level-lists; then it uses
+<code>accumulate</code> to sum each member treated as a 1 if it's an atom or as
+the length of itself if it's a list.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">map</span> proc items)
+  (<span style="color: #b9ca4a;">if</span> (null? items)
+      nil
+      (cons (proc (car items))
+            (<span style="color: #b9ca4a;">map</span> proc (cdr items)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate</span> op initial sequence)
+  (<span style="color: #b9ca4a;">if</span> (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op
+                      initial
+                      (cdr sequence)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">append</span> list1 list2)
+  (<span style="color: #b9ca4a;">if</span> (null? list1)
+      list2
+      (cons (car list1)
+            (append (cdr list1)
+                    list2))))
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">fringe</span> x)
+  (<span style="color: #b9ca4a;">cond</span> ((null? x) nil)
+        ((not (pair? x)) (list x))
+        (<span style="color: #b9ca4a;">else</span> (append (fringe (car x))
+                      (fringe (cdr x))))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">length</span> l)
+  (<span style="color: #b9ca4a;">if</span> (null? l)
+      0
+      (+ 1 (length (cdr l)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">gp-length</span> l)
+  (<span style="color: #b9ca4a;">if</span> (not (pair? l))
+      1
+      (length l)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">gp-count-leaves</span> t)
+  (accumulate (<span style="color: #b9ca4a;">lambda</span> (a b)
+                (+ (gp-length a)
+                   b))
+              0
+              (<span style="color: #b9ca4a;">map</span> fringe t)))
+
+(gp-count-leaves '(1 (2) (((3 4 5)) 4)))
+</pre>
+</div>
+
+<p>
+This above was my solution. I've been told another, better, solution:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">dean-count-leaves</span> t)
+  (accumulate +
+              0
+              (<span style="color: #b9ca4a;">map</span>
+               (<span style="color: #b9ca4a;">lambda</span> (x) (<span style="color: #b9ca4a;">if</span> (pair? x)
+                               (dean-count-leaves x)
+                               1)) t)))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8349bbe" class="outline-2">
+<h2 id="org8349bbe">Exercise 2.36</h2>
+<div class="outline-text-2" id="text-org8349bbe">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The procedure <code>accumulate-n</code> is similar to <code>accumulate</code> except that it
+takes as its third argument a sequence of sequences, which are all
+assumed to have the same number of elements. It applies the designated
+accumulation procedure to combine all the first elements of the
+sequences, all the second elements of the sequences, and so on, and
+returns a sequence of the results. For instance, if s is a sequence
+containing four sequences, <code>((1 2 3) (4 5 6) (7 8 9) (10 11 12))</code>,
+then the value of <code>(accumulate-n + 0 s)</code> should be the sequence <code>(22
+26 30)</code>. Fill in the missing expressions in the following definition
+of <code>accumulate-n</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate-n</span> op init seqs)
+  (<span style="color: #b9ca4a;">if</span> (null? (car seqs))
+      nil
+      (cons (accumulate op init &#10216;??&#10217;)
+            (accumulate-n op init &#10216;??&#10217;))))
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate-n</span> op init seqs)
+  (<span style="color: #b9ca4a;">if</span> (null? (car seqs))
+      nil
+      (cons (accumulate op init (<span style="color: #b9ca4a;">map</span> car seqs))
+            (accumulate-n op init (<span style="color: #b9ca4a;">map</span> cdr seqs)))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org190578d" class="outline-2">
+<h2 id="org190578d">Exercise 2.38</h2>
+<div class="outline-text-2" id="text-org190578d">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The accumulate procedure is also known as <code>fold-right</code>, because it
+combines the first element of the sequence with the result of
+combining all the elements to the right. There is also a <code>fold-left</code>,
+which is similar to <code>fold-right</code>, except that it combines elements
+working in the opposite direction:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">fold-left</span> op initial sequence)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">iter</span> result rest)
+    (<span style="color: #b9ca4a;">if</span> (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+</pre>
+</div>
+
+<p>
+What are the values of
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(fold-right / 1 (list 1 2 3))
+(fold-left  / 1 (list 1 2 3))
+(fold-right list nil (list 1 2 3))
+(fold-left  list nil (list 1 2 3))
+</pre>
+</div>
+
+<p>
+Give a property that op should satisfy to guarantee that <code>fold-right</code>
+and <code>fold-left</code> will produce the same values for any sequence.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">fold-right</span> op initial sequence)
+  (<span style="color: #b9ca4a;">if</span> (null? sequence)
+      initial
+      (op (car sequence)
+          (fold-right op initial (cdr sequence)))))
+
+(fold-right / 1 (list 1 2 3))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(/ 1 (/ 2 (/ 3 1)))</span>
+
+(fold-right list nil (list 1 2 3))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(list 1 (list 2 (list 3 nil)))</span>
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">fold-left</span> op initial sequence)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">iter</span> result rest)
+    (<span style="color: #b9ca4a;">if</span> (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+
+(fold-left / 1 (list 1 2 3))
+(/ (/ (/ 1 1) 2) 3)
+
+(fold-left list nil (list 1 2 3))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(list (list (list nil 1) 2) 3)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org25b9a3b" class="outline-2">
+<h2 id="org25b9a3b">Exercise 2.39</h2>
+<div class="outline-text-2" id="text-org25b9a3b">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Complete the following definitions of <code>reverse</code> (Exercise 2.18) in
+terms of <code>fold-right</code> and <code>fold-left</code> from Exercise 2.38:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">reverse</span> sequence)
+  (fold-right 
+   (<span style="color: #b9ca4a;">lambda</span> (x y) &#10216;??&#10217;) nil sequence))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">reverse</span> sequence)
+  (fold-left 
+   (<span style="color: #b9ca4a;">lambda</span> (x y) &#10216;??&#10217;) nil sequence))
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">reverse</span> seq)
+  (fold-right (<span style="color: #b9ca4a;">lambda</span> (x y) (append y (list x)))
+              nil
+              seq))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">reverse</span> seq)
+  (fold-left (<span style="color: #b9ca4a;">lambda</span> (x y) (append (list y) x))
+             nil
+             seq))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org281982e" class="outline-2">
+<h2 id="org281982e">Exercise 2.40</h2>
+<div class="outline-text-2" id="text-org281982e">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define a procedure <code>unique-pairs</code> that, given an integer <code>n</code>,
+generates the sequence of pairs <code>(i,j)</code> with \(1 \leq j < i \leq
+n\). Use <code>unique-pairs</code> to simplify the definition of <code>prime-sum-pairs</code>
+given above.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">unique-pairs</span> n)
+  (flatmap
+   (<span style="color: #b9ca4a;">lambda</span> (i)
+     (<span style="color: #b9ca4a;">map</span> (<span style="color: #b9ca4a;">lambda</span> (j)
+            (list i j))
+          (enumerate-interval
+           1
+           (- i 1))))
+   (enumerate-interval 1 n)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">prime-sum-pairs</span> n)
+  (<span style="color: #b9ca4a;">map</span> make-pair-sum
+       (filter
+        prime-sum?
+        (unique-pairs n))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgabcca3d" class="outline-2">
+<h2 id="orgabcca3d">Exercise 2.41</h2>
+<div class="outline-text-2" id="text-orgabcca3d">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Write a procedure to find all ordered triples of distinct positive
+integers <i>i</i>, <i>j</i>, and <i>k</i> less than or equal to a given integer <i>n</i>
+that sum to a given integer <i>s</i>.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li>We can:
+<ul class="org-ul">
+<li>enumerate all ordered triples (see below how);</li>
+<li>filter them;</li>
+</ul></li>
+
+<li>In order to enumerate all triples:
+<ul class="org-ul">
+<li>for each element <i>e</i>, enumerate all the possible pairs from 1 to
+<i>n</i> without using <i>e</i>, and then adjoin <i>e</i> to the front of each
+pair.</li>
+</ul></li>
+
+<li>In order to enumerate all possible pairs from 1 to <i>n</i>:
+<ul class="org-ul">
+<li>for each element <i>e</i> of the range from 1 to <i>n</i>, enumerate all
+other elements of the range, and for each of those other elements
+create the list <code>(e other-element)</code>.</li>
+</ul></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate</span> op initial seq)
+  (<span style="color: #b9ca4a;">if</span> (null? seq)
+      initial
+      (op (car seq)
+          (accumulate op initial (cdr seq)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">filter</span> predicate seq)
+  (<span style="color: #b9ca4a;">cond</span> ((null? seq) nil)
+        ((predicate (car seq))
+         (cons (car seq) (filter predicate (cdr seq))))
+        (<span style="color: #b9ca4a;">else</span> (filter predicate (cdr seq)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">enumerate-interval</span> low high)
+  (<span style="color: #b9ca4a;">if</span> (&gt; low high)
+      nil
+      (cons low
+            (enumerate-interval
+             (+ low 1)
+             high))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">enumerate-interval-except</span> low high not-allowed)
+  (filter (<span style="color: #b9ca4a;">lambda</span> (x) (not (= x not-allowed)))
+          (enumerate-interval low high)))
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">create a list of all possible pairs given a sequence</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">all-pairs</span> seq)
+  (accumulate
+   append
+   nil
+   (<span style="color: #b9ca4a;">map</span> (<span style="color: #b9ca4a;">lambda</span> (x)
+          (<span style="color: #b9ca4a;">map</span> (<span style="color: #b9ca4a;">lambda</span> (y)
+                 (cons x (list y)))
+               (filter (<span style="color: #b9ca4a;">lambda</span> (e) (not (= e x))) seq)))
+        seq)))
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">all triples from 1 to n</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">all-triples</span> n)
+  (accumulate
+   append
+   nil
+   (<span style="color: #b9ca4a;">map</span> (<span style="color: #b9ca4a;">lambda</span> (x)
+          (<span style="color: #b9ca4a;">map</span> (<span style="color: #b9ca4a;">lambda</span> (y) (cons x y))
+               (all-pairs (enumerate-interval-except 1 n x))))
+        (enumerate-interval 1 n))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">all-triples-sum</span> n sum)
+  (filter (<span style="color: #b9ca4a;">lambda</span> (x)
+            (= (+ (car x)
+                  (car (cdr x))
+                  (car (cdr (cdr x))))
+               sum))
+          (all-triples n)))
+
+(all-triples-sum 56 8)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; ((1 2 5) (1 3 4) (1 4 3) (1 5 2) (2 1 5) (2 5 1) (3 1 4) (3 4 1) (4 1 3) (4 3 1) (5 1 2) (5 2 1))</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2e6acfe" class="outline-2">
+<h2 id="org2e6acfe">Exercise 2.42</h2>
+<div class="outline-text-2" id="text-org2e6acfe">
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">filter</span> pred seq)
+  (<span style="color: #b9ca4a;">cond</span> ((null? seq) nil)
+        ((pred (car seq)) (cons (car seq) (filter pred (cdr seq))))
+        (<span style="color: #b9ca4a;">else</span> (filter pred (cdr seq)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">accumulate</span> op initial seq)
+  (<span style="color: #b9ca4a;">if</span> (null? seq)
+      initial
+      (op (car seq)
+          (accumulate op initial (cdr seq)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">flatmap</span> op seq)
+  (accumulate append nil (<span style="color: #b9ca4a;">map</span> op seq)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">enumerate-interval</span> low high)
+  (<span style="color: #b9ca4a;">if</span> (&gt; low high)
+      nil
+      (cons low (enumerate-interval (+ low 1) high))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">safe?</span> k poss)
+  (<span style="color: #b9ca4a;">let</span> ((queen (car (filter
+                     (<span style="color: #b9ca4a;">lambda</span> (q)
+                       (= (car (cdr q)) k))
+                     poss))))
+    (<span style="color: #b9ca4a;">if</span> (&gt; (length
+            (filter
+             (<span style="color: #b9ca4a;">lambda</span> (p)
+               (<span style="color: #b9ca4a;">or</span> (= (car queen)
+                      (car p))
+                   (= (- (car p) (car queen))
+                      (- (car (cdr p)) (car (cdr queen))))
+                   (= (- (car p) (car queen))
+                      (- (car (cdr queen)) (car (cdr p))))))
+             poss))
+           1)
+        #f
+        #t)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">adjoin-position</span> nr k rq)
+  (cons (list nr k) rq))
+
+(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">empty-board</span> nil)
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">queens</span> board-size)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">queen-cols</span> k)
+    (<span style="color: #b9ca4a;">if</span> (= k 0)
+        (list empty-board)
+        (filter
+         (<span style="color: #b9ca4a;">lambda</span> (positions) (safe? k positions))
+         (flatmap
+          (<span style="color: #b9ca4a;">lambda</span> (rest-of-queens)
+            (<span style="color: #b9ca4a;">map</span> (<span style="color: #b9ca4a;">lambda</span> (new-row)
+                   (adjoin-position new-row k rest-of-queens))
+                 (enumerate-interval 1 board-size)))
+          (queen-cols (- k 1))))))
+  (queen-cols board-size))
+</pre>
+</div>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.5.5)</span></p>
+</div>
+</body>
+</html>
