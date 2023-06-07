@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-06-07 Wed 22:46 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP. 2.2.4</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP. 2.2.4
+<br />
+<span class="subtitle">2023-06-07 Wed</span>
+</h1>
+
+<div id="outline-container-org937b1e1" class="outline-2">
+<h2 id="org937b1e1">Exercise 2.44</h2>
+<div class="outline-text-2" id="text-org937b1e1">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define the procedure <code>up-split</code> used by <code>corner-split</code>. It is similar
+to <code>right-split</code>, except that it switches the roles of below and
+beside.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">up-split</span> painter n)
+  (<span style="color: #b9ca4a;">if</span> (= n 0)
+      painter
+      (<span style="color: #b9ca4a;">let</span> ((smaller (right-split painter (- n 1))))
+        (below painter (beside smaller smaller)))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org08708c0" class="outline-2">
+<h2 id="org08708c0">Exercise 2.45</h2>
+<div class="outline-text-2" id="text-org08708c0">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+<code>Right-split</code> and <code>up-split</code> can be expressed as instances of a
+general splitting operation. Define a procedure <code>split</code> with the
+property that evaluating
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">right-split</span> (split beside below))
+(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">up-split</span> (split below beside))
+</pre>
+</div>
+
+<p>
+produces procedures <code>right-split</code> and <code>up-split</code> with the same
+behaviors as the ones already defined.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">split</span> p1 p2)
+  (<span style="color: #b9ca4a;">lambda</span> (painter n)
+    (<span style="color: #b9ca4a;">if</span> (= n 0)
+        painter
+        (<span style="color: #b9ca4a;">let</span> ((smaller ((split p1 p2) painter
+                        (- n 1))))
+          (p1 painter
+              (p2 smaller smaller))))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf567e88" class="outline-2">
+<h2 id="orgf567e88">Exercise 2.46</h2>
+<div class="outline-text-2" id="text-orgf567e88">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+A two-dimensional vector <b>v</b> running from the origin to a point can be
+represented as a pair consisting of an <i>x</i>-coordinate and a
+<i>y</i>-coordinate. Implement a data abstraction for vectors by giving a
+constructor <code>make-vect</code> and corresponding selectors <code>xcor-vect</code> and
+<code>ycor-vect</code>. In terms of your selectors and constructor, implement
+procedures <code>add-vect</code>, <code>sub-vect</code>, and <code>scale-vect</code> that perform the
+operations vector addition, vector subtraction, and multiplying a
+vector by a scalar:
+</p>
+
+<p>
+\((x_1, y_1) + (x_2, y_2) = (x_1 + x_2, y_1 + y_2)\),
+</p>
+
+<p>
+\((x_1, y_1) - (x_2, y_2) = (x_1 - x_2, y_1 - y_2)\),
+</p>
+
+<p>
+\(s \cdot (x, y) = (sx, sy)\).
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-vect</span> xcor ycor)
+  (cons xcor ycor))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">alternatively:</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(define make-vect cons)</span>
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">xcor-vect</span> vect)
+  (car vect))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">alternatively:</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(define xcor-vect car)</span>
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">ycor-vect</span> vect)
+  (cdr vect))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">alternatively</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(define ycor-vect cdr)</span>
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">add-vect</span> v1 v2)
+  (make-vect (+ (xcor-vect v1) (xcor-vect v2))
+             (+ (ycor-vect v1) (ycor-vect v1))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">sub-vect</span> v1 v2)
+  (make-vect (- (xcor-vect v1) (xcor-vect v2))
+             (- (ycor-vect v1) (ycor-vect v2))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">scale-vect</span> vect s)
+  (make-vect (* (xcor-vect vect) s)
+             (* (ycor-vect vect) s)))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5f82c7d" class="outline-2">
+<h2 id="org5f82c7d">Exercise 2.47</h2>
+<div class="outline-text-2" id="text-org5f82c7d">
+<p>
+<b>Exercise</b>: 
+</p>
+
+<blockquote>
+<p>
+Here are two possible constructors for frames:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-frame</span> origin edge1 edge2)
+  (list origin edge1 edge2))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-frame</span> origin edge1 edge2)
+  (cons origin (cons edge1 edge2)))
+</pre>
+</div>
+
+<p>
+For each constructor supply the appropriate selectors to produce an implementation for frames.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-frame</span> origin edge1 edge2)
+  (list origin edge1 edge2))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">origin-frame</span> frame)
+  (car frame))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">edge1-frame</span> frame)
+  (car (cdr frame)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">edge2-frame</span> frame)
+  (car (cdr (cdr frame))))
+</pre>
+</div>
+
+<p>
+Alternatively:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-frame</span> origin edge1 edge2)
+  (cons origin (cons edge1 edge2)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">origin-frame</span> frame)
+  (car frame))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">edge1-frame</span> frame)
+  (car (cdr frame)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">edge2-frame</span> frame)
+  (cdr (cdr frame)))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf753f58" class="outline-2">
+<h2 id="orgf753f58">Exercise 2.48</h2>
+<div class="outline-text-2" id="text-orgf753f58">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+A directed line segment in the plane can be represented as a pair of
+vectors—the vector running from the origin to the start-point of the
+segment, and the vector running from the origin to the end-point of
+the segment. Use your vector representation from Exercise 2.46 to
+define a representation for segments with a constructor <code>make-segment</code>
+and selectors <code>start-segment</code> and <code>end-segment</code>.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-segment</span> vector1 vector2)
+  (cons vector1 vector2))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">start-segment</span> segment)
+  (car segment))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">end-segment</span> segment)
+  (cdr segment))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org71ad5a9" class="outline-2">
+<h2 id="org71ad5a9">Exercise 2.49</h2>
+<div class="outline-text-2" id="text-org71ad5a9">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Use <code>segments-&gt;painter</code> to define the following primitive painters:
+</p>
+
+<ol class="org-ol">
+<li>The painter that draws the outline of the designated frame.</li>
+<li>The painter that draws an “X” by connecting opposite corners of the
+frame.</li>
+<li>The painter that draws a diamond shape by connecting the midpoints
+of the sides of the frame.</li>
+<li>The wave painter.</li>
+</ol>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Painter that draws the outline of the frame</span>
+(segments-&gt;painter
+ (list
+  (make-segment (make-vect 0 0)
+                (make-vect 0 1))
+  (make-segment (make-vect 0 1)
+                (make-vect 1 1))
+  (make-segment (make-vect 1 1)
+                (make-vect 1 0))
+  (make-segment (make-vect 1 0)
+                (make-vect 0 0))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Painter that draws an ``X''</span>
+(segments-&gt;painter
+ (list
+  (make-segment (make-vect 0 0)
+                (make-vect 1 1))
+  (make-segment (make-vect 1 0)
+                (make-vect 0 1))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Painter that draws a diamond</span>
+(segments-&gt;painter
+      (list
+       (make-segment (make-vect 0.5 0)
+                     (make-vect 0 0.5))
+       (make-segment (make-vect 0 0.5)
+                     (make-vect 0.5 1))
+       (make-segment (make-vect 0.5 1)
+                     (make-vect 1 0.5))
+       (make-segment (make-vect 1 0.5)
+                     (make-vect 0.5 0))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org923137d" class="outline-2">
+<h2 id="org923137d">Exercise 2.50</h2>
+<div class="outline-text-2" id="text-org923137d">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define the transformation <code>flip-horiz</code>, which flips painters
+horizontally, and transformations that rotate painters
+counterclockwise by 180 degrees and 270 degrees.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">flip-horiz</span> painter)
+  (transform-painter
+   painter
+   (make-vect 1.0 0.0)
+   (make-vect 0.0 0.0)
+   (make-vect 1.0 1.0)))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">rotate-cc-180</span> painter)
+  (transform-painter
+   painter
+   (make-vect 1.0 1.0)
+   (make-vect 0.0 1.0)
+   (make-vect 1.0 0.0)))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">rotate-cc-270</span> painter)
+  (transform-painter
+   painter
+   (make-vect 0.0 1.0)
+   (make-vect 0.0 0.0)
+   (make-vect 1.0 1.0)))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1166251" class="outline-2">
+<h2 id="org1166251">Exercise 2.51</h2>
+<div class="outline-text-2" id="text-org1166251">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define the <code>below</code> operation for painters. <code>Below</code> takes two painters
+as arguments. The resulting painter, given a frame, draws with the
+first painter in the bottom of the frame and with the second painter
+in the top. Define <code>below</code> in two different ways—first by writing a
+procedure that is analogous to the <code>beside</code> procedure given above, and
+again in terms of <code>beside</code> and suitable rotation operations (from
+Exercise 2.50).
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">below2</span> p1 p2)
+  (<span style="color: #b9ca4a;">let</span> ((paint-below (transform-painter
+                      p1
+                      (make-vect 0.0 0.0)
+                      (make-vect 1.0 0.0)
+                      (make-vect 0.0 0.5)))
+        (paint-above (transform-painter
+                      p2
+                      (make-vect 0.0 0.5)
+                      (make-vect 1.0 0.5)
+                      (make-vect 0.0 1.0))))
+    (<span style="color: #b9ca4a;">lambda</span> (frame)
+      (paint-below frame)
+      (paint-above frame))))
+
+(paint (below2 einstein einstein))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">rotate-counterclock-90</span> painter)
+  (transform-painter
+   painter
+   (make-vect 1.0 0.0)
+   (make-vect 1.0 1.0)
+   (make-vect 0.0 0.0)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">rotate-clock-90</span> painter)
+  (transform-painter
+   painter
+   (make-vect 0.0 1.0)
+   (make-vect 0.0 0.0)
+   (make-vect 1.0 1.0)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">below3</span> p1 p2)
+  (rotate-clock-90 (beside (rotate-counterclock-90 p1)
+                           (rotate-counterclock-90 p2))))
+
+(paint (below3 einstein einstein))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgec5a791" class="outline-2">
+<h2 id="orgec5a791">Exercise 2.52</h2>
+<div class="outline-text-2" id="text-orgec5a791">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Make changes to the square limit of <code>wave</code> shown in Figure 2.9 by
+working at each of the levels described above. In particular:
+</p>
+
+<ol class="org-ol">
+<li>Add some segments to the primitive <code>wave</code> painter of Exercise 2.49
+(to add a smile, for example).</li>
+<li>Change the pattern constructed by <code>corner-split</code> (for example, by
+using only one copy of the <code>up-split</code> and <code>right-split</code> images
+instead of two).</li>
+<li>Modify the version of <code>square-limit</code> that uses <code>square-of-four</code> so
+as to assemble the corners in a different pattern. (For example,
+you might make the big Mr. Rogers look outward from each corner of
+the square.)</li>
+</ol>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Change at the level of wave: replace wave with the einstein painter</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">available in Racket's SICP picture language.</span>
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Change at the level of corner split: swap right-split and up-split:</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">corner-split</span> painter n)
+  (<span style="color: #b9ca4a;">if</span> (= n 0)
+      painter
+      (<span style="color: #b9ca4a;">let</span> ((up (right-split painter (- n 1)))
+            (right (up-split painter 
+                             (- n 1))))
+        (<span style="color: #b9ca4a;">let</span> ((top-left (beside up up))
+              (bottom-right (below right 
+                                   right))
+              (corner (corner-split painter 
+                                    (- n 1))))
+          (beside (below painter top-left)
+                  (below bottom-right 
+                         corner))))))
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Change at the level of square-limit: replace flip-vert with</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">flip-horiz:</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">square-limit</span> painter n)
+  (<span style="color: #b9ca4a;">let</span> ((quarter (corner-split painter n)))
+    (<span style="color: #b9ca4a;">let</span> ((half (beside (flip-horiz quarter)
+                        quarter)))
+      (below (flip-horiz half) half))))
+
+(paint (square-limit einstein 3))
+</pre>
+</div>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.91 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</span></p>
+</div>
+</body>
+</html>
