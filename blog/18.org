@@ -1,0 +1,213 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 2.3.3 Example: Representing Sets
+#+subtitle: 2023-07-03 Mon
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.91 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+#+latex_header:
+
+``Informally, a set is simply a collection of distinct objects''.
+Sets can be defined more precisely by employing the method of data
+abstraction, that is, by specifying the operations that can be used on
+them: ~union-set~, ~intersection-set~, ~element-of-set?~ and
+~adjoin-set~.
+
+* Sets as unordered lists
+``One way to represent a set is a list of its elements in which no
+element appears more than once''.
+
+#+begin_src scheme
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((equal? x (car set)) true)
+          (else (element-of-set? x (cdr set)))))
+#+end_src
+
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (if (element-of-set? x set)
+        set
+        (cons x set)))
+#+end_src
+
+#+begin_src scheme
+  (define (intersection-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) 
+           '())
+          ((element-of-set? (car set1) set2)
+           (cons (car set1)
+                 (intersection-set (cdr set1) 
+                                   set2)))
+          (else (intersection-set (cdr set1) 
+                                  set2))))
+#+end_src
+
+The number of steps required by ~element-of-set~ grows as
+$\Theta(n)$. The number of steps required by ~adjoin-set~ too. The
+number of steps required by ~intersection-set~ grows as $\Theta(n^2)$.
+
+** Exercise 2.59
+*Exercise*:
+
+#+begin_quote
+Implement the ~union-set~ operation for the unordered-list
+representation of sets.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (union-set s1 s2)
+    (cond ((null? s1) s2)
+          ((null? s2) s1)
+          ((element-of-set? (car s1) s2)
+           (union-set (cdr s1) s2))
+          (else (cons (car s1)
+                      (union-set (cdr s1) s2)))))
+#+end_src
+
+** Exercise 2.60
+*Exercise*:
+
+#+begin_quote
+We specified that a set would be represented as a list with no
+duplicates. Now suppose we allow duplicates. For instance, the set
+${1,2,3}$ could be represented as the list ~(2 3 2 1 3 2 2)~. Design
+procedures ~element-of-set?~, ~adjoin-set~, ~union-set~, and
+~intersection-set~ that operate on this representation. How does the
+efficiency of each compare with the corresponding procedure for the
+non-duplicate representation? Are there applications for which you
+would use this representation in preference to the non-duplicate one?
+#+end_quote
+
+*Answer*:
+
+I wouldn't change neither ~element-of-set?~ nor ~intersection-set~. So
+their complexity remains the same; respectively, linear and
+exponential.
+
+This is the way I would write ~adjoin-set~:
+
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (cons x set))
+#+end_src
+
+Its complexity is constant. We just have to do one operation,
+regardless of the size of the set.
+
+This is the way I would write ~union-set~:
+
+#+begin_src scheme
+  (define (union-set s1 s2)
+    (if ((null? s1) s2)
+        (else (cons (car s1)
+                    (union-set (cdr s1) s2)))))
+#+end_src
+
+Its complexity is linear. We have to go through each element of one of
+the two lists.
+* Sets as ordered lists
+Representing sets with ordered sequences allows use to speed up our
+operations. For example, ~element-of-set?~ does not necessarily have
+to scan the entire set anymore:
+
+#+begin_src scheme
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((= x (car set)) true)
+          ((< x (car set)) false)
+          (else (element-of-set? x (cdr set)))))
+#+end_src
+
+The average number of step is about $n/2$ (which is still $\Theta(n)
+growth).
+
+The authors present a ``more impressive speedup with
+~intersection-set~''.
+
+#+begin_src scheme
+  (define (intersection-set set1 set2)
+    (if (or (null? set1) (null? set2))
+        '()
+        (let ((x1 (car set1)) (x2 (car set2)))
+          (cond ((= x1 x2)
+                 (cons x1 (intersection-set 
+                           (cdr set1)
+                           (cdr set2))))
+                ((< x1 x2) (intersection-set 
+                            (cdr set1) 
+                            set2))
+                ((< x2 x1) (intersection-set 
+                            set1 
+                            (cdr set2)))))))
+#+end_src
+
+This ~intersection-set~ grows linearly.
+** Exercise 2.61
+*Exercise*":
+
+#+begin_quote
+Give an implementation of ~adjoin-set~ using the ordered
+representation. By analogy with ~element-of-set?~ show how to take
+advantage of the ordering to produce a procedure that requires on the
+average about half as many steps as with the unordered representation.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (cond ((null? set) (cons x set))
+          ((= x (car set)) set)
+          ((< x (car set)) (cons x set))
+          (else (cons (car set)
+                      (adjoin-set x (cdr set))))))
+#+end_src
+
+** Exercise 2.62
+*Exercise*":
+
+#+begin_quote
+Give a $\Theta(n)$ implementation of union-set for sets represented as
+ordered lists.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (union-set s1 s2)
+    (cond ((null? s1) s2)
+          ((null? s2) s1)
+          ((= (car s1) (car s2)) (cons (car s1)
+                                       (union-set (cdr s1)
+                                                  (cdr s2))))
+          ((< (car s1) (car s2)) (cons (car s1)
+                                       (union-set (cdr s1)
+                                                  s2)))
+          ((< (car s2) (car s1)) (cons (car s2)
+                                       (union-set s1
+                                                  (cdr s2))))))
+#+end_src
+
+* Sets as binary trees
+
+* Sets and information retrieval
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
