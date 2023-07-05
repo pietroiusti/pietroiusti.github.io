@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2023-07-04 Tue 22:19 -->
+<!-- 2023-07-05 Wed 23:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SICP 2.3.3 Example: Representing Sets</title>
+<title>SICP 2.3.1 Quotation</title>
 <meta name="generator" content="Org Mode" />
 <style>
   #content { max-width: 60em; margin: auto; }
@@ -193,109 +193,72 @@
   .org-svg { }
 </style>
 <link rel="stylesheet" type="text/css" href="./style.css"/>
-<script>
-  window.MathJax = {
-    tex: {
-      ams: {
-        multlineWidth: '85%'
-      },
-      tags: 'ams',
-      tagSide: 'right',
-      tagIndent: '.8em'
-    },
-    chtml: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    svg: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    output: {
-      font: 'mathjax-modern',
-      displayOverflow: 'overflow'
-    }
-  };
-</script>
-
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">SICP 2.3.3 Example: Representing Sets
+<h1 class="title">SICP 2.3.1 Quotation
 <br />
-<span class="subtitle">2023-07-03 Mon</span>
+<span class="subtitle">2023-07-05 Wed</span>
 </h1>
+<blockquote>
 <p>
-``Informally, a set is simply a collection of distinct objects''.
-Sets can be defined more precisely by employing the method of data
-abstraction, that is, by specifying the operations that can be used on
-them: <code>union-set</code>, <code>intersection-set</code>, <code>element-of-set?</code> and
-<code>adjoin-set</code>.
+In order to manipulate symbols we need a new element in our language:
+the ability to quote a data object.
 </p>
-
-<div id="outline-container-org7cf66ca" class="outline-2">
-<h2 id="org7cf66ca">Sets as unordered lists</h2>
-<div class="outline-text-2" id="text-org7cf66ca">
-<p>
-``One way to represent a set is a list of its elements in which no
-element appears more than once''.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">element-of-set?</span> x set)
-  (<span style="color: #00ffff;">cond</span> ((null? set) false)
-        ((equal? x (car set)) true)
-        (<span style="color: #00ffff;">else</span> (element-of-set? x (cdr set)))))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">adjoin-set</span> x set)
-  (<span style="color: #00ffff;">if</span> (element-of-set? x set)
-      set
-      (cons x set)))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">intersection-set</span> set1 set2)
-  (<span style="color: #00ffff;">cond</span> ((<span style="color: #00ffff;">or</span> (null? set1) (null? set2)) 
-         '())
-        ((element-of-set? (car set1) set2)
-         (cons (car set1)
-               (intersection-set (cdr set1) 
-                                 set2)))
-        (<span style="color: #00ffff;">else</span> (intersection-set (cdr set1) 
-                                set2))))
-</pre>
-</div>
+</blockquote>
 
 <p>
-The number of steps required by <code>element-of-set</code> grows as
-\(\Theta(n)\). The number of steps required by <code>adjoin-set</code> too. The
-number of steps required by <code>intersection-set</code> grows as \(\Theta(n^2)\).
+<code>(list a b)</code> constructs a list of the values of <code>a</code> and <code>b</code>, not the
+list of <code>a</code> and <code>b</code> themselves (the symbols).
 </p>
-</div>
 
-<div id="outline-container-orgd045a20" class="outline-3">
-<h3 id="orgd045a20">Exercise 2.59</h3>
-<div class="outline-text-3" id="text-orgd045a20">
+<p>
+As analytic philosophy students well know,
+</p>
+
+<blockquote>
+<p>
+[t]his issue is well known in the context of natural languages, where
+words and sentences may be regarded either as semantic entities or as
+character strings (syntactic entities)&#x2026;
+</p>
+</blockquote>
+
+<p>
+(In fact, footnote 98 uses an example from Frege.)
+</p>
+
+<blockquote>
+<p>
+We can follow this same practice to identify lists and symbols that
+are to be treated as data objects rather than as expressions to be
+evaluated.
+</p>
+</blockquote>
+
+<div id="outline-container-org7ca27ea" class="outline-2">
+<h2 id="org7ca27ea">Ex. 2.53</h2>
+<div class="outline-text-2" id="text-org7ca27ea">
 <p>
 <b>Exercise</b>:
 </p>
 
 <blockquote>
 <p>
-Implement the <code>union-set</code> operation for the unordered-list
-representation of sets.
+What would the interpreter print in response to evaluating each of the
+following expressions?
 </p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(list 'a 'b 'c)
+(list (list 'george))
+(cdr '((x1 x2) (y1 y2)))
+(cadr '((x1 x2) (y1 y2)))
+(pair? (car '(a short list)))
+(memq 'red '((red shoes) (blue socks)))
+(memq 'red '(red shoes blue socks))
+</pre>
+</div>
 </blockquote>
 
 <p>
@@ -303,35 +266,61 @@ representation of sets.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">union-set</span> s1 s2)
-  (<span style="color: #00ffff;">cond</span> ((null? s1) s2)
-        ((null? s2) s1)
-        ((element-of-set? (car s1) s2)
-         (union-set (cdr s1) s2))
-        (<span style="color: #00ffff;">else</span> (cons (car s1)
-                    (union-set (cdr s1) s2)))))
+<pre class="src src-scheme">(list 'a 'b 'c)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; (a b c)</span>
+(list (list 'george))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; ((george))</span>
+(cdr '((x1 x2) (y1 y2)))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; ((y1 y2))</span>
+(cadr '((x1 x2) (y1 y2)))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; (y1 y2)</span>
+(pair? (car '(a short list)))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; #f</span>
+(memq 'red '((red shoes) (blue socks)))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; #f</span>
+(memq 'red '(red shoes blue socks))
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; (red shoes blue socks)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org44d28a4" class="outline-3">
-<h3 id="org44d28a4">Exercise 2.60</h3>
-<div class="outline-text-3" id="text-org44d28a4">
+<div id="outline-container-org0cde2b7" class="outline-2">
+<h2 id="org0cde2b7">Ex. 2.54</h2>
+<div class="outline-text-2" id="text-org0cde2b7">
 <p>
 <b>Exercise</b>:
 </p>
 
 <blockquote>
 <p>
-We specified that a set would be represented as a list with no
-duplicates. Now suppose we allow duplicates. For instance, the set
-\({1,2,3}\) could be represented as the list <code>(2 3 2 1 3 2 2)</code>. Design
-procedures <code>element-of-set?</code>, <code>adjoin-set</code>, <code>union-set</code>, and
-<code>intersection-set</code> that operate on this representation. How does the
-efficiency of each compare with the corresponding procedure for the
-non-duplicate representation? Are there applications for which you
-would use this representation in preference to the non-duplicate one?
+Two lists are said to be <code>equal?</code> if they contain equal elements
+arranged in the same order. For example,
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(equal? '(this is a list) 
+        '(this is a list))
+</pre>
+</div>
+
+<p>
+is true, but
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(equal? '(this is a list) 
+        '(this (is a) list))
+</pre>
+</div>
+
+<p>
+is false. To be more precise, we can define <code>equal?</code> recursively in
+terms of the basic <code>eq?</code> equality of symbols by saying that <code>a</code> and
+<code>b</code> are <code>equal?</code> if they are both symbols and the symbols are <code>eq?</code>,
+or if they are both lists such that <code>(car a)</code> is <code>equal?</code> to <code>(car b)</code>
+and <code>(cdr a)</code> is <code>equal?</code> to <code>(cdr b)</code>. Using this idea, implement
+<code>equal?</code> as a procedure.
 </p>
 </blockquote>
 
@@ -339,109 +328,39 @@ would use this representation in preference to the non-duplicate one?
 <b>Answer</b>:
 </p>
 
-<p>
-I wouldn't change neither <code>element-of-set?</code> nor <code>intersection-set</code>. So
-their complexity remains the same; respectively, linear and
-exponential.
-</p>
-
-<p>
-This is the way I would write <code>adjoin-set</code>:
-</p>
-
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">adjoin-set</span> x set)
-  (cons x set))
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">equal?</span> a b)
+  (<span style="color: #b9ca4a;">cond</span> ((<span style="color: #b9ca4a;">and</span> (not (pair? a)) (not (pair? b)) (eq? a b))
+         true)
+        ((<span style="color: #b9ca4a;">and</span> (<span style="color: #b9ca4a;">and</span> (pair? a) (pair? b))
+              (equal? (car a) (car b))
+              (equal? (cdr a) (cdr b)))
+         true)
+        (<span style="color: #b9ca4a;">else</span> false)))
 </pre>
 </div>
-
-<p>
-Its complexity is constant. We just have to do one operation,
-regardless of the size of the set.
-</p>
-
-<p>
-This is the way I would write <code>union-set</code>:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">union-set</span> s1 s2)
-  (<span style="color: #00ffff;">if</span> ((null? s1) s2)
-      (<span style="color: #00ffff;">else</span> (cons (car s1)
-                  (union-set (cdr s1) s2)))))
-</pre>
-</div>
-
-<p>
-Its complexity is linear. We have to go through each element of one of
-the two lists.
-</p>
 </div>
 </div>
-</div>
-<div id="outline-container-org90127e6" class="outline-2">
-<h2 id="org90127e6">Sets as ordered lists</h2>
-<div class="outline-text-2" id="text-org90127e6">
-<p>
-Representing sets with ordered sequences allows use to speed up our
-operations. For example, <code>element-of-set?</code> does not necessarily have
-to scan the entire set anymore:
-</p>
 
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">element-of-set?</span> x set)
-  (<span style="color: #00ffff;">cond</span> ((null? set) false)
-        ((= x (car set)) true)
-        ((&lt; x (car set)) false)
-        (<span style="color: #00ffff;">else</span> (element-of-set? x (cdr set)))))
-</pre>
-</div>
-
+<div id="outline-container-org849aab8" class="outline-2">
+<h2 id="org849aab8">Ex. 2.55</h2>
+<div class="outline-text-2" id="text-org849aab8">
 <p>
-The average number of step is about \(n/2\) (which is still $&Theta;(n)
-growth).
-</p>
-
-<p>
-The authors present a ``more impressive speedup with
-<code>intersection-set</code>''.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">intersection-set</span> set1 set2)
-  (<span style="color: #00ffff;">if</span> (<span style="color: #00ffff;">or</span> (null? set1) (null? set2))
-      '()
-      (<span style="color: #00ffff;">let</span> ((x1 (car set1)) (x2 (car set2)))
-        (<span style="color: #00ffff;">cond</span> ((= x1 x2)
-               (cons x1 (intersection-set 
-                         (cdr set1)
-                         (cdr set2))))
-              ((&lt; x1 x2) (intersection-set 
-                          (cdr set1) 
-                          set2))
-              ((&lt; x2 x1) (intersection-set 
-                          set1 
-                          (cdr set2)))))))
-</pre>
-</div>
-
-<p>
-This <code>intersection-set</code> grows linearly.
-</p>
-</div>
-<div id="outline-container-org4556690" class="outline-3">
-<h3 id="org4556690">Exercise 2.61</h3>
-<div class="outline-text-3" id="text-org4556690">
-<p>
-<b>Exercise</b>":
+<b>Exercise</b>:
 </p>
 
 <blockquote>
 <p>
-Give an implementation of <code>adjoin-set</code> using the ordered
-representation. By analogy with <code>element-of-set?</code> show how to take
-advantage of the ordering to produce a procedure that requires on the
-average about half as many steps as with the unordered representation.
+Eva Lu Ator types to the interpreter the expression
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(car ''abracadabra)
+</pre>
+</div>
+
+<p>
+To her surprise, the interpreter prints back quote. Explain.
 </p>
 </blockquote>
 
@@ -449,62 +368,13 @@ average about half as many steps as with the unordered representation.
 <b>Answer</b>:
 </p>
 
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">adjoin-set</span> x set)
-  (<span style="color: #00ffff;">cond</span> ((null? set) (cons x set))
-        ((= x (car set)) set)
-        ((&lt; x (car set)) (cons x set))
-        (<span style="color: #00ffff;">else</span> (cons (car set)
-                    (adjoin-set x (cdr set))))))
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org90ecfa1" class="outline-3">
-<h3 id="org90ecfa1">Exercise 2.62</h3>
-<div class="outline-text-3" id="text-org90ecfa1">
 <p>
-<b>Exercise</b>":
+From the interpreter's perspective, <code>'abracadabra</code> is actually <code>(quote
+abracadabra)</code> (see footnote 100). And <code>''abracadabra</code> is actually
+<code>(quote (quote abracadabra))</code>. The <code>car</code> of the latter is indeed
+<code>quote</code>.
 </p>
 
-<blockquote>
-<p>
-Give a \(\Theta(n)\) implementation of union-set for sets represented as
-ordered lists.
-</p>
-</blockquote>
-
-<p>
-<b>Answer</b>:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #00ffff;">define</span> (<span style="color: #87cefa;">union-set</span> s1 s2)
-  (<span style="color: #00ffff;">cond</span> ((null? s1) s2)
-        ((null? s2) s1)
-        ((= (car s1) (car s2)) (cons (car s1)
-                                     (union-set (cdr s1)
-                                                (cdr s2))))
-        ((&lt; (car s1) (car s2)) (cons (car s1)
-                                     (union-set (cdr s1)
-                                                s2)))
-        ((&lt; (car s2) (car s1)) (cons (car s2)
-                                     (union-set s1
-                                                (cdr s2))))))
-</pre>
-</div>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org7650b04" class="outline-2">
-<h2 id="org7650b04">Sets as binary trees</h2>
-</div>
-
-<div id="outline-container-org0b04312" class="outline-2">
-<h2 id="org0b04312">Sets and information retrieval</h2>
-<div class="outline-text-2" id="text-org0b04312">
 <div style="text-align: center;">
 <a href="./posts.html">←</a>
 </div>
@@ -512,10 +382,7 @@ ordered lists.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Author:  (<a href="mailto:gp@host-667">gp@host-667</a>)</p>
-<p class="date">Date: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.91 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p>
-<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.91 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</span></p>
 </div>
 </body>
 </html>
