@@ -1,0 +1,598 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 2.3.3 Example: Representing Sets
+#+subtitle: 
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+
+#+begin_quote
+``Informally, a set is simply a collection of distinct objects''.
+#+end_quote
+Sets can be defined more precisely by employing the method of data
+abstraction; that is, by specifying the operations that can be used on
+them: ~union-set~, ~intersection-set~, ~element-of-set?~ and
+~adjoin-set~.
+
+* Sets as unordered lists
+#+begin_quote
+``One way to represent a set is a list of its elements in which no
+element appears more than once'':
+#+end_quote
+
+#+begin_src scheme
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((equal? x (car set)) true)
+          (else (element-of-set? x (cdr set)))))
+#+end_src
+
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (if (element-of-set? x set)
+        set
+        (cons x set)))
+#+end_src
+
+#+begin_src scheme
+  (define (intersection-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) 
+           '())
+          ((element-of-set? (car set1) set2)
+           (cons (car set1)
+                 (intersection-set (cdr set1) 
+                                   set2)))
+          (else (intersection-set (cdr set1) 
+                                  set2))))
+#+end_src
+
+The number of steps required by ~element-of-set~ grows as
+$\Theta(n)$. The number of steps required by ~adjoin-set~ too. The
+number of steps required by ~intersection-set~ grows as $\Theta(n^2)$.
+
+** Exercise 2.59
+*Exercise*:
+
+#+begin_quote
+Implement the ~union-set~ operation for the unordered-list
+representation of sets.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (union-set s1 s2)
+    (cond ((null? s1) s2)
+          ((null? s2) s1)
+          ((element-of-set? (car s1) s2)
+           (union-set (cdr s1) s2))
+          (else (cons (car s1)
+                      (union-set (cdr s1) s2)))))
+#+end_src
+
+** Exercise 2.60
+*Exercise*:
+
+#+begin_quote
+We specified that a set would be represented as a list with no
+duplicates. Now suppose we allow duplicates. For instance, the set
+${1,2,3}$ could be represented as the list ~(2 3 2 1 3 2 2)~. Design
+procedures ~element-of-set?~, ~adjoin-set~, ~union-set~, and
+~intersection-set~ that operate on this representation. How does the
+efficiency of each compare with the corresponding procedure for the
+non-duplicate representation? Are there applications for which you
+would use this representation in preference to the non-duplicate one?
+#+end_quote
+
+*Answer*:
+
+I wouldn't change neither ~element-of-set?~ nor ~intersection-set~. So
+their complexity remains the same; respectively, linear and
+exponential.
+
+This is the way I would write ~adjoin-set~:
+
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (cons x set))
+#+end_src
+
+Its complexity is constant. We just have to do one operation,
+regardless of the size of the set.
+
+This is the way I would write ~union-set~:
+
+#+begin_src scheme
+  (define (union-set s1 s2)
+    (if ((null? s1) s2)
+        (else (cons (car s1)
+                    (union-set (cdr s1) s2)))))
+#+end_src
+
+Its complexity is linear. We have to go through each element of one of
+the two lists.
+* Sets as ordered lists
+Representing sets with ordered sequences allows use to speed up our
+operations. For example, ~element-of-set?~ doesn't necessarily have to
+scan the entire set anymore:
+
+#+begin_src scheme
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((= x (car set)) true)
+          ((< x (car set)) false)
+          (else (element-of-set? x (cdr set)))))
+#+end_src
+
+The average number of step is about $n/2$ (which is still $\Theta(n)$
+growth).
+
+The authors present a ``more impressive speedup with
+~intersection-set~'':
+
+#+begin_src scheme
+  (define (intersection-set set1 set2)
+    (if (or (null? set1) (null? set2))
+        '()
+        (let ((x1 (car set1)) (x2 (car set2)))
+          (cond ((= x1 x2)
+                 (cons x1 (intersection-set 
+                           (cdr set1)
+                           (cdr set2))))
+                ((< x1 x2) (intersection-set 
+                            (cdr set1) 
+                            set2))
+                ((< x2 x1) (intersection-set 
+                            set1 
+                            (cdr set2)))))))
+#+end_src
+
+The ~intersection-set~ above grows linearly.
+** Exercise 2.61
+*Exercise*":
+
+#+begin_quote
+Give an implementation of ~adjoin-set~ using the ordered
+representation. By analogy with ~element-of-set?~ show how to take
+advantage of the ordering to produce a procedure that requires on the
+average about half as many steps as with the unordered representation.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (cond ((null? set) (cons x set))
+          ((= x (car set)) set)
+          ((< x (car set)) (cons x set))
+          (else (cons (car set)
+                      (adjoin-set x (cdr set))))))
+#+end_src
+
+** Exercise 2.62
+*Exercise*":
+
+#+begin_quote
+Give a $\Theta(n)$ implementation of union-set for sets represented as
+ordered lists.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (union-set s1 s2)
+    (cond ((null? s1) s2)
+          ((null? s2) s1)
+          ((= (car s1) (car s2)) (cons (car s1)
+                                       (union-set (cdr s1)
+                                                  (cdr s2))))
+          ((< (car s1) (car s2)) (cons (car s1)
+                                       (union-set (cdr s1)
+                                                  s2)))
+          ((< (car s2) (car s1)) (cons (car s2)
+                                       (union-set s1
+                                                  (cdr s2))))))
+#+end_src
+
+* Sets as binary trees
+We can represent a set in terms of a tree (which are, in turn,
+represented by us in terms of lists). Each node of the tree has an
+entry, a left branch and a right branch. The left branch's entry must
+be smaller than the entry, while the right branch's entry must be
+greater.
+
+Given the tree representation, we can have an ~element-of-set?~  with
+$\Theta(\log n)$ order of growth...
+
+#+begin_src scheme
+  (define (entry tree) (car tree))
+  (define (left-branch tree) (cadr tree))
+  (define (right-branch tree) (caddr tree))
+  (define (make-tree entry left right)
+    (list entry left right))
+#+end_src
+
+#+begin_src scheme
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((= x (entry set)) true)
+          ((< x (entry set))
+           (element-of-set? 
+            x 
+            (left-branch set)))
+          ((> x (entry set))
+           (element-of-set? 
+            x 
+            (right-branch set)))))
+#+end_src
+
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (cond ((null? set) (make-tree x '() '()))
+          ((= x (entry set)) set)
+          ((< x (entry set))
+           (make-tree 
+            (entry set)
+            (adjoin-set x (left-branch set))
+            (right-branch set)))
+          ((> x (entry set))
+           (make-tree
+            (entry set)
+            (left-branch set)
+            (adjoin-set x (right-branch set))))))
+#+end_src
+
+Adjoining an item in this way requires $\Theta(\log n)$ steps.
+
+** Exercise 2.63
+*Exercise*:
+#+begin_quote
+Each of the following two procedures converts a binary tree to a list.
+
+#+begin_src 
+(define (tree->list-1 tree)
+  (if (null? tree)
+      '()
+      (append 
+       (tree->list-1 
+        (left-branch tree))
+       (cons (entry tree)
+             (tree->list-1 
+              (right-branch tree))))))
+
+(define (tree->list-2 tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree)
+        result-list
+        (copy-to-list 
+         (left-branch tree)
+         (cons (entry tree)
+               (copy-to-list 
+                (right-branch tree)
+                result-list)))))
+  (copy-to-list tree '()))
+#+end_src
+
+1. Do the two procedures produce the same result for every tree? If
+   not, how do the results differ? What lists do the two procedures
+   produce for the trees in Figure 2.16?
+2. Do the two procedures have the same order of growth in the number
+   of steps required to convert a balanced tree with $n$ elements to a
+   list? If not, which one grows more slowly?
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (entry tree) (car tree))
+  (define (left-branch tree) (cadr tree))
+  (define (right-branch tree) (caddr tree))
+  (define (make-tree entry left right)
+    (list entry left right))
+
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((= x (entry set)) true)
+          ((< x (entry set))
+           (element-of-set?
+            x
+            (left-branch set)))
+          ((> x (entry set))
+           (element-of-set?
+            x
+            (right-branch set)))))
+
+  (define (adjoin-set x set)
+    (cond ((null? set) (make-tree x '() '()))
+          ((= x (entry set)) set)
+          ((< x (entry set))
+           (make-tree
+            (entry set)
+            (adjoin-set x (left-branch set))
+            (right-branch set)))
+          ((> x (entry set))
+           (make-tree
+            (entry set)
+            (left-branch set)
+            (adjoin-set x (right-branch set))))))
+
+
+  (define (tree->list-1 tree)
+    (if (null? tree)
+        '()
+        (append
+         (tree->list-1
+          (left-branch tree))
+         (cons (entry tree)
+               (tree->list-1
+                (right-branch tree))))))
+
+  (define (tree->list-2 tree)
+    (define (copy-to-list tree result-list)
+      (if (null? tree)
+          result-list
+          (copy-to-list
+           (left-branch tree)
+           (cons (entry tree)
+                 (copy-to-list
+                  (right-branch tree)
+                  result-list)))))
+    (copy-to-list tree '()))
+
+  (tree->list-1 (make-tree 7
+                           (make-tree 3
+                                      (make-tree 1 nil nil)
+                                      (make-tree 5 nil nil))
+                           (make-tree 9
+                                      nil
+                                      (make-tree 11 nil nil))))
+  ;; => (1 3 5 7 9 11)
+
+  (tree->list-2 (make-tree 7
+                           (make-tree 3
+                                      (make-tree 1 nil nil)
+                                      (make-tree 5 nil nil))
+                           (make-tree 9
+                                      nil
+                                      (make-tree 11 nil nil))))
+  ;; => (1 3 5 7 9 11)
+
+  (tree->list-1 (make-tree 3
+                           (make-tree 1 nil nil)
+                           (make-tree 7
+                                      (make-tree 5 nil nil)
+                                      (make-tree 9
+                                                 nil
+                                                 (make-tree 11 nil nil)))))
+  ;; => (1 3 5 7 9 11)
+
+  (tree->list-2 (make-tree 3
+                           (make-tree 1 nil nil)
+                           (make-tree 7
+                                      (make-tree 5 nil nil)
+                                      (make-tree 9
+                                                 nil
+                                                 (make-tree 11 nil nil)))))
+  ;; => (1 3 5 7 9 11)
+
+  (tree->list-1 (make-tree 5
+                           (make-tree 3
+                                      (make-tree 1 nil nil)
+                                      nil)
+                           (make-tree 9
+                                      (make-tree 7 nil nil)
+                                      (make-tree 11 nil nil))))
+  ;; => (1 3 5 7 9 11)
+
+  (tree->list-2 (make-tree 5
+                           (make-tree 3
+                                      (make-tree 1 nil nil)
+                                      nil)
+                           (make-tree 9
+                                      (make-tree 7 nil nil)
+                                      (make-tree 11 nil nil))))
+  ;; => (1 3 5 7 9 11)
+
+#+end_src
+
+It looks like tree->list-1 and tree->list-2 give always the same
+result.
+
+In time, they seem to grow at the same pace (Are you sure? Doesn't the
+append in tree->list-1 makes it grow faster?).
+
+In space, tree->list-2 seems to grow more slowly, because one the two
+recursive calls is a tail call (scheme optimizes in that case).
+
+** Exercise 2.64
+*Exercise*:
+
+#+begin_quote
+The following procedure ~list->tree~ converts an ordered list to a
+balanced binary tree. The helper procedure ~partial-tree~ takes as
+arguments an integer $n$ and list of at least $n$ elements and
+constructs a balanced tree containing the first $n$ elements of the
+list. The result returned by ~partial-tree~ is a pair (formed with
+cons) whose ~car~ is the constructed tree and whose ~cdr~ is the list
+of elements not included in the tree.
+
+#+begin_src scheme
+  (define (list->tree elements)
+    (car (partial-tree 
+          elements (length elements))))
+
+  (define (partial-tree elts n)
+    (if (= n 0)
+        (cons '() elts)
+        (let ((left-size 
+               (quotient (- n 1) 2)))
+          (let ((left-result 
+                 (partial-tree 
+                  elts left-size)))
+            (let ((left-tree 
+                   (car left-result))
+                  (non-left-elts 
+                   (cdr left-result))
+                  (right-size 
+                   (- n (+ left-size 1))))
+              (let ((this-entry 
+                     (car non-left-elts))
+                    (right-result 
+                     (partial-tree 
+                      (cdr non-left-elts)
+                      right-size)))
+                (let ((right-tree 
+                       (car right-result))
+                      (remaining-elts 
+                       (cdr right-result)))
+                  (cons (make-tree this-entry 
+                                   left-tree 
+                                   right-tree)
+                        remaining-elts))))))))
+#+end_src
+
+1. Write a short paragraph explaining as clearly as you can how
+   ~partial-tree~ works. Draw the tree produced by ~list->tree~ for
+   the list (1 3 5 7 9 11).
+2. What is the order of growth in the number of steps required by
+   ~list->tree~ to convert a list of n elements?
+#+end_quote
+
+*Answer*:
+
+I've done quite a horrible job, but here it is:
+
+The function applies a recursive strategy. The central element of the
+list given will be the entry of the tree. The central element is the
+element whose index is the quotient of ~(- n 1)~ and ~2~, where n is
+the length of the list. Then the left and the right branch are
+computed. The left branch is the car of ~left-result~, that is, the
+result of the recursive call (~partial-tree~) applied to the original
+list and the quotient of ~(- n 1)~ and ~2~. The result of this latter
+recursive call is needed in order for computing the right branch as
+well. For the right tree is the car of ~right-result~, that is, the
+recursive call (~partial-tree~) applied to the ~cdr~ of ~left-result~
+and $(- n (+ left-size 1)$. The terminal case of partial-tree is
+represented by when n is 0. In that case the empty list is consed onto
+the given list.
+
+The tree produced by ~(list->tree '(1 3 5 7 9 11))~ is:
+
+#+begin_src
+      5
+    /   \
+   /     \
+  /       \
+ /         \
+1           9
+ \         / \
+  \       /   \
+   3     7    11
+#+end_src
+
+
+2. The order of growth is linear.
+
+** Exercise 2.65
+#+begin_quote
+Use the results of Exercise 2.63 and Exercise 2.64 to give $\Theta(n)$
+implementations of ~union-set~ and ~intersection-set~ for sets
+implemented as (balanced) binary trees.
+#+end_quote
+
+*Answer*:
+
+We already have a ~union-set~ (from ex 2.62) and an ~intersection-set~
+(presented by the authors) /which work with ordered lists/ and have a
+linear --- $\Theta(n)$ --- order of growth.
+
+So, assuming that the value of the application of ~tree->list-1~ (or
+~tree->list-2~) is an ordered list, we can compute the union for sets
+implemented as binary trees (let's calle it ~union-set-bt~) as
+follows::
+
+#+begin_src scheme
+  (define (union-set-bt set1 set2)
+    (list->tree (union-set (tree->list-1 set1)
+                           (tree->list-1 set2)))
+#+end_src
+
+#+begin_src scheme
+  (define (intersection-set-bt set1 set2)
+    (list->tree (intersection-set (tree->list-1 set1)
+                                  (tree->list-1 set2)))
+#+end_src
+
+The order of growth of the processes evolved by ~union-set-bt~ and
+~intersection-set-bt~ procedures is linear because ~list->tree~,
+~union-set~ and ~tree->list-1~ (we could have alternatively used
+~tree-list-2~) all evolve processes with linear order of growth.
+
+Now, if we have to drop the assumption that the application of
+~tree->lits1/2~ is going to be ordered, we can order the lists using a
+sorting procedure with an order of growth of $\Theta(n)$ or less, for
+example an implementation of merge sort. Given so, ~union-set-bt~ and
+~intersection-set-bt~ would look as follow and would still be linear:
+
+#+begin_src scheme
+  (define (union-set-bt set1 set2)
+    (list->tree (union-set (sort (tree->list-1 set1))
+                           (sort (tree->list-1 set2))))
+#+end_src
+
+#+begin_src scheme
+  (define (intersection-set-bt set1 set2)
+    (list->tree (intersection-set (sort (tree->list-1 set1))
+                                  (sort ((tree->list-1 set2))))
+#+end_src
+
+** Exercise 2.66
+*Exercise*:
+
+#+begin_quote
+Implement the lookup procedure for the case where the set of records
+is structured as a binary tree, ordered by the numerical values of the
+keys.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (key el)
+    (car el))
+
+  ;; In this set represented as a tree, the keys are the cars of the elements.
+  (list->tree '( (1 "el with key 1") (2 "el with key 2") (3 "etc") (4 "foo") (6 "bar") (7 "baz")))
+  ;; =>((3 "etc") ((1 "el with key 1") () ((2 "el with key 2") () ())) ((6 "bar") ((4 "foo") () ()) ((7 "baz") () ())))
+
+  (define (lookup given-key set)
+    (cond ((null? set) false)
+          ((= given-key (key (entry set)))
+           (entry set))
+          ((< given-key (key (entry set)))
+           (lookup given-key (left-branch set)))
+          (else (lookup given-key (right-branch set)))))
+
+  (lookup 3 (list->tree '( (1 "el with key 1") (2 "el with key 2") (3 "etc") (4 "foo") (6 "bar") (7 "baz"))))
+  ;; => (3 "etc")
+
+  (lookup 8 (list->tree '( (1 "el with key 1") (2 "el with key 2") (3 "etc") (4 "foo") (6 "bar") (7 "baz"))))
+  ;; => #f
+#+end_src
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
