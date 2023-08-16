@@ -1,0 +1,402 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 2.3.4 Example: Huffman Encoding Trees
+#+subtitle: 2023-08-16 Wed
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+
+Suppose we are in the business of encoding messages using bits. To do
+that we need a way to associate a certain number of bits to each
+symbol that belongs to our language. In /fixed-length/ codes all
+symbols have the same number of bits. If we had $n$ symbols, then we
+would need $\log_{2}n$ bits per symbol. So, if we wanted to
+distinguish, say, the eight symbols A, B, C, D, E, F, G, H, then we
+would need $\log_{2}8$ bits per symbols, that is, 3 bits per symbol
+($2^{3} = 8$). For example:
+
+|   A |   B |   C |   D |   E |   F |   G |   H |
+|-----+-----+-----+-----+-----+-----+-----+-----|
+| 000 | 001 | 010 | 011 | 100 | 101 | 110 | 111 |
+|-----+-----+-----+-----+-----+-----+-----+-----|
+
+The message `BACADAEAFABBAAAGAH' would then be encoded as the string
+of 54 bits `001000010000011000100000101000001001000000000110000111'.
+The ASCII code is an example of a fixed-length code.
+
+/Variable-length/ codes, instead, do not assign the same number of
+bits to all symbols. They assign shorter codes to frequent
+symbols. This allows for considerable savings. The Morse code is an
+example of a variable-length code.
+
+With the following variable-length code
+
+| A |   B |    C |    D |    E |    F |    G |    H |
+|---+-----+------+------+------+------+------+------|
+| 0 | 100 | 1010 | 1011 | 1100 | 1101 | 1110 | 1111 |
+|---+-----+------+------+------+------+------+------|
+
+We would encode the same message above in 42 bits.
+
+However, we need a way to know when the end of a symbol is
+reached. One technique, used by in the Morse code, is using
+separators. Another solution consists in designing the code ``in such
+a way that no complete code for any symbol is the beginning (or
+/prefix/) of the code for another symbol. Such a code is called a
+/prefix code/''.
+
+One particular ``scheme'' for attaining savings by taking advantage of
+relative frequencies is called the /Huffman encoding method/. A
+Huffman code can be represented as a binary tree. The leaves hold the
+encoded symbols pluse a weight (whose usage we shall see). Each
+non-leaf node holds the set of all the symbols below it and the sum of
+their weights.
+
+#+begin_src
+    *Figure 2.18:* A Huffman encoding tree.
+    (From SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007))
+
+                    {A B C D E F G H} 17
+                             ,*
+                            / \
+                           /   \
+                         A 8    * {B C D E F G H} 9
+                     __________/ \_____________
+                    /                          \
+         {B C D} 5 *                            * {E F G H} 4
+                  / \                       ___/ \___
+                 /   \                     /         \
+               B 3    * {C D} 2   {E F} 2 *           * {G H} 2
+                     / \                 / \         / \
+                    /   \               /   \       /   \
+                  C 1   D 1           E 1   F 1   G 1   H 1
+#+end_src
+
+To encode: start at the root, and move down until your reach a
+leaf. If you go left add a 0, otherwise add a 1.
+
+To decode: start at the root and use the 0s and 1s to decide whether
+to go; left or right.
+* Generating Huffman trees
+#+begin_src
+Initial leaves {(A 8) (B 3) (C 1) (D 1) (E 1) (F 1) (G 1) (H 1)}
+Merge          {(A 8) (B 3) ({C D} 2) (E 1) (F 1) (G 1) (H 1)}
+Merge          {(A 8) (B 3) ({C D} 2) ({E F} 2) (G 1) (H 1)}
+Merge          {(A 8) (B 3) ({C D} 2) ({E F} 2) ({G H} 2)}
+Merge          {(A 8) (B 3) ({C D} 2) ({E F G H} 4)}
+Merge          {(A 8) ({B C D} 5) ({E F G H} 4)}
+Merge          {(A 8) ({B C D E F G H} 9)}
+Final merge    {({A B C D E F G H} 17)}
+#+end_src
+
+* Representing Huffman trees
+#+begin_src scheme
+  ;; Leaf constructor
+  (define (make-leaf symbol weight)
+    (list 'leaf symbol weight))
+
+  (define (leaf? object)
+    (eq? (car object) 'leaf))
+
+  ;; Leaf selectors:
+  (define (symbol-leaf x) (cadr x))
+
+  (define (weight-leaf x) (caddr x))
+
+  ;; Tree constructor:
+  (define (make-code-tree left right)
+    (list left
+          right
+          (append (symbols left) (symbols right))
+          (+ (weight left) (weight right))))
+
+  ;; Tree selectors:
+  (define (left-branch tree) (car tree))
+
+  (define (right-branch tree) (cadr tree))
+
+  (define (symbols tree)
+    (if (leaf? tree)
+        (list (symbol-leaf tree))
+        (caddr tree)))
+
+  (define (weight tree)
+    (if (leaf? tree)
+        (weight-leaf tree)
+        (cadddr tree)))
+#+end_src
+
+* The decoding procedure
+#+begin_src scheme
+  (define (decode bits tree)
+    (define (decode-1 bits current-branch)
+      (if (null? bits)
+          '()
+          (let ((next-branch
+                 (choose-branch (car bits) current-branch)))
+            (if (leaf? next-branch)
+                (cons (symbol-leaf next-branch)
+                      (decode-1 (cdr bits) tree))
+                (decode-1 (cdr bits) next-branch)))))
+    (decode-1 bits tree))
+
+  (define (choose-branch bit branch)
+    (cond ((= bit 0) (left-branch branch))
+          ((= bit 1) (right-branch branch))
+          (else (error "bad bit -- CHOOSE-BRANCH" bit))))
+#+end_src
+* Sets of weighted elements
+#+begin_src scheme
+  (define (adjoin-set x set)
+    (cond ((null? set) (list x))
+          ((< (weight x) (weight (car set))) (cons x set))
+          (else (cons (car set)
+                      (adjoin-set x (cdr set))))))
+
+  (define (make-leaf-set pairs)
+    (if (null? pairs)
+        '()
+        (let ((pair (car pairs)))
+          (adjoin-set (make-leaf (car pair)    ; symbol
+                                 (cadr pair))  ; frequency
+                      (make-leaf-set (cdr pairs))))))
+#+end_src
+
+* Exercise 2.67
+*Exercise*:
+
+#+begin_quote
+Define an encoding tree and a sample message:
+
+#+begin_src scheme
+  (define sample-tree
+    (make-code-tree
+     (make-leaf 'A 4)
+     (make-code-tree
+      (make-leaf 'B 2)
+      (make-code-tree
+       (make-leaf 'D 1)
+       (make-leaf 'C 1)))))
+
+  (define sample-message
+    '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+#+end_src
+
+Use the ~decode~ procedure to decode the message, and give the result.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (decode sample-message sample-tree) ;; (A D A B B C A)
+#+end_src
+
+* Exercise 2.68
+*Exercise*:
+
+#+begin_quote
+The ~encode~ procedure takes as arguments a message and a tree and
+produces the list of bits that gives the encoded message.
+
+#+begin_src scheme
+  (define (encode message tree)
+    (if (null? message)
+        '()
+        (append
+         (encode-symbol (car message)
+                        tree)
+         (encode (cdr message) tree))))
+#+end_src
+
+~Encode-symbol~ is a procedure, which you must write, that returns the
+list of bits that encodes a given symbol according to a given
+tree. You should design ~encode-symbol~ so that it signals an error if
+the symbol is not in the tree at all. Test your procedure by encoding
+the result you obtained in Exercise 2.67 with the sample tree and
+seeing whether it is the same as the original sample message.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((equal? x (car set)) true)
+          (else (element-of-set? x (cdr set)))))
+
+  (define (encode-symbol sym tree)
+    (cond ((element-of-set? sym (symbols tree))
+           (if (element-of-set? sym (symbols (left-branch tree)))
+               (if (leaf? (left-branch tree))
+                   '(0)
+                   (cons 0 (encode-symbol sym (left-branch tree))))
+               (if (leaf? (right-branch tree))
+                   '(1)
+                   (cons 1 (encode-symbol sym (right-branch tree))))))
+          (else (error "Cannot encode symbol :( Symbol is not in the tree"))))
+#+end_src
+
+- Comments:
+  - The check for error could be done just once.
+  - Simplify the conditions?
+
+* Exercise 2.69
+*Exercise*:
+#+begin_quote
+The following procedure takes as its argument a list of
+symbol-frequency pairs (where no symbol appears in more than one pair)
+and generates a Huffman encoding tree according to the Huffman
+algorithm.
+
+#+begin_src scheme
+  (define (generate-huffman-tree pairs)
+    (successive-merge (make-leaf-set pairs)))
+#+end_src
+
+~Make-leaf-set~ is the procedure given above that transforms the list
+of pairs into an ordered set of leaves.  ~Successive-merge~ is the
+procedure you must write, using ~make-code-tree~ to successively merge
+the smallest-weight elements of the set until there is only one
+element left, which is the desired Huffman tree.  (This procedure is
+slightly tricky, but not really complicated.  If you find yourself
+designing a complex procedure, then you are almost certainly doing
+something wrong.  You can take significant advantage of the fact that
+we are using an ordered set representation.)
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (successive-merge pairs)
+    (cond ((null? pairs) nil)
+          ((null? (cdr pairs)) (car pairs))
+          (else (successive-merge
+                 (adjoin-set (make-code-tree (car pairs) (cadr pairs))
+                             (cddr pairs))))))
+#+end_src
+
+* Exercise 2.70
+#+begin_quote
+The following eight-symbol alphabet with associated relative
+frequencies was designed to efficiently encode the lyrics of 1950s
+rock songs. (Note that the “symbols” of an “alphabet” need not be
+individual letters.)
+
+#+begin_src
+A    2    NA  16
+BOOM 1    SHA  3
+GET  2    YIP  9
+JOB  2    WAH  1
+#+end_src
+
+Use ~generate-huffman-tree~ (Exercise 2.69) to generate a
+corresponding Huffman tree, and use ~encode~ (Exercise 2.68) to encode
+the following message:
+
+#+begin_src
+Get a job
+Sha na na na na na na na na
+
+Get a job
+Sha na na na na na na na na
+
+Wah yip yip yip yip
+yip yip yip yip yip
+Sha boom
+#+end_src
+
+How many bits are required for the encoding? What is the smallest
+number of bits that would be needed to encode this song if we used a
+fixed-length code for the eight-symbol alphabet?
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define rock-tree
+    (generate-huffman-tree
+     '((A 2) (NA 16) (BOOM 1) (SHA 3) (GET 2) (YIP 9) (JOB 2) (WAH 1))))
+
+  (encode '(GET A JOB
+                SHA NA NA NA NA NA NA NA NA
+
+                GET A JOB
+                SHA NA NA NA NA NA NA NA NA
+
+                WAH YIP YIP YIP YIP
+                YIP YIP YIP YIP YIP
+                SHA BOOM)
+          rock-tree)
+  ;; => (1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 0 1 1 0 1 1)
+
+#+end_src
+
+84 bits are required.
+
+If we used a fixed-length code, given that we have 8 symbols, we would
+need 3 bits for each symbol (Cf. p.161). The song is made of 36
+symbols, so to encode it with a fixed-length code we would need (*
+36 3) = 108 bits.
+
+* Exercise 2.71
+*Exercise*:
+
+#+begin_quote
+Suppose we have a Huffman tree for an alphabet of n symbols, and that
+the relative frequencies of the symbols are
+$1,2,4,\dots,2^{n−1}$. Sketch the tree for $n=5$; for $n=10$. In such
+a tree (for general $n$) how many bits are required to encode the most
+frequent symbol? The least frequent symbol?
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+
+  ;; for n = 5:
+  ;; (((((leaf A 1) (leaf B 2) (A B) 3) (leaf C 4) (A B C) 7)
+  ;;   (leaf D 8) (A B C D) 15) (leaf E 16) (A B C D E) 31)
+  ;;
+  ;;                              *
+  ;;                         _____|____
+  ;;                        |          |
+  ;;                        *         E 16
+  ;;                    ____|____
+  ;;                   |         |
+  ;;                   *        D 8
+  ;;               ____|____
+  ;;               |       |
+  ;;               *      C 4
+  ;;               |
+  ;;           ____*____
+  ;;          |         |
+  ;;
+  ;;        A 1        B 2
+
+  ;; Analogously for n = 10...
+
+  ;; The newly created tree at each step of successive-merge is placed
+  ;; at the start, because its weight is one value less than then next
+  ;; element.
+#+end_src
+
+We need only 1 bit to represent the most frequent symbol.
+
+We need $n - 1$ to represent the least frequent symbol.
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export

@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-08-16 Wed 23:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 2.3.4 Example: Huffman Encoding Trees</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 2.3.4 Example: Huffman Encoding Trees
+<br />
+<span class="subtitle">2023-08-16 Wed</span>
+</h1>
+<p>
+Suppose we are in the business of encoding messages using bits. To do
+that we need a way to associate a certain number of bits to each
+symbol that belongs to our language. In <i>fixed-length</i> codes all
+symbols have the same number of bits. If we had \(n\) symbols, then we
+would need \(\log_{2}n\) bits per symbol. So, if we wanted to
+distinguish, say, the eight symbols A, B, C, D, E, F, G, H, then we
+would need \(\log_{2}8\) bits per symbols, that is, 3 bits per symbol
+(\(2^{3} = 8\)). For example:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">A</th>
+<th scope="col" class="org-right">B</th>
+<th scope="col" class="org-right">C</th>
+<th scope="col" class="org-right">D</th>
+<th scope="col" class="org-right">E</th>
+<th scope="col" class="org-right">F</th>
+<th scope="col" class="org-right">G</th>
+<th scope="col" class="org-right">H</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">000</td>
+<td class="org-right">001</td>
+<td class="org-right">010</td>
+<td class="org-right">011</td>
+<td class="org-right">100</td>
+<td class="org-right">101</td>
+<td class="org-right">110</td>
+<td class="org-right">111</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The message `BACADAEAFABBAAAGAH' would then be encoded as the string
+of 54 bits `001000010000011000100000101000001001000000000110000111'.
+The ASCII code is an example of a fixed-length code.
+</p>
+
+<p>
+<i>Variable-length</i> codes, instead, do not assign the same number of
+bits to all symbols. They assign shorter codes to frequent
+symbols. This allows for considerable savings. The Morse code is an
+example of a variable-length code.
+</p>
+
+<p>
+With the following variable-length code
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">A</th>
+<th scope="col" class="org-right">B</th>
+<th scope="col" class="org-right">C</th>
+<th scope="col" class="org-right">D</th>
+<th scope="col" class="org-right">E</th>
+<th scope="col" class="org-right">F</th>
+<th scope="col" class="org-right">G</th>
+<th scope="col" class="org-right">H</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">0</td>
+<td class="org-right">100</td>
+<td class="org-right">1010</td>
+<td class="org-right">1011</td>
+<td class="org-right">1100</td>
+<td class="org-right">1101</td>
+<td class="org-right">1110</td>
+<td class="org-right">1111</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+We would encode the same message above in 42 bits.
+</p>
+
+<p>
+However, we need a way to know when the end of a symbol is
+reached. One technique, used by in the Morse code, is using
+separators. Another solution consists in designing the code ``in such
+a way that no complete code for any symbol is the beginning (or
+<i>prefix</i>) of the code for another symbol. Such a code is called a
+<i>prefix code</i>''.
+</p>
+
+<p>
+One particular ``scheme'' for attaining savings by taking advantage of
+relative frequencies is called the <i>Huffman encoding method</i>. A
+Huffman code can be represented as a binary tree. The leaves hold the
+encoded symbols pluse a weight (whose usage we shall see). Each
+non-leaf node holds the set of all the symbols below it and the sum of
+their weights.
+</p>
+
+<pre class="example">
+*Figure 2.18:* A Huffman encoding tree.
+(From SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007))
+
+                {A B C D E F G H} 17
+                         *
+                        / \
+                       /   \
+                     A 8    * {B C D E F G H} 9
+                 __________/ \_____________
+                /                          \
+     {B C D} 5 *                            * {E F G H} 4
+              / \                       ___/ \___
+             /   \                     /         \
+           B 3    * {C D} 2   {E F} 2 *           * {G H} 2
+                 / \                 / \         / \
+                /   \               /   \       /   \
+              C 1   D 1           E 1   F 1   G 1   H 1
+</pre>
+
+<p>
+To encode: start at the root, and move down until your reach a
+leaf. If you go left add a 0, otherwise add a 1.
+</p>
+
+<p>
+To decode: start at the root and use the 0s and 1s to decide whether
+to go; left or right.
+</p>
+<div id="outline-container-org60ec80a" class="outline-2">
+<h2 id="org60ec80a">Generating Huffman trees</h2>
+<div class="outline-text-2" id="text-org60ec80a">
+<pre class="example">
+Initial leaves {(A 8) (B 3) (C 1) (D 1) (E 1) (F 1) (G 1) (H 1)}
+Merge          {(A 8) (B 3) ({C D} 2) (E 1) (F 1) (G 1) (H 1)}
+Merge          {(A 8) (B 3) ({C D} 2) ({E F} 2) (G 1) (H 1)}
+Merge          {(A 8) (B 3) ({C D} 2) ({E F} 2) ({G H} 2)}
+Merge          {(A 8) (B 3) ({C D} 2) ({E F G H} 4)}
+Merge          {(A 8) ({B C D} 5) ({E F G H} 4)}
+Merge          {(A 8) ({B C D E F G H} 9)}
+Final merge    {({A B C D E F G H} 17)}
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgc323618" class="outline-2">
+<h2 id="orgc323618">Representing Huffman trees</h2>
+<div class="outline-text-2" id="text-orgc323618">
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Leaf constructor</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-leaf</span> symbol weight)
+  (list 'leaf symbol weight))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">leaf?</span> object)
+  (eq? (car object) 'leaf))
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Leaf selectors:</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">symbol-leaf</span> x) (cadr x))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">weight-leaf</span> x) (caddr x))
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Tree constructor:</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-code-tree</span> left right)
+  (list left
+        right
+        (append (symbols left) (symbols right))
+        (+ (weight left) (weight right))))
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Tree selectors:</span>
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">left-branch</span> tree) (car tree))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">right-branch</span> tree) (cadr tree))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">symbols</span> tree)
+  (<span style="color: #b9ca4a;">if</span> (leaf? tree)
+      (list (symbol-leaf tree))
+      (caddr tree)))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">weight</span> tree)
+  (<span style="color: #b9ca4a;">if</span> (leaf? tree)
+      (weight-leaf tree)
+      (cadddr tree)))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5e7399c" class="outline-2">
+<h2 id="org5e7399c">The decoding procedure</h2>
+<div class="outline-text-2" id="text-org5e7399c">
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">decode</span> bits tree)
+  (<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">decode-1</span> bits current-branch)
+    (<span style="color: #b9ca4a;">if</span> (null? bits)
+        '()
+        (<span style="color: #b9ca4a;">let</span> ((next-branch
+               (choose-branch (car bits) current-branch)))
+          (<span style="color: #b9ca4a;">if</span> (leaf? next-branch)
+              (cons (symbol-leaf next-branch)
+                    (decode-1 (cdr bits) tree))
+              (decode-1 (cdr bits) next-branch)))))
+  (decode-1 bits tree))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">choose-branch</span> bit branch)
+  (<span style="color: #b9ca4a;">cond</span> ((= bit 0) (left-branch branch))
+        ((= bit 1) (right-branch branch))
+        (<span style="color: #b9ca4a;">else</span> (error <span style="color: #70c0b1;">"bad bit -- CHOOSE-BRANCH"</span> bit))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org827fcd0" class="outline-2">
+<h2 id="org827fcd0">Sets of weighted elements</h2>
+<div class="outline-text-2" id="text-org827fcd0">
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">adjoin-set</span> x set)
+  (<span style="color: #b9ca4a;">cond</span> ((null? set) (list x))
+        ((&lt; (weight x) (weight (car set))) (cons x set))
+        (<span style="color: #b9ca4a;">else</span> (cons (car set)
+                    (adjoin-set x (cdr set))))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">make-leaf-set</span> pairs)
+  (<span style="color: #b9ca4a;">if</span> (null? pairs)
+      '()
+      (<span style="color: #b9ca4a;">let</span> ((pair (car pairs)))
+        (adjoin-set (make-leaf (car pair)    <span style="color: #969896; font-style: italic;">; </span><span style="color: #969896; font-style: italic;">symbol</span>
+                               (cadr pair))  <span style="color: #969896; font-style: italic;">; </span><span style="color: #969896; font-style: italic;">frequency</span>
+                    (make-leaf-set (cdr pairs))))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc349eda" class="outline-2">
+<h2 id="orgc349eda">Exercise 2.67</h2>
+<div class="outline-text-2" id="text-orgc349eda">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define an encoding tree and a sample message:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">sample-tree</span>
+  (make-code-tree
+   (make-leaf 'A 4)
+   (make-code-tree
+    (make-leaf 'B 2)
+    (make-code-tree
+     (make-leaf 'D 1)
+     (make-leaf 'C 1)))))
+
+(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">sample-message</span>
+  '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+</pre>
+</div>
+
+<p>
+Use the <code>decode</code> procedure to decode the message, and give the result.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(decode sample-message sample-tree) <span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(A D A B B C A)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0fc9fa5" class="outline-2">
+<h2 id="org0fc9fa5">Exercise 2.68</h2>
+<div class="outline-text-2" id="text-org0fc9fa5">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The <code>encode</code> procedure takes as arguments a message and a tree and
+produces the list of bits that gives the encoded message.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">encode</span> message tree)
+  (<span style="color: #b9ca4a;">if</span> (null? message)
+      '()
+      (append
+       (encode-symbol (car message)
+                      tree)
+       (encode (cdr message) tree))))
+</pre>
+</div>
+
+<p>
+<code>Encode-symbol</code> is a procedure, which you must write, that returns the
+list of bits that encodes a given symbol according to a given
+tree. You should design <code>encode-symbol</code> so that it signals an error if
+the symbol is not in the tree at all. Test your procedure by encoding
+the result you obtained in Exercise 2.67 with the sample tree and
+seeing whether it is the same as the original sample message.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">element-of-set?</span> x set)
+  (<span style="color: #b9ca4a;">cond</span> ((null? set) false)
+        ((equal? x (car set)) true)
+        (<span style="color: #b9ca4a;">else</span> (element-of-set? x (cdr set)))))
+
+(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">encode-symbol</span> sym tree)
+  (<span style="color: #b9ca4a;">cond</span> ((element-of-set? sym (symbols tree))
+         (<span style="color: #b9ca4a;">if</span> (element-of-set? sym (symbols (left-branch tree)))
+             (<span style="color: #b9ca4a;">if</span> (leaf? (left-branch tree))
+                 '(0)
+                 (cons 0 (encode-symbol sym (left-branch tree))))
+             (<span style="color: #b9ca4a;">if</span> (leaf? (right-branch tree))
+                 '(1)
+                 (cons 1 (encode-symbol sym (right-branch tree))))))
+        (<span style="color: #b9ca4a;">else</span> (error <span style="color: #70c0b1;">"Cannot encode symbol :( Symbol is not in the tree"</span>))))
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Comments:
+<ul class="org-ul">
+<li>The check for error could be done just once.</li>
+<li>Simplify the conditions?</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org410ac9d" class="outline-2">
+<h2 id="org410ac9d">Exercise 2.69</h2>
+<div class="outline-text-2" id="text-org410ac9d">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+The following procedure takes as its argument a list of
+symbol-frequency pairs (where no symbol appears in more than one pair)
+and generates a Huffman encoding tree according to the Huffman
+algorithm.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">generate-huffman-tree</span> pairs)
+  (successive-merge (make-leaf-set pairs)))
+</pre>
+</div>
+
+<p>
+<code>Make-leaf-set</code> is the procedure given above that transforms the list
+of pairs into an ordered set of leaves.  <code>Successive-merge</code> is the
+procedure you must write, using <code>make-code-tree</code> to successively merge
+the smallest-weight elements of the set until there is only one
+element left, which is the desired Huffman tree.  (This procedure is
+slightly tricky, but not really complicated.  If you find yourself
+designing a complex procedure, then you are almost certainly doing
+something wrong.  You can take significant advantage of the fact that
+we are using an ordered set representation.)
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> (<span style="color: #e78c45;">successive-merge</span> pairs)
+  (<span style="color: #b9ca4a;">cond</span> ((null? pairs) nil)
+        ((null? (cdr pairs)) (car pairs))
+        (<span style="color: #b9ca4a;">else</span> (successive-merge
+               (adjoin-set (make-code-tree (car pairs) (cadr pairs))
+                           (cddr pairs))))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfaf01ad" class="outline-2">
+<h2 id="orgfaf01ad">Exercise 2.70</h2>
+<div class="outline-text-2" id="text-orgfaf01ad">
+<blockquote>
+<p>
+The following eight-symbol alphabet with associated relative
+frequencies was designed to efficiently encode the lyrics of 1950s
+rock songs. (Note that the “symbols” of an “alphabet” need not be
+individual letters.)
+</p>
+
+<pre class="example">
+A    2    NA  16
+BOOM 1    SHA  3
+GET  2    YIP  9
+JOB  2    WAH  1
+</pre>
+
+<p>
+Use <code>generate-huffman-tree</code> (Exercise 2.69) to generate a
+corresponding Huffman tree, and use <code>encode</code> (Exercise 2.68) to encode
+the following message:
+</p>
+
+<pre class="example">
+Get a job
+Sha na na na na na na na na
+
+Get a job
+Sha na na na na na na na na
+
+Wah yip yip yip yip
+yip yip yip yip yip
+Sha boom
+</pre>
+
+<p>
+How many bits are required for the encoding? What is the smallest
+number of bits that would be needed to encode this song if we used a
+fixed-length code for the eight-symbol alphabet?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b9ca4a;">define</span> <span style="color: #e78c45;">rock-tree</span>
+  (generate-huffman-tree
+   '((A 2) (NA 16) (BOOM 1) (SHA 3) (GET 2) (YIP 9) (JOB 2) (WAH 1))))
+
+(encode '(GET A JOB
+              SHA NA NA NA NA NA NA NA NA
+
+              GET A JOB
+              SHA NA NA NA NA NA NA NA NA
+
+              WAH YIP YIP YIP YIP
+              YIP YIP YIP YIP YIP
+              SHA BOOM)
+        rock-tree)
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">=&gt; (1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 0 1 1 0 1 1)</span>
+
+</pre>
+</div>
+
+<p>
+84 bits are required.
+</p>
+
+<p>
+If we used a fixed-length code, given that we have 8 symbols, we would
+need 3 bits for each symbol (Cf. p.161). The song is made of 36
+symbols, so to encode it with a fixed-length code we would need (*
+36 3) = 108 bits.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgcf57885" class="outline-2">
+<h2 id="orgcf57885">Exercise 2.71</h2>
+<div class="outline-text-2" id="text-orgcf57885">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Suppose we have a Huffman tree for an alphabet of n symbols, and that
+the relative frequencies of the symbols are
+\(1,2,4,\dots,2^{n−1}\). Sketch the tree for \(n=5\); for \(n=10\). In such
+a tree (for general \(n\)) how many bits are required to encode the most
+frequent symbol? The least frequent symbol?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">for n = 5:</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">(((((leaf A 1) (leaf B 2) (A B) 3) (leaf C 4) (A B C) 7)</span>
+<span style="color: #969896; font-style: italic;">;;   </span><span style="color: #969896; font-style: italic;">(leaf D 8) (A B C D) 15) (leaf E 16) (A B C D E) 31)</span>
+<span style="color: #969896; font-style: italic;">;;</span>
+<span style="color: #969896; font-style: italic;">;;                              </span><span style="color: #969896; font-style: italic;">*</span>
+<span style="color: #969896; font-style: italic;">;;                         </span><span style="color: #969896; font-style: italic;">_____|____</span>
+<span style="color: #969896; font-style: italic;">;;                        </span><span style="color: #969896; font-style: italic;">|          |</span>
+<span style="color: #969896; font-style: italic;">;;                        </span><span style="color: #969896; font-style: italic;">*         E 16</span>
+<span style="color: #969896; font-style: italic;">;;                    </span><span style="color: #969896; font-style: italic;">____|____</span>
+<span style="color: #969896; font-style: italic;">;;                   </span><span style="color: #969896; font-style: italic;">|         |</span>
+<span style="color: #969896; font-style: italic;">;;                   </span><span style="color: #969896; font-style: italic;">*        D 8</span>
+<span style="color: #969896; font-style: italic;">;;               </span><span style="color: #969896; font-style: italic;">____|____</span>
+<span style="color: #969896; font-style: italic;">;;               </span><span style="color: #969896; font-style: italic;">|       |</span>
+<span style="color: #969896; font-style: italic;">;;               </span><span style="color: #969896; font-style: italic;">*      C 4</span>
+<span style="color: #969896; font-style: italic;">;;               </span><span style="color: #969896; font-style: italic;">|</span>
+<span style="color: #969896; font-style: italic;">;;           </span><span style="color: #969896; font-style: italic;">____*____</span>
+<span style="color: #969896; font-style: italic;">;;          </span><span style="color: #969896; font-style: italic;">|         |</span>
+<span style="color: #969896; font-style: italic;">;;</span>
+<span style="color: #969896; font-style: italic;">;;        </span><span style="color: #969896; font-style: italic;">A 1        B 2</span>
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">Analogously for n = 10...</span>
+
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">The newly created tree at each step of successive-merge is placed</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">at the start, because its weight is one value less than then next</span>
+<span style="color: #969896; font-style: italic;">;; </span><span style="color: #969896; font-style: italic;">element.</span>
+</pre>
+</div>
+
+<p>
+We need only 1 bit to represent the most frequent symbol.
+</p>
+
+<p>
+We need \(n - 1\) to represent the least frequent symbol.
+</p>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</span></p>
+</div>
+</body>
+</html>
