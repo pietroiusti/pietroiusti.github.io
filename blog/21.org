@@ -1,0 +1,324 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 2.4 Multiple Representations for Abstract Data
+#+subtitle: 2023-08-16 Wed
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+
+/Data Abstraction/ keeps separate the /use/ from the /implementation/,
+the /interface/ from the /representation/.
+
+A Scheme programmer, for example, usually operates at a level of
+abstraction such that she doesn't have to worry about how ~car~,
+~cdr~, and ~cons~ are /implemented/. She just has to know /how they
+behave/. She just has to know that ~cons~ takes two entities and
+creates a further entity --- aptly called a ``pair''--- the
+application of ~car~ to which returns the first entity and the
+application of ~cdr~ to which returns the second entity. The
+implementation of how this works remains in the shadows. The
+programmer knows how to /use/ pairs, but she doens't necessarily have
+to know how pairs are represented.
+
+Section 2.1.1 showed a example of this kinds of ``abstractions
+barriers''. We saw there ``how to separate the task of designing a
+program that uses rational numbers from the task of implemententing
+rational numbers.
+
+The ``abstractions barriers'' we are talking about
+can be thought of as horizontal barriers which are present at
+different levels (see Figure 2.1). In that specific example, there are
+the following barriers:
+- ~cons~, ~car~, ~cdr~;
+- ~make-rat~, ~numer~, ~denom~;
+- ~add-rat~, ~sub-rat~, etc.;
+- programs that use rational numbers.
+
+Despite the benefits that those barriers provide, those barriers are
+not enough. They are not enough, because there might be more than one
+useful representation for a certain data object and we might want to
+use those different representatiosn together in our system. Complex
+numbers offer a more-or-less-toy example. Complex numbers can be
+represented in the so-called ``rectangular'' form --- which is in
+terms of a real part and an imaginary part ---, or in the so-called
+``polar'' form --- which is in terms of a magnitude and an angle. Each
+of those two representations can be, depending on the circumstances,
+more appropriate than the other.
+
+We need:
+ - *not only*: ``data-abstraction barriers'' that isolate /use/ from
+   /representation/, /interface/ from /implementation/,
+ - *but also*: abstraction barriers that isolate different
+   representations for the same data object and allow those different
+   design choices to coexist.
+ - *moreover*: we need to able to add a certain representation to a
+   system /additively/, that is, without having to redesign or
+   reimplement it.
+
+We can think of those additiona barriers as /vertical/ barriers.
+
+#+begin_src 
+     *Figure 2.19:* Data-abstraction barriers in the complex-number
+     system.
+
+                     Programs that use complex numbers
+            +-------------------------------------------------+
+          --| add-complex sub-complex mul-complex div-complex |--
+            +-------------------------------------------------+
+                        Complex arithmetic package
+          ---------------------------+---------------------------
+                    Rectangular      |         Polar
+                  representation     |     representation
+          ---------------------------+---------------------------
+              List structure and primitive machine arithmetic
+
+[Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
+#+end_src
+
+Vertical barriers can be build through the usage of *generic
+procedures*, ``procedures that can operate on data that may be
+represented in more than one way''.
+
+We will be able to write generic procedure thanks to the usage of
+/type tags/. To achieve the ability to add representation to a certain
+system additively we will use the tecnnique of /data-directed/
+programming. We will also briefly look at an alternative to
+data-directed programming called /message passing/.
+
+* 2.4.1 Representations for Complex Numbers
+We want a complex number arithmetic system. Basically we want four
+operations: addition, subtraction, multiplication, and division.
+
+Using a data-abstraction strategy --- exactly what we did with
+rational number) ---, we can just /assume/ that we have the following
+selectors and constructors:
+- Selectors:
+  - ~real-part~;
+  - ~imag-part~;
+  - ~magnitude~;
+  - ~angle~;
+- Constructors:
+  - ~make-from-real-imag~;
+  - ~make-from-mag-ang~;
+
+- Those selectors and constructors are our /abstract data/. We can
+  specify operations on complex numbers in terms of that abstract
+  data:
+  - ~add-complex~:
+    #+begin_src scheme
+      (define (add-complex z1 z2)
+        (make-from-real-imag (+ (real-part z1) (real-part z2))
+                             (+ (imag-part z1) (imag-part z2))))
+    #+end_src
+  - ~sub-complex~:
+    #+begin_src scheme
+      (define (sub-complex z1 z2)
+        (make-from-real-imag (- (real-part z1) (real-part z2))
+                             (- (imag-part z1) (imag-part z2))))
+    #+end_src
+  - ~mul-complex~:
+    #+begin_src scheme
+      (define (mul-complex z1 z2)
+        (make-from-mag-ang (* (magnitude z1) (magnitude z2))
+                           (+ (angle z1) (angle z2))))
+    #+end_src
+  - ~div-complex~:
+    #+begin_src scheme
+      (define (div-complex z1 z2)
+        (make-from-mag-ang (/ (magnitude z1) (magnitude z2))
+                           (- (angle z1) (angle z2))))
+    #+end_src
+
+Now that we have the complex number arithmetic operations, we need
+somebody to implement a complex number representation. Both Ben and
+Alyssa want to do it, and we are for some reason --- pick your
+favorite reason) ---, forced to use both representation in our system.
+
+Here is what Ben does:
+
+#+begin_src scheme
+  (define (real-part z) (car z))
+
+  (define (imag-part z) (cdr z))
+
+  (define (magnitude z)
+    (sqrt (+ (square (real-part z)) (square (imag-part z)))))
+
+  (define (angle z)
+    (atan (imag-part z) (real-part z)))
+
+  (define (make-from-real-imag x y) (cons x y))
+
+  (define (make-from-mag-ang r a)
+    (cons (* r (cos a)) (* r (sin a))))
+#+end_src
+
+And here is what Alyssa does:
+
+#+begin_src scheme
+  (define (real-part z)
+    (* (magnitude z) (cos (angle z))))
+
+  (define (imag-part z)
+    (* (magnitude z) (sin (angle z))))
+
+  (define (magnitude z) (car z))
+
+  (define (angle z) (cdr z))
+
+  (define (make-from-real-imag x y)
+    (cons (sqrt (+ (square x) (square y)))
+          (atan y x)))
+
+  (define (make-from-mag-ang r a) (cons r a))
+#+end_src
+
+Ben has implement what can be called a ``rectangular'' representation
+(a pair of a real-part and an imaginary part), whereas Alyssa has
+implemented what can be called a ``polar'' representation (a pair of a
+magnitude and an angle). The selectors and the constructors they have
+created have the same name but they operate differently underneath the
+hood.
+
+Given that the operations ~add-complex~, ~sub-complex~, ~mul-complex~,
+and ~div-complex~ are implemented in terms of abstract data, choosing
+Ben's representation over Alyssa's, or vice versa, would make no
+difference: those operations would work in both cases.
+
+* 2.4.2 Tagged data
+Now, what if don't want to choose one representation over the other?
+What if we want to keep both representation? What if we want a system
+that looks like that figure 2.19?
+
+If our system has to include multiple representations for the same
+object type, then we need some way to distinguish object with
+representation foo from object with representation bar. A simple way
+to do that is /tagging/ the objects. To tag and check the tags we do
+use something like this:
+
+#+begin_src scheme
+  (define (attach-tag type-tag contents)
+    (cons type-tag contents))
+
+  (define (type-tag datum)
+    (if (pair? datum)
+        (car datum)
+        (error "Bad tagged datum -- TYPE-TAG" datum)))
+
+  (define (contents datum)
+    (if (pair? datum)
+        (cdr datum)
+        (error "Bad tagged datum -- CONTENTS" datum)))
+
+  (define (rectangular? z)
+    (eq? (type-tag z) 'rectangular))
+
+  (define (polar? z)
+    (eq? (type-tag z) 'polar))
+#+end_src
+
+If Ben and Alyssa have a designed their representation packages
+separately, what would they have to do to exist compatibly in the
+system? Here is what they can do. Ben can write his representation in
+this way:
+#+begin_src scheme
+  (define (real-part-rectangular z) (car z))
+
+  (define (imag-part-rectangular z) (cdr z))
+
+  (define (magnitude-rectangular z)
+    (sqrt (+ (square (real-part-rectangular z))
+             (square (imag-part-rectangular z)))))
+
+  (define (angle-rectangular z)
+    (atan (imag-part-rectangular z)
+          (real-part-rectangular z)))
+
+  (define (make-from-real-imag-rectangular x y)
+    (attach-tag 'rectangular (cons x y)))
+
+  (define (make-from-mag-ang-rectangular r a)
+    (attach-tag 'rectangular
+                (cons (* r (cos a)) (* r (sin a)))))
+#+end_src
+
+And Alyssa can write her representation in this way:
+#+begin_src scheme
+  (define (real-part-polar z)
+    (* (magnitude-polar z) (cos (angle-polar z))))
+
+  (define (imag-part-polar z)
+    (* (magnitude-polar z) (sin (angle-polar z))))
+
+  (define (magnitude-polar z) (car z))
+
+  (define (angle-polar z) (cdr z))
+
+  (define (make-from-real-imag-polar x y)
+    (attach-tag 'polar
+                (cons (sqrt (+ (square x) (square y)))
+                      (atan y x))))
+
+  (define (make-from-mag-ang-polar r a)
+    (attach-tag 'polar (cons r a)))
+#+end_src
+
+This packages differ from the original packages in two respects:
+1. the constructor is now tagging the objects it creates;
+2. the function names have been modified in order to avoid name
+   conflicts (for example, in Ben's represenation, ~real-part~ has
+   become ~real-part-rectangular~).
+
+Now that we have been given typed data, we need somebody, say a
+``manager'', that looks at those types and make things work. The
+manager can write a bunch of /generic/ selectors:
+#+begin_src scheme
+  (define (real-part z)
+    (cond ((rectangular? z)
+           (real-part-rectangular (contents z)))
+          ((polar? z)
+           (real-part-polar (contents z)))
+          (else (error "Unknown type -- REAL-PART" z))))
+
+  (define (imag-part z)
+    (cond ((rectangular? z)
+           (imag-part-rectangular (contents z)))
+          ((polar? z)
+           (imag-part-polar (contents z)))
+          (else (error "Unknown type -- IMAG-PART" z))))
+
+  (define (magnitude z)
+    (cond ((rectangular? z)
+           (magnitude-rectangular (contents z)))
+          ((polar? z)
+           (magnitude-polar (contents z)))
+          (else (error "Unknown type -- MAGNITUDE" z))))
+
+  (define (angle z)
+    (cond ((rectangular? z)
+           (angle-rectangular (contents z)))
+          ((polar? z)
+           (angle-polar (contents z)))
+          (else (error "Unknown type -- ANGLE" z))))
+#+end_src
+
+This strategy is called /dispatch on type/. We can think of the system
+as having three parts: Ben, Alyssa, and the manager. The idea is that
+you break your system into a bunch of pieces. There is Ben and Alyssa
+who are making representations and then there is the manager who looks
+at the types on the data and /dispatches/ tasks to the right person.
+
+* 2.4.3 Data-Directed Programming and Additivity
+
+
