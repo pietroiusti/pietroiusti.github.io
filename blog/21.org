@@ -13,30 +13,27 @@
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
 #+title: SICP 2.4 Multiple Representations for Abstract Data
-#+subtitle: 2023-08-16 Wed
+#+subtitle: 2023-09-24 Sun
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
 
-/Data Abstraction/ keeps separate the /use/ from the /implementation/,
-the /interface/ from the /representation/.
+/Data Abstraction/ separates the /use/ from the /implementation/, the
+/interface/ from the /representation/. A Scheme programmer, for
+example, usually operates at a level of abstraction such that she
+doesn't have to worry about how ~car~, ~cdr~, and ~cons~ are
+/implemented/. She just has to know /how they behave/. She just has to
+know that ~cons~ takes two entities and creates a further entity --- a
+pair --- the application of ~car~ to which returns the first entity
+and the application of ~cdr~ to which returns the second entity. When
+we /use/ pairs, their /implementation/ remains in the shadows[fn::A
+cool way to represent pairs is shown on page 91.]. The programmer
+knows how to use pairs, but he doesn't necessarily have to know how
+pairs are represented.
 
-A Scheme programmer, for example, usually operates at a level of
-abstraction such that she doesn't have to worry about how ~car~,
-~cdr~, and ~cons~ are /implemented/. She just has to know /how they
-behave/. She just has to know that ~cons~ takes two entities and
-creates a further entity --- aptly called a ``pair''--- the
-application of ~car~ to which returns the first entity and the
-application of ~cdr~ to which returns the second entity. The
-implementation of how this works remains in the shadows. The
-programmer knows how to /use/ pairs, but she doens't necessarily have
-to know how pairs are represented.
-
-Section 2.1.1 showed a example of this kinds of ``abstractions
-barriers''. We saw there ``how to separate the task of designing a
+Section 2.1.1 showed an example of this kind of ``abstractions
+barriers''. There we saw ``how to separate the task of designing a
 program that uses rational numbers from the task of implemententing
-rational numbers.
-
-The ``abstractions barriers'' we are talking about
+rational numbers. The ``abstractions barriers'' we are talking about
 can be thought of as horizontal barriers which are present at
 different levels (see Figure 2.1). In that specific example, there are
 the following barriers:
@@ -66,8 +63,7 @@ We need:
    system /additively/, that is, without having to redesign or
    reimplement it.
 
-We can think of those additiona barriers as /vertical/ barriers.
-
+We can think of those additiona barriers as /vertical/ barriers:
 #+begin_src 
      *Figure 2.19:* Data-abstraction barriers in the complex-number
      system.
@@ -86,19 +82,19 @@ We can think of those additiona barriers as /vertical/ barriers.
 [Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
 #+end_src
 
-Vertical barriers can be build through the usage of *generic
+Vertical barriers can be built through the usage of *generic
 procedures*, ``procedures that can operate on data that may be
-represented in more than one way''.
-
-We will be able to write generic procedure thanks to the usage of
-/type tags/. To achieve the ability to add representation to a certain
-system additively we will use the tecnnique of /data-directed/
-programming. We will also briefly look at an alternative to
-data-directed programming called /message passing/.
+represented in more than one way''. We will be able to write generic
+procedures thanks to the usage of /type tags/. To achieve the ability
+to add representation to a certain system additively we will use the
+technnique of /data-directed/ programming. We will also briefly look
+at an alternative to data-directed programming called /message
+passing/.
 
 * 2.4.1 Representations for Complex Numbers
 We want a complex number arithmetic system. Basically we want four
-operations: addition, subtraction, multiplication, and division.
+operations that work with complex numbers: addition, subtraction,
+multiplication, and division.
 
 Using a data-abstraction strategy --- exactly what we did with
 rational number) ---, we can just /assume/ that we have the following
@@ -107,47 +103,46 @@ selectors and constructors:
   - ~real-part~;
   - ~imag-part~;
   - ~magnitude~;
-  - ~angle~;
+  - ~angle~.
 - Constructors:
   - ~make-from-real-imag~;
-  - ~make-from-mag-ang~;
+  - ~make-from-mag-ang~.
 
-- Those selectors and constructors are our /abstract data/. We can
-  specify operations on complex numbers in terms of that abstract
-  data:
-  - ~add-complex~:
-    #+begin_src scheme
-      (define (add-complex z1 z2)
-        (make-from-real-imag (+ (real-part z1) (real-part z2))
-                             (+ (imag-part z1) (imag-part z2))))
-    #+end_src
-  - ~sub-complex~:
-    #+begin_src scheme
-      (define (sub-complex z1 z2)
-        (make-from-real-imag (- (real-part z1) (real-part z2))
-                             (- (imag-part z1) (imag-part z2))))
-    #+end_src
-  - ~mul-complex~:
-    #+begin_src scheme
-      (define (mul-complex z1 z2)
-        (make-from-mag-ang (* (magnitude z1) (magnitude z2))
-                           (+ (angle z1) (angle z2))))
-    #+end_src
-  - ~div-complex~:
-    #+begin_src scheme
-      (define (div-complex z1 z2)
-        (make-from-mag-ang (/ (magnitude z1) (magnitude z2))
-                           (- (angle z1) (angle z2))))
-    #+end_src
+The selectors and constructors above are our /abstract data/. We can
+specify operations on complex numbers in terms of that abstract data:
+- ~add-complex~:
+  #+begin_src scheme
+    (define (add-complex z1 z2)
+      (make-from-real-imag (+ (real-part z1) (real-part z2))
+                           (+ (imag-part z1) (imag-part z2))))
+  #+end_src
+- ~sub-complex~:
+  #+begin_src scheme
+    (define (sub-complex z1 z2)
+      (make-from-real-imag (- (real-part z1) (real-part z2))
+                           (- (imag-part z1) (imag-part z2))))
+  #+end_src
+- ~mul-complex~:
+  #+begin_src scheme
+    (define (mul-complex z1 z2)
+      (make-from-mag-ang (* (magnitude z1) (magnitude z2))
+                         (+ (angle z1) (angle z2))))
+  #+end_src
+- ~div-complex~:
+  #+begin_src scheme
+    (define (div-complex z1 z2)
+      (make-from-mag-ang (/ (magnitude z1) (magnitude z2))
+                         (- (angle z1) (angle z2))))
+  #+end_src
 
 Now that we have the complex number arithmetic operations, we need
 somebody to implement a complex number representation. Both Ben and
-Alyssa want to do it, and we are for some reason --- pick your
-favorite reason) ---, forced to use both representation in our system.
+Alyssa want to do it and, for some reason --- pick your favorite
+reason ---, we are forced to use both representations in our system.
 
 Here is what Ben does:
-
 #+begin_src scheme
+  ;; Ben's representation
   (define (real-part z) (car z))
 
   (define (imag-part z) (cdr z))
@@ -165,8 +160,8 @@ Here is what Ben does:
 #+end_src
 
 And here is what Alyssa does:
-
 #+begin_src scheme
+  ;; Alyssa's representation
   (define (real-part z)
     (* (magnitude z) (cos (angle z))))
 
@@ -184,12 +179,13 @@ And here is what Alyssa does:
   (define (make-from-mag-ang r a) (cons r a))
 #+end_src
 
-Ben has implement what can be called a ``rectangular'' representation
-(a pair of a real-part and an imaginary part), whereas Alyssa has
-implemented what can be called a ``polar'' representation (a pair of a
-magnitude and an angle). The selectors and the constructors they have
-created have the same name but they operate differently underneath the
-hood.
+Ben has implemented what can be called a ``rectangular''
+representation (in which a complex number is represented as a pair of
+a real-part and an imaginary part), whereas Alyssa has implemented
+what can be called a ``polar'' representation (in which a complex
+number is represented as a pair of a magnitude and an angle). The
+selectors and the constructors they have created have the same name,
+operate differently underneath the hood.
 
 Given that the operations ~add-complex~, ~sub-complex~, ~mul-complex~,
 and ~div-complex~ are implemented in terms of abstract data, choosing
@@ -198,14 +194,14 @@ difference: those operations would work in both cases.
 
 * 2.4.2 Tagged data
 Now, what if don't want to choose one representation over the other?
-What if we want to keep both representation? What if we want a system
+What if we want to keep both representations? What if we want a system
 that looks like that figure 2.19?
 
 If our system has to include multiple representations for the same
-object type, then we need some way to distinguish object with
-representation foo from object with representation bar. A simple way
-to do that is /tagging/ the objects. To tag and check the tags we do
-use something like this:
+object type, then we need some way to distinguish objects with
+representation foo from objects with representation bar. A simple way
+to do that is /tagging/ the objects. To tag and check the tags we can
+do something like this:
 
 #+begin_src scheme
   (define (attach-tag type-tag contents)
@@ -274,15 +270,15 @@ And Alyssa can write her representation in this way:
     (attach-tag 'polar (cons r a)))
 #+end_src
 
-This packages differ from the original packages in two respects:
+These ``packages'' differ from the original packages in two respects:
 1. the constructor is now tagging the objects it creates;
 2. the function names have been modified in order to avoid name
    conflicts (for example, in Ben's represenation, ~real-part~ has
    become ~real-part-rectangular~).
 
 Now that we have been given typed data, we need somebody, say a
-``manager'', that looks at those types and make things work. The
-manager can write a bunch of /generic/ selectors:
+``manager'' (see lecture), that looks at those types and make things
+work. The manager can now write /generic/ selectors:
 #+begin_src scheme
   (define (real-part z)
     (cond ((rectangular? z)
@@ -315,10 +311,357 @@ manager can write a bunch of /generic/ selectors:
 
 This strategy is called /dispatch on type/. We can think of the system
 as having three parts: Ben, Alyssa, and the manager. The idea is that
-you break your system into a bunch of pieces. There is Ben and Alyssa
-who are making representations and then there is the manager who looks
-at the types on the data and /dispatches/ tasks to the right person.
+you break your system into a bunch of pieces. There is Ben and Alyssa,
+who are making representations, and then there is the manager, who
+looks at the types on the data and /dispatches/ tasks to the right
+person.
 
 * 2.4.3 Data-Directed Programming and Additivity
+How can we criticize the system described above? First, Ben and Alyssa
+had to change the names of their procedures. Second, when somebody
+wants to add a representation into the system, even if Ben and Allyssa
+don't care, whoever is in charge of the generic selectors --- the
+manager, in our narrative ---, has to change all of them!
 
+(Roughly, from the lecture:) ``The inflexibility in the system, the
+place where work has to be done to accommodate is in the manager.
+That's quite annoying. It's even more annoying when you think that the
+manager isn't really doing anything... the bottleneck in the system is
+in the bureaucracy...''
+
+Now, abstractly, in the system, there is a table:
+
+|           | polar           | rectangular           |
+|-----------+-----------------+-----------------------|
+| real-part | real-part-polar | real-part-rectangular |
+|-----------+-----------------+-----------------------|
+| imag-part | imag-part-polar | imag-part-rectangular |
+|-----------+-----------------+-----------------------|
+| magnitude | magnitude-polar | magnitude-rectangular |
+|-----------+-----------------+-----------------------|
+| angle     | angle-polar     | angle-rectangular     |
+    
+In the table we have the right procedures for the given types
+(columns) and operators (rows). ``That's really what's going on. In
+some sense, all the manager is doing is acting as this table''.
+
+How do we fix our system? We get rid of the manager. We let our system
+use the table directly. How do we do that? Let's assume --- again,
+data abstraction! --- that we have some sort of table data structure
+in which we can put things:
+
+#+begin_src scheme
+  `(put <OP> <TYPE> <ITEM>)' installs the `<ITEM>' in the table,
+  indexed by the `<OP>' and the `<TYPE>'.
+
+  `(get <OP> <TYPE>)' looks up the `<OP>', `<TYPE>' entry in the
+  table and returns the item found there.  If no item is found,
+  `get' returns false.
+#+end_src
+
+Given that we have this table, now Ben and Alyssa, when they build
+their systems, can fill the table appriopriately:
+
+Ben:
+#+begin_src scheme
+  (define (install-rectangular-package)
+    ;; internal procedures
+    (define (real-part z) (car z))
+    (define (imag-part z) (cdr z))
+    (define (make-from-real-imag x y) (cons x y))
+    (define (magnitude z)
+      (sqrt (+ (square (real-part z))
+               (square (imag-part z)))))
+    (define (angle z)
+      (atan (imag-part z) (real-part z)))
+    (define (make-from-mag-ang r a)
+      (cons (* r (cos a)) (* r (sin a))))
+
+    ;; interface to the rest of the system
+    (define (tag x) (attach-tag 'rectangular x))
+    (put 'real-part '(rectangular) real-part)
+    (put 'imag-part '(rectangular) imag-part)
+    (put 'magnitude '(rectangular) magnitude)
+    (put 'angle '(rectangular) angle)
+    (put 'make-from-real-imag 'rectangular
+         (lambda (x y) (tag (make-from-real-imag x y))))
+    (put 'make-from-mag-ang 'rectangular
+         (lambda (r a) (tag (make-from-mag-ang r a))))
+    'done)
+#+end_src
+
+Alyssa:
+#+begin_src scheme
+  (define (install-polar-package)
+    ;; internal procedures
+    (define (magnitude z) (car z))
+    (define (angle z) (cdr z))
+    (define (make-from-mag-ang r a) (cons r a))
+    (define (real-part z)
+      (* (magnitude z) (cos (angle z))))
+    (define (imag-part z)
+      (* (magnitude z) (sin (angle z))))
+    (define (make-from-real-imag x y)
+      (cons (sqrt (+ (square x) (square y)))
+            (atan y x)))
+
+    ;; interface to the rest of the system
+    (define (tag x) (attach-tag 'polar x))
+    (put 'real-part '(polar) real-part)
+    (put 'imag-part '(polar) imag-part)
+    (put 'magnitude '(polar) magnitude)
+    (put 'angle '(polar) angle)
+    (put 'make-from-real-imag 'polar
+         (lambda (x y) (tag (make-from-real-imag x y))))
+    (put 'make-from-mag-ang 'polar
+         (lambda (r a) (tag (make-from-mag-ang r a))))
+    'done)
+#+end_src
+
+Who makes a representation has the responsibility of setting up a
+column in the table. The manager has been ``automated out of
+existence''. The manager is replaced by a procedure. This procedure is
+called ~apply-generic~ and is the key procedure in the whole system
+(see also its simpler version ~operate~ shown in the lecture).
+
+#+begin_src scheme
+  (define (apply-generic op . args)
+    (let ((type-tags (map type-tag args)))
+      (let ((proc (get op type-tags)))
+        (if proc
+            (apply proc (map contents args))
+            (error
+             "No method for these types -- APPLY-GENERIC"
+             (list op type-tags))))))
+#+end_src
+
+We use ~apply-generic~ to define the generic selectors:
+
+#+begin_src scheme
+  (define (real-part z) (apply-generic 'real-part z))
+  (define (imag-part z) (apply-generic 'imag-part z))
+  (define (magnitude z) (apply-generic 'magnitude z))
+  (define (angle z) (apply-generic 'angle z))
+#+end_src
+
+This strategy is called ``data-directed programming'', because, ``in
+some sense the data objects themselves are carrying with them the
+information about how you should operate on them''.
+
+** Exercise 2.74
+*Exercise*:
+#+begin_quote
+Insatiable Enterprises, Inc., is a highly decentralized conglomerate
+company consisting of a large number of independent divisions located
+all over the world. The company's computer facilities have just been
+interconnected by means of a clever network-interfacing scheme that
+makes the entire network appear to any user to be a single computer.
+Insatiable's president, in her first attempt to exploit the ability of
+the network to extract administrative information from division files,
+is dismayed to discover that, although all the division files have
+been implemented as data structures in Scheme, the particular data
+structure used varies from division to division. A meeting of division
+managers is hastily called to search for a strategy to integrate the
+files that will satisfy headquarters' needs while preserving the
+existing autonomy of the divisions.
+
+Show how such a strategy can be implemented with data-directed
+programming. As an example, suppose that each division's personnel
+records consist of a single file, which contains a set of records
+keyed on employees' names. The structure of the set varies from
+division to division. Furthermore, each employee's record is itself a
+set (structured differently from division to division) that contains
+information keyed under identifiers such as ~address~ and ~salary~. In
+particular:
+
+a. Implement for headquarters a ~get-record~ procedure that retrieves
+a specified employee's record from a specified personnel file. The
+procedure should be applicable to any division's file. Explain how the
+individual divisions' files should be structured. In particular, what
+type information must be supplied?
+
+b. Implement for headquarters a ~get-salary~ procedure that returns
+the salary information from a given employee's record from any
+division's personnel file. How should the record be structured in
+order to make this operation work?
+
+c. Implement for headquarters a ~find-employee-record~ procedure. This
+should search all the divisions' files for the record of a given
+employee and return the record. Assume that this procedure takes as
+arguments an employee's name and a list of all the divisions' files.
+
+d. When Insatiable takes over a new company, what changes must be made
+in order to incorporate the new personnel information into the central
+system?
+#+end_quote
+
+*Answer*:
+
+Division1 could provide its package like that:
+
+#+begin_src scheme
+  (define (install-division1-package)
+    ;; internal procedures
+    (define (get-record file employee-name)
+      ;; ...
+      )
+
+    ;; interface to the rest of the system
+    (define (tag-file x) (attach-tag 'division1 x))
+    (define (tag-employee x) (attach-tag 'employee-division1 x))
+    (put 'get-record '(division1 employee-division1) get-record))
+#+end_src
+
+Other divisions would do anologously.
+
+A generic ~get-record~ procedure could then be implemented as follows:
+#+begin_src scheme
+  (define (get-record personnel-file name)
+    (apply-generic 'get-record personnel-file name))
+#+end_src
+
+** Message Passing
+Data-directed programming makes use of a operation-and-type table.
+
+The first method we have seen --- generic operations with explicit
+dispatch --- can be thought of as decomposing that table ``into rows,
+with each generic operation procedure representing a row of the
+table.''
+
+There is at least a third alternative, known as ``message passing'',
+which consists in decomposing the table into type columns only:
+#+begin_quote
+instead of using "intelligent operations" that dispatch on data types,
+to work with "intelligent data objects" that dispatch on operation
+names.
+#+end_quote
+
+Here is how we could write ~make-from-real-imag~ following such an
+approach:
+#+begin_src scheme
+  (define (make-from-real-imag x y)
+    (define (dispatch op)
+      (cond ((eq? op 'real-part) x)
+            ((eq? op 'imag-part) y)
+            ((eq? op 'magnitude)
+             (sqrt (+ (square x) (square y))))
+            ((eq? op 'angle) (atan y x))
+            (else
+             (error "Unknown op -- MAKE-FROM-REAL-IMAG" op))))
+    dispatch)
+#+end_src
+
+And here is how ~apply-generic~ would look like:
+#+begin_src scheme
+  (define (apply-generic op arg) (arg op))
+#+end_src
+
+#+begin_quote
+The name comes from the image that a data object is an entity that
+receives the requested operation name as a "message."
+#+end_quote
+
+** Exercise 2.75
+*Exercise*:
+#+begin_quote
+Implement the constructor `make-from-mag-ang' in message-passing
+style. This procedure should be analogous to the `make-from-real-imag'
+procedure given above.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (make-from-mag-ang r a)
+    (define (dispatch op)
+      (cond ((eq? op 'real-part) (* r (cos a)))
+            ((eq? op 'imag-part) (* r (sin a)))
+            ((eq? op 'magnitude) r)
+            ((eq? op 'angle) a)
+            (else (error "Unknown op - MAKE-FROM-MAG-ANG" op))))
+    dispatch)
+#+end_src
+
+** Exercise 2.76
+*Exercise*:
+#+begin_quote
+As a large system with generic operations evolves, new types of data
+objects or new operations may be needed. For each of the three
+strategies--generic operations with explicit dispatch, data-directed
+style, and message-passing-style--describe the changes that must be
+made to a system in order to add new types or new operations. Which
+organization would be most appropriate for a system in which new types
+must often be added? Which would be most appropriate for a system in
+which new operations must often be added?
+#+end_quote
+
+*Answer*:
+
+*** Generic operations with explicit dispatch
+**** Adding a new type
+Let's imagine Henry wants to add his representation to the complex
+number arithmetic system.
+
+Somebody (the ``manager''...) has to change all generic operators.
+~real-part~, ~imag-part~, ~magnitude~, ~angle~, now need an additonal
+check for Henry's representation. Moreover, Henry should make sure
+that the names of his procedures don't conflict with those used by Ben
+and Alyssa.
+**** Adding a new operation
+Suppose we need a ~get-foo~ operation.
+
+All of those in charge of maintaining representation (Ben, Alyssa, and
+Henry) have to write a method that performs the right operation with
+their representation. And, again, name conflict is to be avoided.
+
+Moreover, somebody (the ``manager''...) has to write a generic
+~get-foo~ operation. In order to do so, he has to know all the names
+of the procedures written by Ben, Alyssa, and Henry.
+*** Data-directed Programming
+**** Adding a new type
+Again, let's imagine that Henry wants to add his representation to the
+complex number arithmetic system we already have.
+
+Herry, in data-directed system, has to ``install'' his packaged, that
+is, he has to put his procedures into the table.
+
+By following the method shown at p. ? he doesn't have to worry about
+name conflict (That method exploits scope. There are other ways as
+well; for example, putting lambdas into the table. The table stores
+objects, not names).
+
+There is now work for the ``manager''. The manager has been
+``automated out of existence'' (ref: ). The generic operations we
+already have will do the right thing thanks to ~apply-generic~ (or its
+simpler version ~operate~ shown in the lecture).
+**** Adding a new operation
+Again, suppose we need a ~get-foo~ operation.
+
+Sombody has to write a generic ~get-foo~.
+
+However, unlike with generic operations with explicit dispatch, now we
+don't need to know anything besides the name of the operation we want
+to add.
+
+Each package mantainer will have the responsibility to add their
+version of ~get-foo~ to the table. However, in case one doesn't and we
+try to ~get-foo~ to complext number of their type, the generic
+operation will show a suitable error message.
+*** Message passing
+**** Adding a new type
+Again, let's imagine that Henry wants to add his representation to the
+complex number arithmetic system we already have.
+
+Henry just as to add a new constructor. The situation is somewhat
+analogous to the data-directed programming case.
+**** Adding a new operation
+Again, suppose we need a ~get-foo~ operation.
+
+Somebody has to write the generic operation ~get-foo~, like in
+data-directed programming.
+
+Moreove, each ``packgage maintainers'' will have to add their version
+of ~get-foo~ in the ~dispatch~ procedure. In this case as well, if
+somebody forgets to add the procedures, an error message is printed
+when we apply ~get-foo~ on the releavant object.
 
