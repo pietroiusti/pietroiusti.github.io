@@ -1,0 +1,1262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-09-27 Wed 23:42 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 2.4 Multiple Representations for Abstract Data</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 2.4 Multiple Representations for Abstract Data
+<br />
+<span class="subtitle">2023-09-27 Wed</span>
+</h1>
+<p>
+<i>Data Abstraction</i> separates the <i>use</i> from the <i>implementation</i>, the
+<i>interface</i> from the <i>representation</i>. A Scheme programmer, for
+example, usually operates at a level of abstraction such that she
+doesn't have to worry about how <code>car</code>, <code>cdr</code>, and <code>cons</code> are
+<i>implemented</i>. She just has to know <i>how they behave</i>. She just has to
+know that <code>cons</code> takes two entities and creates a further entity &#x2014; a
+pair &#x2014; the application of <code>car</code> to which returns the first entity
+and the application of <code>cdr</code> to which returns the second entity. When
+we <i>use</i> pairs, their <i>implementation</i> remains in the shadows<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>. The programmer knows how to use pairs, but he doesn't
+necessarily have to know how pairs are represented.
+</p>
+
+<p>
+Section 2.1.1 showed an example of this kind of ``abstractions
+barriers''. There we saw ``how to separate the task of designing a
+program that uses rational numbers from the task of implementing
+rational numbers. The ``abstractions barriers'' we are talking about
+can be thought of as horizontal barriers which are present at
+different levels (see Figure 2.1). In that specific example, there are
+the following barriers:
+</p>
+<ul class="org-ul">
+<li><code>cons</code>, <code>car</code>, <code>cdr</code>;</li>
+<li><code>make-rat</code>, <code>numer</code>, <code>denom</code>;</li>
+<li><code>add-rat</code>, <code>sub-rat</code>, etc.;</li>
+<li>programs that use rational numbers.</li>
+</ul>
+
+<p>
+Despite the benefits that those barriers provide, those barriers are
+not enough. They are not enough, because there might be more than one
+useful representation for a certain data object and we might want to
+use those different representations together in our system. Complex
+numbers offer a more-or-less-toy example. Complex numbers can be
+represented in the so-called ``rectangular'' form &#x2014; which is in
+terms of a real part and an imaginary part &#x2014;, or in the so-called
+``polar'' form &#x2014; which is in terms of a magnitude and an angle. Each
+of those two representations can be, depending on the circumstances,
+more appropriate than the other.
+</p>
+
+<p>
+We need:
+</p>
+<ul class="org-ul">
+<li><b>not only</b>: ``data-abstraction barriers'' that isolate <i>use</i> from
+<i>representation</i>, <i>interface</i> from <i>implementation</i>,</li>
+<li><b>but also</b>: abstraction barriers that isolate different
+representations for the same data object and allow those different
+design choices to coexist.</li>
+<li><b>moreover</b>: we need to able to add a certain representation to a
+system <i>additively</i>, that is, without having to re-design or
+re-implement it.</li>
+</ul>
+
+<p>
+We can think of those additional barriers as <i>vertical</i> barriers:
+</p>
+<pre class="example">
+     *Figure 2.19:* Data-abstraction barriers in the complex-number
+     system.
+
+                     Programs that use complex numbers
+            +-------------------------------------------------+
+          --| add-complex sub-complex mul-complex div-complex |--
+            +-------------------------------------------------+
+                        Complex arithmetic package
+          ---------------------------+---------------------------
+                    Rectangular      |         Polar
+                  representation     |     representation
+          ---------------------------+---------------------------
+              List structure and primitive machine arithmetic
+
+[Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
+</pre>
+
+<p>
+Vertical barriers can be built through the usage of <b>generic
+procedures</b>, ``procedures that can operate on data that may be
+represented in more than one way''. We will be able to write generic
+procedures thanks to the usage of <i>type tags</i>. To achieve the ability
+to add representation to a certain system additively we will use the
+technique of <i>data-directed</i> programming. We will also briefly look
+at an alternative to data-directed programming called <i>message
+passing</i>.
+</p>
+
+<div id="outline-container-org8f9f2de" class="outline-2">
+<h2 id="org8f9f2de">2.4.1 Representations for Complex Numbers</h2>
+<div class="outline-text-2" id="text-org8f9f2de">
+<p>
+We want a complex number arithmetic system. Basically we want four
+operations that work with complex numbers: addition, subtraction,
+multiplication, and division.
+</p>
+
+<p>
+Using a data-abstraction strategy &#x2014; exactly what we did with
+rational number) &#x2014;, we can just <i>assume</i> that we have the following
+selectors and constructors:
+</p>
+<ul class="org-ul">
+<li>Selectors:
+<ul class="org-ul">
+<li><code>real-part</code>;</li>
+<li><code>imag-part</code>;</li>
+<li><code>magnitude</code>;</li>
+<li><code>angle</code>.</li>
+</ul></li>
+<li>Constructors:
+<ul class="org-ul">
+<li><code>make-from-real-imag</code>;</li>
+<li><code>make-from-mag-ang</code>.</li>
+</ul></li>
+</ul>
+
+<p>
+The selectors and constructors above are our <i>abstract data</i>. We can
+specify operations on complex numbers in terms of that abstract data:
+</p>
+<ul class="org-ul">
+<li><p>
+<code>add-complex</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">add-complex</span> z1 z2)
+  (make-from-real-imag (+ (real-part z1) (real-part z2))
+                       (+ (imag-part z1) (imag-part z2))))
+</pre>
+</div></li>
+<li><p>
+<code>sub-complex</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">sub-complex</span> z1 z2)
+  (make-from-real-imag (- (real-part z1) (real-part z2))
+                       (- (imag-part z1) (imag-part z2))))
+</pre>
+</div></li>
+<li><p>
+<code>mul-complex</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">mul-complex</span> z1 z2)
+  (make-from-mag-ang (* (magnitude z1) (magnitude z2))
+                     (+ (angle z1) (angle z2))))
+</pre>
+</div></li>
+<li><p>
+<code>div-complex</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">div-complex</span> z1 z2)
+  (make-from-mag-ang (/ (magnitude z1) (magnitude z2))
+                     (- (angle z1) (angle z2))))
+</pre>
+</div></li>
+</ul>
+
+<p>
+Now that we have the complex number arithmetic operations, we need
+somebody to implement a complex number representation. Both Ben and
+Alyssa want to do it and, for some reason &#x2014; pick your favorite
+reason &#x2014;, we are forced to use both representations in our system.
+</p>
+
+<p>
+Here is what Ben does:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">Ben's representation</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part</span> z) (car z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part</span> z) (cdr z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude</span> z)
+  (sqrt (+ (square (real-part z)) (square (imag-part z)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle</span> z)
+  (atan (imag-part z) (real-part z)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-real-imag</span> x y) (cons x y))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-mag-ang</span> r a)
+  (cons (* r (cos a)) (* r (sin a))))
+</pre>
+</div>
+
+<p>
+And here is what Alyssa does:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">Alyssa's representation</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part</span> z)
+  (* (magnitude z) (cos (angle z))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part</span> z)
+  (* (magnitude z) (sin (angle z))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude</span> z) (car z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle</span> z) (cdr z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-real-imag</span> x y)
+  (cons (sqrt (+ (square x) (square y)))
+        (atan y x)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-mag-ang</span> r a) (cons r a))
+</pre>
+</div>
+
+<p>
+Ben has implemented what can be called a ``rectangular''
+representation (in which a complex number is represented as a pair of
+a real-part and an imaginary part), whereas Alyssa has implemented
+what can be called a ``polar'' representation (in which a complex
+number is represented as a pair of a magnitude and an angle). The
+selectors and the constructors they have created have the same name,
+operate differently underneath the hood.
+</p>
+
+<p>
+Given that the operations <code>add-complex</code>, <code>sub-complex</code>, <code>mul-complex</code>,
+and <code>div-complex</code> are implemented in terms of abstract data, choosing
+Ben's representation over Alyssa's, or vice versa, would make no
+difference: those operations would work in both cases.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd600812" class="outline-2">
+<h2 id="orgd600812">2.4.2 Tagged data</h2>
+<div class="outline-text-2" id="text-orgd600812">
+<p>
+Now, what if don't want to choose one representation over the other?
+What if we want to keep both representations? What if we want a system
+that looks like that figure 2.19?
+</p>
+
+<p>
+If our system has to include multiple representations for the same
+object type, then we need some way to distinguish objects with
+representation foo from objects with representation bar. A simple way
+to do that is <i>tagging</i> the objects. To tag and check the tags we can
+do something like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">attach-tag</span> type-tag contents)
+  (cons type-tag contents))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">type-tag</span> datum)
+  (<span style="color: #531ab6;">if</span> (pair? datum)
+      (car datum)
+      (error <span style="color: #3548cf;">"Bad tagged datum -- TYPE-TAG"</span> datum)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">contents</span> datum)
+  (<span style="color: #531ab6;">if</span> (pair? datum)
+      (cdr datum)
+      (error <span style="color: #3548cf;">"Bad tagged datum -- CONTENTS"</span> datum)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rectangular?</span> z)
+  (eq? (type-tag z) 'rectangular))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">polar?</span> z)
+  (eq? (type-tag z) 'polar))
+</pre>
+</div>
+
+<p>
+If Ben and Alyssa have a designed their representation packages
+separately, what would they have to do to exist compatibly in the
+system? Here is what they can do. Ben can write his representation in
+this way:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part-rectangular</span> z) (car z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part-rectangular</span> z) (cdr z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude-rectangular</span> z)
+  (sqrt (+ (square (real-part-rectangular z))
+           (square (imag-part-rectangular z)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle-rectangular</span> z)
+  (atan (imag-part-rectangular z)
+        (real-part-rectangular z)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-real-imag-rectangular</span> x y)
+  (attach-tag 'rectangular (cons x y)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-mag-ang-rectangular</span> r a)
+  (attach-tag 'rectangular
+              (cons (* r (cos a)) (* r (sin a)))))
+</pre>
+</div>
+
+<p>
+And Alyssa can write her representation in this way:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part-polar</span> z)
+  (* (magnitude-polar z) (cos (angle-polar z))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part-polar</span> z)
+  (* (magnitude-polar z) (sin (angle-polar z))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude-polar</span> z) (car z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle-polar</span> z) (cdr z))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-real-imag-polar</span> x y)
+  (attach-tag 'polar
+              (cons (sqrt (+ (square x) (square y)))
+                    (atan y x))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-mag-ang-polar</span> r a)
+  (attach-tag 'polar (cons r a)))
+</pre>
+</div>
+
+<p>
+These ``packages'' differ from the original packages in two respects:
+</p>
+<ol class="org-ol">
+<li>the constructor is now tagging the objects it creates;</li>
+<li>the function names have been modified in order to avoid name
+conflicts (for example, in Ben's representation, <code>real-part</code> has
+become <code>real-part-rectangular</code>).</li>
+</ol>
+
+<p>
+Now that we have been given typed data, we need somebody, say a
+``manager'' (see lecture), that looks at those types and make things
+work. The manager can now write <i>generic</i> selectors:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part</span> z)
+  (<span style="color: #531ab6;">cond</span> ((rectangular? z)
+         (real-part-rectangular (contents z)))
+        ((polar? z)
+         (real-part-polar (contents z)))
+        (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown type -- REAL-PART"</span> z))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part</span> z)
+  (<span style="color: #531ab6;">cond</span> ((rectangular? z)
+         (imag-part-rectangular (contents z)))
+        ((polar? z)
+         (imag-part-polar (contents z)))
+        (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown type -- IMAG-PART"</span> z))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude</span> z)
+  (<span style="color: #531ab6;">cond</span> ((rectangular? z)
+         (magnitude-rectangular (contents z)))
+        ((polar? z)
+         (magnitude-polar (contents z)))
+        (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown type -- MAGNITUDE"</span> z))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle</span> z)
+  (<span style="color: #531ab6;">cond</span> ((rectangular? z)
+         (angle-rectangular (contents z)))
+        ((polar? z)
+         (angle-polar (contents z)))
+        (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown type -- ANGLE"</span> z))))
+</pre>
+</div>
+
+<p>
+This strategy is called <i>dispatch on type</i>. We can think of the system
+as having three parts: Ben, Alyssa, and the manager. The idea is that
+you break your system into a bunch of pieces. There is Ben and Alyssa,
+who are making representations, and then there is the manager, who
+looks at the types on the data and <i>dispatches</i> tasks to the right
+person.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfe3a705" class="outline-2">
+<h2 id="orgfe3a705">2.4.3 Data-Directed Programming and Additivity</h2>
+<div class="outline-text-2" id="text-orgfe3a705">
+<p>
+How can we criticize the system described above? First, Ben and Alyssa
+had to change the names of their procedures. Second, when somebody
+wants to add a representation into the system, even if Ben and Alyssa
+don't care, whoever is in charge of the generic selectors &#x2014; the
+manager, in our narrative &#x2014;, has to change all of them!
+</p>
+
+<p>
+(Roughly, from the lecture:) ``The inflexibility in the system, the
+place where work has to be done to accommodate is in the manager.
+That's quite annoying. It's even more annoying when you think that the
+manager isn't really doing anything&#x2026; the bottleneck in the system is
+in the bureaucracy&#x2026;''
+</p>
+
+<p>
+Now, abstractly, in the system, there is a table:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">polar</th>
+<th scope="col" class="org-left">rectangular</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">real-part</td>
+<td class="org-left">real-part-polar</td>
+<td class="org-left">real-part-rectangular</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">imag-part</td>
+<td class="org-left">imag-part-polar</td>
+<td class="org-left">imag-part-rectangular</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">magnitude</td>
+<td class="org-left">magnitude-polar</td>
+<td class="org-left">magnitude-rectangular</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">angle</td>
+<td class="org-left">angle-polar</td>
+<td class="org-left">angle-rectangular</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+In the table we have the right procedures for the given types
+(columns) and operators (rows). ``That's really what's going on. In
+some sense, all the manager is doing is acting as this table''.
+</p>
+
+<p>
+How do we fix our system? We get rid of the manager. We let our system
+use the table directly. How do we do that? Let's assume &#x2014; again,
+data abstraction! &#x2014; that we have some sort of table data structure
+in which we can put things:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">`(put <span style="color: #005f5f;">&lt;OP&gt;</span> <span style="color: #005f5f;">&lt;TYPE&gt;</span> <span style="color: #005f5f;">&lt;ITEM&gt;</span>)' installs the `<span style="color: #005f5f;">&lt;ITEM&gt;</span>' in the table,
+indexed by the `<span style="color: #005f5f;">&lt;OP&gt;</span>' and the `<span style="color: #005f5f;">&lt;TYPE&gt;</span>'.
+
+`(get <span style="color: #005f5f;">&lt;OP&gt;</span> <span style="color: #005f5f;">&lt;TYPE&gt;</span>)' looks up the `<span style="color: #005f5f;">&lt;OP&gt;</span>', `<span style="color: #005f5f;">&lt;TYPE&gt;</span>' entry in the
+table and returns the item found there.  If no item is found,
+`get' returns false.
+</pre>
+</div>
+
+<p>
+Given that we have this table, now Ben and Alyssa, when they build
+their systems, can fill the table appropriately:
+</p>
+
+<p>
+Ben:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">install-rectangular-package</span>)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">internal procedures</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part</span> z) (car z))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part</span> z) (cdr z))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-real-imag</span> x y) (cons x y))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude</span> z)
+    (sqrt (+ (square (real-part z))
+             (square (imag-part z)))))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle</span> z)
+    (atan (imag-part z) (real-part z)))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-mag-ang</span> r a)
+    (cons (* r (cos a)) (* r (sin a))))
+
+  <span style="color: #595959;">;; </span><span style="color: #595959;">interface to the rest of the system</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tag</span> x) (attach-tag 'rectangular x))
+  (put 'real-part '(rectangular) real-part)
+  (put 'imag-part '(rectangular) imag-part)
+  (put 'magnitude '(rectangular) magnitude)
+  (put 'angle '(rectangular) angle)
+  (put 'make-from-real-imag 'rectangular
+       (<span style="color: #531ab6;">lambda</span> (x y) (tag (make-from-real-imag x y))))
+  (put 'make-from-mag-ang 'rectangular
+       (<span style="color: #531ab6;">lambda</span> (r a) (tag (make-from-mag-ang r a))))
+  'done)
+</pre>
+</div>
+
+<p>
+Alyssa:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">install-polar-package</span>)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">internal procedures</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude</span> z) (car z))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle</span> z) (cdr z))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-mag-ang</span> r a) (cons r a))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part</span> z)
+    (* (magnitude z) (cos (angle z))))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part</span> z)
+    (* (magnitude z) (sin (angle z))))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-real-imag</span> x y)
+    (cons (sqrt (+ (square x) (square y)))
+          (atan y x)))
+
+  <span style="color: #595959;">;; </span><span style="color: #595959;">interface to the rest of the system</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tag</span> x) (attach-tag 'polar x))
+  (put 'real-part '(polar) real-part)
+  (put 'imag-part '(polar) imag-part)
+  (put 'magnitude '(polar) magnitude)
+  (put 'angle '(polar) angle)
+  (put 'make-from-real-imag 'polar
+       (<span style="color: #531ab6;">lambda</span> (x y) (tag (make-from-real-imag x y))))
+  (put 'make-from-mag-ang 'polar
+       (<span style="color: #531ab6;">lambda</span> (r a) (tag (make-from-mag-ang r a))))
+  'done)
+</pre>
+</div>
+
+<p>
+Who makes a representation has the responsibility of setting up a
+column in the table. The manager has been ``automated out of
+existence''. The manager is replaced by a procedure. This procedure is
+called <code>apply-generic</code> and is the key procedure in the whole system
+(see also its simpler version <code>operate</code> shown in the lecture).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-generic</span> op . args)
+  (<span style="color: #531ab6;">let</span> ((type-tags (<span style="color: #531ab6;">map</span> type-tag args)))
+    (<span style="color: #531ab6;">let</span> ((proc (get op type-tags)))
+      (<span style="color: #531ab6;">if</span> proc
+          (apply proc (<span style="color: #531ab6;">map</span> contents args))
+          (error
+           <span style="color: #3548cf;">"No method for these types -- APPLY-GENERIC"</span>
+           (list op type-tags))))))
+</pre>
+</div>
+
+<p>
+We use <code>apply-generic</code> to define the generic selectors:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">real-part</span> z) (apply-generic 'real-part z))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">imag-part</span> z) (apply-generic 'imag-part z))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude</span> z) (apply-generic 'magnitude z))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">angle</span> z) (apply-generic 'angle z))
+</pre>
+</div>
+
+<p>
+This strategy is called ``data-directed programming'', because, ``in
+some sense the data objects themselves are carrying with them the
+information about how you should operate on them''.
+</p>
+</div>
+
+<div id="outline-container-org308e6af" class="outline-3">
+<h3 id="org308e6af">Exercise 2.74</h3>
+<div class="outline-text-3" id="text-org308e6af">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Insatiable Enterprises, Inc., is a highly decentralized conglomerate
+company consisting of a large number of independent divisions located
+all over the world. The company's computer facilities have just been
+interconnected by means of a clever network-interfacing scheme that
+makes the entire network appear to any user to be a single computer.
+Insatiable's president, in her first attempt to exploit the ability of
+the network to extract administrative information from division files,
+is dismayed to discover that, although all the division files have
+been implemented as data structures in Scheme, the particular data
+structure used varies from division to division. A meeting of division
+managers is hastily called to search for a strategy to integrate the
+files that will satisfy headquarters' needs while preserving the
+existing autonomy of the divisions.
+</p>
+
+<p>
+Show how such a strategy can be implemented with data-directed
+programming. As an example, suppose that each division's personnel
+records consist of a single file, which contains a set of records
+keyed on employees' names. The structure of the set varies from
+division to division. Furthermore, each employee's record is itself a
+set (structured differently from division to division) that contains
+information keyed under identifiers such as <code>address</code> and <code>salary</code>. In
+particular:
+</p>
+
+<p>
+a. Implement for headquarters a <code>get-record</code> procedure that retrieves
+a specified employee's record from a specified personnel file. The
+procedure should be applicable to any division's file. Explain how the
+individual divisions' files should be structured. In particular, what
+type information must be supplied?
+</p>
+
+<p>
+b. Implement for headquarters a <code>get-salary</code> procedure that returns
+the salary information from a given employee's record from any
+division's personnel file. How should the record be structured in
+order to make this operation work?
+</p>
+
+<p>
+c. Implement for headquarters a <code>find-employee-record</code> procedure. This
+should search all the divisions' files for the record of a given
+employee and return the record. Assume that this procedure takes as
+arguments an employee's name and a list of all the divisions' files.
+</p>
+
+<p>
+d. When Insatiable takes over a new company, what changes must be made
+in order to incorporate the new personnel information into the central
+system?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+</div>
+
+<div id="outline-container-orgf047d97" class="outline-4">
+<h4 id="orgf047d97">a.</h4>
+<div class="outline-text-4" id="text-orgf047d97">
+<p>
+A generic <code>get-record</code> procedure could be implemented as follows:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">get-record</span> personnel-file name)
+  (apply-generic 'get-record personnel-file name))
+</pre>
+</div>
+
+
+<p>
+Division1 (and, analogously, other divisions) could provide its
+package like that:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">install-division1-package</span>)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">internal procedures</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">get-record</span> file employee-name)
+    <span style="color: #595959;">;; </span><span style="color: #595959;">...</span>
+    )
+
+  <span style="color: #595959;">;; </span><span style="color: #595959;">constructors</span>
+  <span style="color: #595959;">;; </span><span style="color: #595959;">...</span>
+
+  <span style="color: #595959;">;; </span><span style="color: #595959;">interface to the rest of the system</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tag-file</span> x) (attach-tag 'division1 x))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tag-employee-name</span> x) (attach-tag 'employee-name-division1 x))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tag-employee</span> x) (attach-tag 'employee-division1 x))
+
+  (put 'get-record '(division1 employee-name-division1) get-record))
+</pre>
+</div>
+
+<p>
+[Should employee-name1 be typed data? Couldn't it be just a non-typed
+string]
+</p>
+</div>
+</div>
+<div id="outline-container-orgb588f2b" class="outline-4">
+<h4 id="orgb588f2b">b.</h4>
+<div class="outline-text-4" id="text-orgb588f2b">
+<p>
+Headquarters could use this procedure:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">get-salary</span> employee-record)
+  (apply-generic 'get-salary employee-record))
+</pre>
+</div>
+
+<p>
+Division1 (and, analogously, the other divisions) could provide their
+version of <code>get-salary</code> procedures in the following ways:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">install-division1-package</span>)
+  <span style="color: #595959;">;;</span><span style="color: #595959;">...</span>
+
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">get-salary</span> employee-name)
+    <span style="color: #595959;">;; </span>
+    )
+
+  <span style="color: #595959;">;</span><span style="color: #595959;">...</span>
+
+  <span style="color: #595959;">;; </span><span style="color: #595959;">interface to the rest of the system</span>
+  <span style="color: #595959;">;; </span><span style="color: #595959;">..</span>
+
+  (put 'get-salary '(employee-division1) get-salary))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0d5ae1d" class="outline-4">
+<h4 id="org0d5ae1d">c</h4>
+<div class="outline-text-4" id="text-org0d5ae1d">
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">find-employee-record</span> name divisions)
+    (<span style="color: #531ab6;">if</span> (null? divisions)
+        nil
+        (<span style="color: #531ab6;">or</span> (get-record name (car divisions))
+            (find-employee-record name (cdr divisions)))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org89e53bb" class="outline-4">
+<h4 id="org89e53bb">d</h4>
+<div class="outline-text-4" id="text-org89e53bb">
+<p>
+Somebody has fill the table with the relevant new methods.
+<code>get-record</code>, <code>get-salary</code>, and <code>find-employee-record</code> remain the way
+they are.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1960de1" class="outline-3">
+<h3 id="org1960de1">Message Passing</h3>
+<div class="outline-text-3" id="text-org1960de1">
+<p>
+Data-directed programming makes use of a operation-and-type table.
+</p>
+
+<p>
+The first method we have seen &#x2014; generic operations with explicit
+dispatch &#x2014; can be thought of as decomposing that table ``into rows,
+with each generic operation procedure representing a row of the
+table.''
+</p>
+
+<p>
+There is at least a third alternative, known as ``message passing'',
+which consists in decomposing the table into type columns only:
+</p>
+<blockquote>
+<p>
+instead of using "intelligent operations" that dispatch on data types,
+to work with "intelligent data objects" that dispatch on operation
+names.
+</p>
+</blockquote>
+
+<p>
+Here is how we could write <code>make-from-real-imag</code> following such an
+approach:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-real-imag</span> x y)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> op)
+    (<span style="color: #531ab6;">cond</span> ((eq? op 'real-part) x)
+          ((eq? op 'imag-part) y)
+          ((eq? op 'magnitude)
+           (sqrt (+ (square x) (square y))))
+          ((eq? op 'angle) (atan y x))
+          (<span style="color: #531ab6;">else</span>
+           (error <span style="color: #3548cf;">"Unknown op -- MAKE-FROM-REAL-IMAG"</span> op))))
+  dispatch)
+</pre>
+</div>
+
+<p>
+And here is how <code>apply-generic</code> would look like:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-generic</span> op arg) (arg op))
+</pre>
+</div>
+
+<blockquote>
+<p>
+The name comes from the image that a data object is an entity that
+receives the requested operation name as a "message."
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgd57a3b7" class="outline-3">
+<h3 id="orgd57a3b7">Exercise 2.75</h3>
+<div class="outline-text-3" id="text-orgd57a3b7">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Implement the constructor `make-from-mag-ang' in message-passing
+style. This procedure should be analogous to the `make-from-real-imag'
+procedure given above.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-from-mag-ang</span> r a)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> op)
+    (<span style="color: #531ab6;">cond</span> ((eq? op 'real-part) (* r (cos a)))
+          ((eq? op 'imag-part) (* r (sin a)))
+          ((eq? op 'magnitude) r)
+          ((eq? op 'angle) a)
+          (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown op - MAKE-FROM-MAG-ANG"</span> op))))
+  dispatch)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8210486" class="outline-3">
+<h3 id="org8210486">Exercise 2.76</h3>
+<div class="outline-text-3" id="text-org8210486">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+As a large system with generic operations evolves, new types of data
+objects or new operations may be needed. For each of the three
+strategies &#x2014; generic operations with explicit dispatch,
+data-directed style, and message-passing-style &#x2014; describe the
+changes that must be made to a system in order to add new types or new
+operations. Which organization would be most appropriate for a system
+in which new types must often be added? Which would be most
+appropriate for a system in which new operations must often be added?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+</div>
+
+<div id="outline-container-org146b9f0" class="outline-4">
+<h4 id="org146b9f0">Generic operations with explicit dispatch</h4>
+<div class="outline-text-4" id="text-org146b9f0">
+</div>
+<ul class="org-ul">
+<li><a id="org312ff30"></a>Adding a new type<br />
+<div class="outline-text-5" id="text-org312ff30">
+<p>
+Let's imagine Henry wants to add his representation to the complex
+number arithmetic system.
+</p>
+
+<p>
+Somebody (the ``manager''&#x2026;) has to change all generic operators.
+<code>real-part</code>, <code>imag-part</code>, <code>magnitude</code>, <code>angle</code>, now need an additonal
+check for Henry's representation. Moreover, Henry should make sure
+that the names of his procedures don't conflict with those used by Ben
+and Alyssa.
+</p>
+</div>
+</li>
+<li><a id="org0319cb9"></a>Adding a new operation<br />
+<div class="outline-text-5" id="text-org0319cb9">
+<p>
+Suppose we need a <code>get-foo</code> operation.
+</p>
+
+<p>
+All of those in charge of maintaining representation (Ben, Alyssa, and
+Henry) have to write a method that performs the right operation when
+their their representation is used. And, again, name conflict is to be
+avoided.
+</p>
+
+<p>
+Moreover, somebody (the ``manager''&#x2026;) has to write a generic
+<code>get-foo</code> operation. In order to do so, he has to know all the names
+of the procedures written by Ben, Alyssa, and Henry.
+</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="outline-container-orgb288c32" class="outline-4">
+<h4 id="orgb288c32">Data-directed Programming</h4>
+<div class="outline-text-4" id="text-orgb288c32">
+</div>
+<ul class="org-ul">
+<li><a id="org5e90545"></a>Adding a new type<br />
+<div class="outline-text-5" id="text-org5e90545">
+<p>
+Again, let's imagine that Henry wants to add his representation to the
+complex number arithmetic system we already have.
+</p>
+
+<p>
+Henry, in data-directed system, has to ``install'' his packaged, that
+is, he has to put his procedures into the table.
+</p>
+
+<p>
+By following the method shown at p. ? he doesn't have to worry about
+name conflict (That method exploits scope. There are other ways as
+well; for example, putting lambdas into the table; see the video
+lecture. The table stores objects, not names).
+</p>
+
+<p>
+There is now no work for the ``manager''. The manager has been
+``automated out of existence'' (see the lecture). The generic
+operations we already have will do the right thing thanks to
+<code>apply-generic</code> (or its simpler version <code>operate</code> shown in the
+lecture).
+</p>
+</div>
+</li>
+<li><a id="orgbac7bed"></a>Adding a new operation<br />
+<div class="outline-text-5" id="text-orgbac7bed">
+<p>
+Again, suppose we need a <code>get-foo</code> operation.
+</p>
+
+<p>
+Somebody has to write a generic <code>get-foo</code>.
+</p>
+
+<p>
+However, unlike with generic operations with explicit dispatch, now we
+don't need to know anything besides the name of the operation we want
+to add.
+</p>
+
+<p>
+Each package maintainer will have the responsibility to add their
+version of <code>get-foo</code> to the table. However, in case one doesn't and we
+try to <code>get-foo</code> to complex number of their type, the generic
+operation will show a suitable error message.
+</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="outline-container-org8447257" class="outline-4">
+<h4 id="org8447257">Message passing</h4>
+<div class="outline-text-4" id="text-org8447257">
+</div>
+<ul class="org-ul">
+<li><a id="orgf6a3701"></a>Adding a new type<br />
+<div class="outline-text-5" id="text-orgf6a3701">
+<p>
+Again, let's imagine that Henry wants to add his representation to the
+complex number arithmetic system we already have.
+</p>
+
+<p>
+Henry just as to add a new constructor. The situation is somewhat
+analogous to the data-directed programming case.
+</p>
+</div>
+</li>
+<li><a id="orgec7ae07"></a>Adding a new operation<br />
+<div class="outline-text-5" id="text-orgec7ae07">
+<p>
+Again, suppose we need a <code>get-foo</code> operation.
+</p>
+
+<p>
+Somebody has to write the generic operation <code>get-foo</code>, like in
+data-directed programming.
+</p>
+
+<p>
+Moreover, each ``package maintainers'' will have to add their version
+of <code>get-foo</code> in the <code>dispatch</code> procedure. In this case as well, if
+somebody forgets to add the relevant procedure, an error message is
+printed when we apply <code>get-foo</code> on the relevant object.
+</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="outline-container-org850c4d4" class="outline-4">
+<h4 id="org850c4d4">Conclusions</h4>
+<div class="outline-text-4" id="text-org850c4d4">
+<blockquote>
+<p>
+Which organization would be most appropriate for a system
+in which new types must often be added?
+</p>
+</blockquote>
+
+<p>
+Either data-directed programming or message passing. As far as I can
+now see, they are both superior, in this respect, to generic
+operations with explicit dispatch, but none of them is obviously
+better than the other.
+</p>
+
+<blockquote>
+<p>
+Which would be most appropriate for a system in which new operations
+must often be added?
+</p>
+</blockquote>
+
+<p>
+I would give the same answer: either data-directed programming or
+message passing. As far as I can now see, they are both superior, in
+this respect, to generic operations with explicit dispatch, but none
+of them is obviously better than the other.
+</p>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">A
+cool way to represent pairs using procedures only is shown on page
+91.</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</span></p>
+</div>
+</body>
+</html>

@@ -13,7 +13,7 @@
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
 #+title: SICP 2.4 Multiple Representations for Abstract Data
-#+subtitle: 2023-09-24 Sun
+#+subtitle: 2023-09-27 Wed
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
 
@@ -26,13 +26,13 @@ know that ~cons~ takes two entities and creates a further entity --- a
 pair --- the application of ~car~ to which returns the first entity
 and the application of ~cdr~ to which returns the second entity. When
 we /use/ pairs, their /implementation/ remains in the shadows[fn::A
-cool way to represent pairs is shown on page 91.]. The programmer
-knows how to use pairs, but he doesn't necessarily have to know how
-pairs are represented.
+cool way to represent pairs using procedures only is shown on page
+91.]. The programmer knows how to use pairs, but he doesn't
+necessarily have to know how pairs are represented.
 
 Section 2.1.1 showed an example of this kind of ``abstractions
 barriers''. There we saw ``how to separate the task of designing a
-program that uses rational numbers from the task of implemententing
+program that uses rational numbers from the task of implementing
 rational numbers. The ``abstractions barriers'' we are talking about
 can be thought of as horizontal barriers which are present at
 different levels (see Figure 2.1). In that specific example, there are
@@ -45,7 +45,7 @@ the following barriers:
 Despite the benefits that those barriers provide, those barriers are
 not enough. They are not enough, because there might be more than one
 useful representation for a certain data object and we might want to
-use those different representatiosn together in our system. Complex
+use those different representations together in our system. Complex
 numbers offer a more-or-less-toy example. Complex numbers can be
 represented in the so-called ``rectangular'' form --- which is in
 terms of a real part and an imaginary part ---, or in the so-called
@@ -60,10 +60,10 @@ We need:
    representations for the same data object and allow those different
    design choices to coexist.
  - *moreover*: we need to able to add a certain representation to a
-   system /additively/, that is, without having to redesign or
-   reimplement it.
+   system /additively/, that is, without having to re-design or
+   re-implement it.
 
-We can think of those additiona barriers as /vertical/ barriers:
+We can think of those additional barriers as /vertical/ barriers:
 #+begin_src 
      *Figure 2.19:* Data-abstraction barriers in the complex-number
      system.
@@ -87,7 +87,7 @@ procedures*, ``procedures that can operate on data that may be
 represented in more than one way''. We will be able to write generic
 procedures thanks to the usage of /type tags/. To achieve the ability
 to add representation to a certain system additively we will use the
-technnique of /data-directed/ programming. We will also briefly look
+technique of /data-directed/ programming. We will also briefly look
 at an alternative to data-directed programming called /message
 passing/.
 
@@ -273,7 +273,7 @@ And Alyssa can write her representation in this way:
 These ``packages'' differ from the original packages in two respects:
 1. the constructor is now tagging the objects it creates;
 2. the function names have been modified in order to avoid name
-   conflicts (for example, in Ben's represenation, ~real-part~ has
+   conflicts (for example, in Ben's representation, ~real-part~ has
    become ~real-part-rectangular~).
 
 Now that we have been given typed data, we need somebody, say a
@@ -319,7 +319,7 @@ person.
 * 2.4.3 Data-Directed Programming and Additivity
 How can we criticize the system described above? First, Ben and Alyssa
 had to change the names of their procedures. Second, when somebody
-wants to add a representation into the system, even if Ben and Allyssa
+wants to add a representation into the system, even if Ben and Alyssa
 don't care, whoever is in charge of the generic selectors --- the
 manager, in our narrative ---, has to change all of them!
 
@@ -360,7 +360,7 @@ in which we can put things:
 #+end_src
 
 Given that we have this table, now Ben and Alyssa, when they build
-their systems, can fill the table appriopriately:
+their systems, can fill the table appropriately:
 
 Ben:
 #+begin_src scheme
@@ -497,7 +497,16 @@ system?
 
 *Answer*:
 
-Division1 could provide its package like that:
+*** a.
+A generic ~get-record~ procedure could be implemented as follows:
+#+begin_src scheme
+  (define (get-record personnel-file name)
+    (apply-generic 'get-record personnel-file name))
+#+end_src
+
+
+Division1 (and, analogously, other divisions) could provide its
+package like that:
 
 #+begin_src scheme
   (define (install-division1-package)
@@ -506,19 +515,55 @@ Division1 could provide its package like that:
       ;; ...
       )
 
+    ;; constructors
+    ;; ...
+
     ;; interface to the rest of the system
     (define (tag-file x) (attach-tag 'division1 x))
+    (define (tag-employee-name x) (attach-tag 'employee-name-division1 x))
     (define (tag-employee x) (attach-tag 'employee-division1 x))
-    (put 'get-record '(division1 employee-division1) get-record))
+
+    (put 'get-record '(division1 employee-name-division1) get-record))
 #+end_src
 
-Other divisions would do anologously.
-
-A generic ~get-record~ procedure could then be implemented as follows:
+[Should employee-name1 be typed data? Couldn't it be just a non-typed
+string]
+*** b.
+Headquarters could use this procedure:
 #+begin_src scheme
-  (define (get-record personnel-file name)
-    (apply-generic 'get-record personnel-file name))
+  (define (get-salary employee-record)
+    (apply-generic 'get-salary employee-record))
 #+end_src
+
+Division1 (and, analogously, the other divisions) could provide their
+version of ~get-salary~ procedures in the following ways:
+#+begin_src scheme
+  (define (install-division1-package)
+    ;;...
+
+    (define (get-salary employee-name)
+      ;; 
+      )
+
+    ;...
+
+    ;; interface to the rest of the system
+    ;; ..
+
+    (put 'get-salary '(employee-division1) get-salary))
+#+end_src
+*** c
+#+begin_src scheme
+(define (find-employee-record name divisions)
+    (if (null? divisions)
+        nil
+        (or (get-record name (car divisions))
+            (find-employee-record name (cdr divisions)))))
+#+end_src
+*** d
+Somebody has fill the table with the relevant new methods.
+~get-record~, ~get-salary~, and ~find-employee-record~ remain the way
+they are.
 
 ** Message Passing
 Data-directed programming makes use of a operation-and-type table.
@@ -587,12 +632,12 @@ procedure given above.
 #+begin_quote
 As a large system with generic operations evolves, new types of data
 objects or new operations may be needed. For each of the three
-strategies--generic operations with explicit dispatch, data-directed
-style, and message-passing-style--describe the changes that must be
-made to a system in order to add new types or new operations. Which
-organization would be most appropriate for a system in which new types
-must often be added? Which would be most appropriate for a system in
-which new operations must often be added?
+strategies --- generic operations with explicit dispatch,
+data-directed style, and message-passing-style --- describe the
+changes that must be made to a system in order to add new types or new
+operations. Which organization would be most appropriate for a system
+in which new types must often be added? Which would be most
+appropriate for a system in which new operations must often be added?
 #+end_quote
 
 *Answer*:
@@ -611,8 +656,9 @@ and Alyssa.
 Suppose we need a ~get-foo~ operation.
 
 All of those in charge of maintaining representation (Ben, Alyssa, and
-Henry) have to write a method that performs the right operation with
-their representation. And, again, name conflict is to be avoided.
+Henry) have to write a method that performs the right operation when
+their their representation is used. And, again, name conflict is to be
+avoided.
 
 Moreover, somebody (the ``manager''...) has to write a generic
 ~get-foo~ operation. In order to do so, he has to know all the names
@@ -622,30 +668,31 @@ of the procedures written by Ben, Alyssa, and Henry.
 Again, let's imagine that Henry wants to add his representation to the
 complex number arithmetic system we already have.
 
-Herry, in data-directed system, has to ``install'' his packaged, that
+Henry, in data-directed system, has to ``install'' his packaged, that
 is, he has to put his procedures into the table.
 
 By following the method shown at p. ? he doesn't have to worry about
 name conflict (That method exploits scope. There are other ways as
-well; for example, putting lambdas into the table. The table stores
-objects, not names).
+well; for example, putting lambdas into the table; see the video
+lecture. The table stores objects, not names).
 
-There is now work for the ``manager''. The manager has been
-``automated out of existence'' (ref: ). The generic operations we
-already have will do the right thing thanks to ~apply-generic~ (or its
-simpler version ~operate~ shown in the lecture).
+There is now no work for the ``manager''. The manager has been
+``automated out of existence'' (see the lecture). The generic
+operations we already have will do the right thing thanks to
+~apply-generic~ (or its simpler version ~operate~ shown in the
+lecture).
 **** Adding a new operation
 Again, suppose we need a ~get-foo~ operation.
 
-Sombody has to write a generic ~get-foo~.
+Somebody has to write a generic ~get-foo~.
 
 However, unlike with generic operations with explicit dispatch, now we
 don't need to know anything besides the name of the operation we want
 to add.
 
-Each package mantainer will have the responsibility to add their
+Each package maintainer will have the responsibility to add their
 version of ~get-foo~ to the table. However, in case one doesn't and we
-try to ~get-foo~ to complext number of their type, the generic
+try to ~get-foo~ to complex number of their type, the generic
 operation will show a suitable error message.
 *** Message passing
 **** Adding a new type
@@ -660,8 +707,33 @@ Again, suppose we need a ~get-foo~ operation.
 Somebody has to write the generic operation ~get-foo~, like in
 data-directed programming.
 
-Moreove, each ``packgage maintainers'' will have to add their version
+Moreover, each ``package maintainers'' will have to add their version
 of ~get-foo~ in the ~dispatch~ procedure. In this case as well, if
-somebody forgets to add the procedures, an error message is printed
-when we apply ~get-foo~ on the releavant object.
+somebody forgets to add the relevant procedure, an error message is
+printed when we apply ~get-foo~ on the relevant object.
+*** Conclusions
+#+begin_quote
+Which organization would be most appropriate for a system
+in which new types must often be added?
+#+end_quote
 
+Either data-directed programming or message passing. As far as I can
+now see, they are both superior, in this respect, to generic
+operations with explicit dispatch, but none of them is obviously
+better than the other.
+
+#+begin_quote
+Which would be most appropriate for a system in which new operations
+must often be added?
+#+end_quote
+
+I would give the same answer: either data-directed programming or
+message passing. As far as I can now see, they are both superior, in
+this respect, to generic operations with explicit dispatch, but none
+of them is obviously better than the other.
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
