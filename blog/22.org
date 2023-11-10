@@ -1,0 +1,366 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 2.5 Systems with Generic Operations
+#+subtitle: 2023-11-09 Thu
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+
+* 2.5.1 Generic Arithmetic Operations
+In 2.5.1, Authors show how to define generic operations that can take
+different types of arguments (in our case different types of numbers),
+for example a generic ~add~ that works with ordinary numbers as well
+as with rational and complex numbers.  The technique used to define
+such generic operations is the same way that has been used to define
+the generic operations (selectors) in the case of complex numbers (in
+2.4.3).
+** Exercise 2.77
+*Exercise*:
+
+#+begin_quote
+Louis Reasoner tries to evaluate the expression ~(magnitude z)~ where
+~z~ is the object shown in Figure 2-24.  To his surprise, instead of
+the answer 5 he gets an error message from ~apply-generic~, saying
+there is no method for the operation ~magnitude~ on the types
+~(complex)~.  He shows this interaction to Alyssa P. Hacker, who says
+"The problem is that the complex-number selectors were never defined
+for ~complex~ numbers, just for ~polar~ and ~rectangular~ numbers.
+All you have to do to make this work is add the following to the
+~complex~ package:"
+
+#+begin_src scheme
+  (put 'real-part '(complex) real-part)
+  (put 'imag-part '(complex) imag-part)
+  (put 'magnitude '(complex) magnitude)
+  (put 'angle '(complex) angle)
+#+end_src
+
+Describe in detail why this works.  As an example, trace through all
+the procedures called in evaluating the expression ~(magnitude z)~
+where ~z~ is the object shown in Figure 2-24.  In particular, how many
+times is ~apply-generic~ invoked?  What procedure is dispatched to in
+each case?
+#+end_quote
+
+*Answer*:
+
+Here is ~z~:
+#+begin_src
+
+  -->[o|o]-->[o|o]-------->[o|o]
+      |       |             | |
+      v       v             v v
+  'complex  'rectangular    3 4
+#+end_src
+
+Louis evaluates ~(magnitude z)~.
+
+Louis is using the procedure defined as follows:
+
+#+begin_src scheme
+  (define (magnitude z)
+    (apply-generic 'magnitude z))
+#+end_src
+
+This means that when calling ~magnitude~, the first thing we do is
+looking in the table for the item specified by the row ~'magnitude~
+and column ~'complex~ (the type of ~z~).
+
+However, nobody has stored such a table item. (At the moment there is
+an element specified by row ~'magnitude~ and column ~'rectangular~,
+and an element specified by row ~'magnitude~ and column ~'polar~.) So,
+Louis' invocation produces an error.
+
+Alyssa's code adds to the table four objects. Those objects are the
+generic procedures defined on page 84, which are themselves designed
+to look for and use an object in the table.
+
+So, now, when Louis calls ~(magnitude z)~, we look for a table item
+which exists. It's the item which has been installed by Alyssa with
+this line:
+#+begin_src scheme
+  (put 'magnitude '(complex) magnitude)
+#+end_src
+
+Given that we find an item in the table, ~apply-generic~ applies it to
+the ~contents~ of ~z~. These are the ~contents~ of ~z~:
+
+#+begin_src
+    [o|o]------>[o|o]
+     |           | |
+     v           v v
+'rectangular     3 4
+#+end_src
+
+Applying ~magnitude~ to these contents means, again, looking for an
+item in the table. This time we are looking for the item specified the
+row ~'magnitude~ and the colum ~'rectangular~. That item is found and
+applied to the contents.
+
+Table before Alyssa's change:
+|           | rectangular           | polar           |
+|-----------+-----------------------+-----------------|
+| ...       |                       |                 |
+| magnitude | magnitude-rectangular | magnitude-polar |
+| ...       |                       |                 |
+
+
+Table after Alyssa's change:
+|           | complex   | rectangular           | polar           |
+|-----------+-----------+-----------------------+-----------------|
+| ...       |           |                       |                 |
+| magnitude | magnitude | magnitude-rectangular | magnitude-polar |
+| ...       |           |                       |                 |
+
+When evaluating ~(magnitude z)~, after Alyssa's contribution,
+~apply-generic~ is called twice. The first time it dispatches to
+~magnitude~ to itself (in a sense, ~magnitude~, through
+~apply-generic~, is dispatching to itself). The second time it
+dispatches to ~magnitude-rectangular~.
+
+#+begin_src scheme
+  (magnitude z) ;; z:  -->[o|o]-->[o|o]-------->[o|o]
+                ;;         |       |             | |
+                ;;         v       v             v v
+                ;;     'complex  'rectangular    3 4
+  ;;    |
+  ;;    |
+  ;;    V
+  ;;  apply-generic
+  ;;    |
+  ;;    |
+  ;;    V
+  (magnitude z') ;; z': -->[o|o]-------->[o|o]
+                 ;;         |             | |
+                 ;;         v             v v
+                 ;;       'rectangular    3 4
+  ;;    |
+  ;;    |
+  ;;    V
+  ;;  apply-generic
+  ;;    |
+  ;;    |
+  ;;    V
+  (magnitude z'') ;; z'': -->[o|o]
+                  ;;          | |
+                  ;;          v v
+                  ;;          3 4
+#+end_src
+
+Basically, Alyssa's line, has the effect of making ~magnitude~
+stripping off ~'complex~ before dispatching to someone else.
+** Exercise 2.78
+*Exercise*:
+
+#+begin_quote
+The internal procedures in the ~scheme-number~ package are essentially
+nothing more than calls to the primitive procedures ~+~, ~-~, etc. It
+was not possible to use the primitives of the language directly
+because our type-tag system requires that each data object have a type
+attached to it. In fact, however, all Lisp implementations do have a
+type system, which they use internally. Primitive predicates such as
+~symbol?~ and ~number?~ determine whether data objects have particular
+types. Modify the definitions of ~type-tag~, ~contents~, and
+~attach-tag~ from section 2-4-2 so that our generic system takes
+advantage of Scheme's internal type system. That is to say, the system
+should work as before except that ordinary numbers should be
+represented simply as Scheme numbers rather than as pairs whose ~car~
+is the symbol ~scheme-number~.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (type-tag datum)
+    (cond ((number? datum) 'scheme-number)
+          ((pair? datum) (car datum))
+          (else (error "Bad tagged datum -- TYPE-TAG" datum))))
+
+  (define (contents datum)
+    (cond ((number? datum) datum)
+          ((pair? datum) (cdr datum))
+          (else (error "Bad tagged datum -- CONTENTS" datum))))
+
+  (define (attach-tag type-tag contents)
+    (if (number? contents)
+        contents
+        (cons type-tag contents)))
+  ;; alternatively
+  (define (attach-tag type-tag contents)
+    (if (eq? type-tag 'scheme-number)
+        contents
+        (cons type-tag contents)))
+#+end_src
+** Exercise 2.79
+*Exercise*:
+
+#+begin_quote
+Define a generic equality predicate ~equ?~ that tests the equality of
+two numbers, and install it in the generic arithmetic package. This
+operation should work for ordinary numbers, rational numbers, and
+complex numbers.
+#+end_quote
+
+*Answer*:
+
+I guess, first of all:
+
+#+begin_src scheme
+  (define (equ? x y) apply-generic 'equ? x y)
+#+end_src
+
+After this, we should put the specific procedures for the types of
+numbers we have:
+
+#+begin_src scheme
+  (put 'equ? '(scheme-number scheme-number)
+       (lambda (x y) (= x y)))
+#+end_src
+
+#+begin_src scheme
+  (put 'equ? '(rational rational)
+       (lambda (x y) (and (= (car x) (car y))
+                          (= (cdr x) (cdr y)))))
+#+end_src
+(if ~equ?~ for rational numbers was defined within the
+~install-rational-package~ procedure we could make use of ~number~ and
+~denom~)
+
+#+begin_src scheme
+  (put 'equ? '(complex complex)
+       (lambda (x y) (and (= (real-part x) (real-part y))
+                          (= (imag-part x) (imag-part y)))))
+#+end_src
+(~Real-part~ and ~imag-part~, if I'm not wrong, here work correctly
+thanks to the code added by Alyssa P. Hacker in ex. 2.77.)
+
+(Alternatively, we could have used ~magnitude~ and ~angle~, instead of
+~real-part~ and ~imag-part~.)
+** Exercise 2.80
+Exercise*:
+
+#+begin_quote
+Define a generic predicate ~=zero?~ that tests if its argument is
+zero, and install it in the generic arithmetic package. This operation
+should work for ordinary numbers, rational numbers, and complex
+numbers.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (=zero? x)
+    (apply-generic =zero? x))
+#+end_src
+
+#+begin_src scheme
+  (put '=zero '(scheme-number scheme-number)
+       (lambda (x) (= x 0)))
+#+end_src
+
+#+begin_src scheme
+  (put '=zero '(rational rational)
+       (lambda (x)
+         (and (= (car x) 0)
+              (not (= (cdr x) 0)))))
+  ;; the numerator must be zero and the denominator must be non-zero
+#+end_src
+
+#+begin_src scheme
+  (put '=zero '(complex)
+       (lambda (x)
+         (and (= (real-part x) 0)
+              (= (imag-part x) 0))))
+#+end_src
+
+Alternatively:
+
+#+begin_src scheme
+  (put '=zero '(complex)
+       (lambda (x)
+         (= (angle x) 0)))
+#+end_src
+
+
+* 2.5.2 Combining Data of Different Types
+So far we have considered operations on objects of the same type. For
+example, the addition of two ordinary numbers or the multiplication of
+two rational numbers. But this means that the operations we have
+defined ``treat the different data types as being completely
+independent.''. We haven't dealt with, say the addition of an ordinary
+number and a rational number, or the division of a rational number and
+a complex number. How should we introduce ``cross-type'' operations in
+our system?
+
+#+begin_quote
+one way to handle cross-type operations is to design a different
+procedure for each possible combination of types for which the
+operation is valid. [...] this technique works, but it is cumbersome.
+#+end_quote
+
+When we can, we should be ``by taking advantage of additional
+structure that may be latent in our type system'': often an object of
+a certain data type can be seen as an object of a another data
+type. E.g., the rational number 2/2, can be seen as the ordinary
+number 1. Given so, if we are asked to perform an operation on a
+rational number and an ordinary number, we could try to ``coerce'' the
+rational number into an ordinary number. And if we are successfull in
+doing so, then we can use our good old procedure that works with
+ordinary numbers.
+
+The coercion idea can be implement by designing coercion procedures,
+installing them into a coercion table, and then modifying
+~apply-generic~.
+
+#+begin_src scheme
+  (define (scheme-number->complex n)
+    (make-complex-from-real-imag (contents n) 0))
+
+  (put-coercion 'scheme-number 'complex scheme-number->complex)
+
+  ;; For simplicity, only the case in which there are two arguments is
+  ;; considered
+  (define (apply-generic op . args)
+    (let ((type-tags (map type-tag args)))
+      (let ((proc (get op type-tags)))
+        (if proc
+            (apply proc (map contents args))
+            (if (= (length args) 2)
+                (let ((type1 (car type-tags))
+                      (type2 (cadr type-tags))
+                      (a1 (car args))
+                      (a2 (cadr args)))
+                  (let ((t1->t2 (get-coercion type1 type2))
+                        (t2->t1 (get-coercion type2 type1)))
+                    (cond (t1->t2
+                           (apply-generic op (t1->t2 a1) a2))
+                          (t2->t1
+                           (apply-generic op a1 (t2->t1 a2)))
+                          (else
+                           (error "No method for these types"
+                                  (list op type-tags))))))
+                (error "No method for these types"
+                       (list op type-tags)))))))
+#+end_src
+
+This coercion scheme is useful, but not general enough: there may be
+cases in which it's not possible neither object can be converted into
+the type of the other object, but in which both objects could be
+converted to a third type.
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
