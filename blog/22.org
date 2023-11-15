@@ -13,7 +13,7 @@
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
 #+title: SICP 2.5 Systems with Generic Operations
-#+subtitle: 2023-11-09 Thu
+#+subtitle: 2023-11-15 Wed
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
 
@@ -105,7 +105,7 @@ the ~contents~ of ~z~. These are the ~contents~ of ~z~:
 
 Applying ~magnitude~ to these contents means, again, looking for an
 item in the table. This time we are looking for the item specified the
-row ~'magnitude~ and the colum ~'rectangular~. That item is found and
+row ~'magnitude~ and the column ~'rectangular~. That item is found and
 applied to the contents.
 
 Table before Alyssa's change:
@@ -292,7 +292,6 @@ Alternatively:
          (= (angle x) 0)))
 #+end_src
 
-
 * 2.5.2 Combining Data of Different Types
 So far we have considered operations on objects of the same type. For
 example, the addition of two ordinary numbers or the multiplication of
@@ -315,7 +314,7 @@ a certain data type can be seen as an object of a another data
 type. E.g., the rational number 2/2, can be seen as the ordinary
 number 1. Given so, if we are asked to perform an operation on a
 rational number and an ordinary number, we could try to ``coerce'' the
-rational number into an ordinary number. And if we are successfull in
+rational number into an ordinary number. And if we are successful in
 doing so, then we can use our good old procedure that works with
 ordinary numbers.
 
@@ -358,6 +357,219 @@ This coercion scheme is useful, but not general enough: there may be
 cases in which it's not possible neither object can be converted into
 the type of the other object, but in which both objects could be
 converted to a third type.
+
+** Exercise 2.81
+*Exercise*:
+
+#+begin_quote
+Louis Reasoner has noticed that ~apply-generic~ may try to coerce the
+arguments to each other's type even if they already have the same
+type. Therefore, he reasons, we need to put procedures in the coercion
+table to ``coerce'' arguments of each type to their own type. For
+example, in addition to the ~scheme-number->complex~ coercion shown
+above, he would do:
+
+#+begin_src scheme
+  (define (scheme-number->scheme-number n) n)
+  (define (complex->complex z) z)
+  (put-coercion 'scheme-number 'scheme-number
+  scheme-number->scheme-number)
+  (put-coercion 'complex 'complex complex->complex)
+#+end_src
+
+a. With Louis's coercion procedures installed, what happens if
+~apply-generic~ is called with two arguments of type ~scheme-number~
+or two arguments of type ~complex~ for an operation that is not found
+in the table for those types? For example, assume that we've defined a
+generic exponentiation operation:
+
+#+begin_src scheme
+  (define (exp x y) (apply-generic 'exp x y))
+#+end_src
+
+and have put a procedure for exponentiation in the Scheme-number
+package but not in any other package:
+
+#+begin_src scheme
+  ;; following added to Scheme-number package
+  (put 'exp '(scheme-number scheme-number)
+  (lambda (x y) (tag (expt x y)))) ; using primitive `expt'
+#+end_src
+
+What happens if we call ~exp~ with two complex numbers as arguments?
+
+b. Is Louis correct that something had to be done about coercion with
+arguments of the same type, or does ~apply-generic~ work correctly as
+is?
+
+c. Modify ~apply-generic~ so that it doesn't try coercion if the two
+arguments have the same type.
+#+end_quote
+
+*Answer*:
+
+*** a
+If we call ~exp~ with two complex numbers, we would call
+
+#+begin_src scheme
+  (apply-generic 'exp CN1 CN2)
+#+end_src
+
+We are not going to find a procedure, because we don't have an object
+in the table for row ~'exp~ and column ~'(complex complex)~.
+
+So we would go inside the second ~if~.
+
+Both ~t1->t2~ and ~t2->t1~ would be truthy, thanks to the code added
+by Louis Reasoner.
+
+Given that the former is truthy, we would call
+
+#+begin_src scheme
+  (apply-generic 'exp (t1->t2 CN1) CN2)
+#+end_src
+
+~(t1->t2 CN1)~ evaluates to CN1, so we would call ~apply-generic~
+again with its original arguments. So: we would be calling
+~apply-generic~ /ad infinitum/ with the same arguments.
+
+*** b
+Think about what happens if we call ~exp~ with two rational numbers or
+complex numbers without the additional code provided by Louis
+Reasoner.
+
+# #+begin_src scheme
+#   (exp CN1 CN2)
+#   ;     |
+#   ;     V
+#   (apply-generic 'exp '(complex complex))
+#   ;     |
+#   ;     V
+#   ;     ?
+# #+end_src
+
+~Apply-generic~ would not find a ~proc~ (when it uses ~get~), and so
+(given that ~(= (length args) 2)~ is true) is going to apply
+~get-coercion~ twice. So, yeah, Louis Reasoner was right. Something
+has to be done.
+*** c
+My first instinct is to turn
+
+#+begin_src scheme
+  (if (= (length args) 2)
+#+end_src
+
+into
+
+#+begin_src scheme
+  (if (and (= (length args) 2)
+           (eq (car (type-tags))
+               (cadr (type-tags))))
+#+end_src
+
+There might be more elegant ways of doing it, but this should work.
+Here is the modified procedure:
+
+#+begin_src scheme
+  (define (apply-generic op . args)
+    (let ((type-tags (map type-tag args)))
+      (let ((proc (get op type-tags)))
+        (if proc
+            (apply proc (map contents args))
+            (if (and (= (length args) 2)
+                     (eq (car (type-tags))
+                         (cadr (type-tags))))
+                (let ((type1 (car type-tags))
+                      (type2 (cadr type-tags))
+                      (a1 (car args))
+                      (a2 (cadr args)))
+                  (let ((t1->t2 (get-coercion type1 type2))
+                        (t2->t1 (get-coercion type2 type1)))
+                    (cond (t1->t2
+                           (apply-generic op (t1->t2 a1) a2))
+                          (t2->t1
+                           (apply-generic op a1 (t2->t1 a2)))
+                          (else
+                           (error "No method for these types"
+                                  (list op type-tags))))))
+                (error "No method for these types"
+                       (list op type-tags)))))))
+#+end_src
+** Exercise 2.82
+*Exercise*:
+
+#+begin_quote
+Show how to generalize ~apply-generic~ to handle coercion in the
+general case of multiple arguments. One strategy is to attempt to
+coerce all the arguments to the type of the first argument, then to
+the type of the second argument, and so on. Give an example of a
+situation where this strategy (and likewise the two-argument version
+given above) is not sufficiently general. (Hint: Consider the case
+where there are some suitable mixed-type operations present in the
+table that will not be tried.)
+#+end_quote
+
+*Answer*:
+
+Authors are telling us what to try: ``One strategy is to attempt to
+coerce all the arguments to the type of the first argument, then to
+the type of the second argument, and so on.''
+
+So we need to ``loop'' over the arguments and, for each one of them,
+we get its type and then try to coerce all the others to that
+type. This sort of ``double loop'' operation probably lends itself to
+be handled in some elegant way using higher-order procedures.
+
+In the following approach, if the first retrieval of ~proc~ fails, I'm
+going to loop over each argument using what I would call ``procedural
+iteration'' (Cf. pp. 32-33). I create the list of the functions needed
+from the coercion table, and create, if possible (if I've found all
+relevant procedures), the list of all coerced arguments. We then try
+to retrieve the relevant ~proc~ again. I we succeed we can call
+~apply~, otherwise we keep iterating.
+
+#+begin_src scheme
+  (define (apply-generic op . args)
+    (let ((type-tags (map type-tag args)))
+      (let ((proc (get op type-tags)))
+        (if proc
+            (apply proc (map contents args))
+            (apply-generic-coerce 0 op . args)))))
+
+  (define (apply-generic-coerce i op . args)
+    (if (>= i (length args))
+        (error "failed to find op")
+        ;; find type of args with index i
+        (let ((type (type-tag (list-ref args i))))
+          ;; build a list of all the functions that are needed from the coercion table
+          ;; (when the type is the same we can just use the identity function.
+          (let ((coercing-funs (map (lambda (arg)
+                                      (if (eq? (type-tag arg) type)
+                                          identity
+                                          (get-coercion (type-tag arg) type)))
+                                    args)))
+            (if (> (length (filter is-falsy coercing-funs) 0)
+                   ;; try with next type
+                   (apply-generic-coerce (+ 1 i) op . args)
+                   (let ((coerced-args (map (lambda (arg)
+                                              ((get-coercion (type-tag arg) type) arg)))))
+                     (let ((proc (get op (map type-tags coerced-args))))
+                       (if proc
+                           ;; found proc!
+                           (apply proc (map contents coerced-args))
+                           ;; try with next type
+                           (apply-generic-coerce (+ 1 i) op . args))))))))))
+#+end_src
+
+I suspect that the situations in which the procedure is not going to
+work are those situations in which, in order to find an operation in
+our table, we would have to coerce each argument to some type which
+differs from any of the types of the arguments.  For example, if we
+have in the table an operation ~foo~ which works on triangles and we
+try to apply it to an isosceles triangle and a right triangle, trying
+to coerce the isosceles triangle to a right triangle or vice versa
+will not work. We will have instead to coerce both the isosceles and
+the right triangles to a triangle.
 
 #+begin_export html
 <div style="text-align: center;">

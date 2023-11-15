@@ -1,0 +1,1025 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-11-15 Wed 23:11 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 2.5 Systems with Generic Operations</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 2.5 Systems with Generic Operations
+<br />
+<span class="subtitle">2023-11-15 Wed</span>
+</h1>
+
+<div id="outline-container-orgbccc6f4" class="outline-2">
+<h2 id="orgbccc6f4">2.5.1 Generic Arithmetic Operations</h2>
+<div class="outline-text-2" id="text-orgbccc6f4">
+<p>
+In 2.5.1, Authors show how to define generic operations that can take
+different types of arguments (in our case different types of numbers),
+for example a generic <code>add</code> that works with ordinary numbers as well
+as with rational and complex numbers.  The technique used to define
+such generic operations is the same way that has been used to define
+the generic operations (selectors) in the case of complex numbers (in
+2.4.3).
+</p>
+</div>
+<div id="outline-container-orgd66ddce" class="outline-3">
+<h3 id="orgd66ddce">Exercise 2.77</h3>
+<div class="outline-text-3" id="text-orgd66ddce">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Louis Reasoner tries to evaluate the expression <code>(magnitude z)</code> where
+<code>z</code> is the object shown in Figure 2-24.  To his surprise, instead of
+the answer 5 he gets an error message from <code>apply-generic</code>, saying
+there is no method for the operation <code>magnitude</code> on the types
+<code>(complex)</code>.  He shows this interaction to Alyssa P. Hacker, who says
+"The problem is that the complex-number selectors were never defined
+for <code>complex</code> numbers, just for <code>polar</code> and <code>rectangular</code> numbers.
+All you have to do to make this work is add the following to the
+<code>complex</code> package:"
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put 'real-part '(complex) real-part)
+(put 'imag-part '(complex) imag-part)
+(put 'magnitude '(complex) magnitude)
+(put 'angle '(complex) angle)
+</pre>
+</div>
+
+<p>
+Describe in detail why this works.  As an example, trace through all
+the procedures called in evaluating the expression <code>(magnitude z)</code>
+where <code>z</code> is the object shown in Figure 2-24.  In particular, how many
+times is <code>apply-generic</code> invoked?  What procedure is dispatched to in
+each case?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Here is <code>z</code>:
+</p>
+<pre class="example">
+
+--&gt;[o|o]--&gt;[o|o]--------&gt;[o|o]
+    |       |             | |
+    v       v             v v
+'complex  'rectangular    3 4
+</pre>
+
+<p>
+Louis evaluates <code>(magnitude z)</code>.
+</p>
+
+<p>
+Louis is using the procedure defined as follows:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">magnitude</span> z)
+  (apply-generic 'magnitude z))
+</pre>
+</div>
+
+<p>
+This means that when calling <code>magnitude</code>, the first thing we do is
+looking in the table for the item specified by the row <code>'magnitude</code>
+and column <code>'complex</code> (the type of <code>z</code>).
+</p>
+
+<p>
+However, nobody has stored such a table item. (At the moment there is
+an element specified by row <code>'magnitude</code> and column <code>'rectangular</code>,
+and an element specified by row <code>'magnitude</code> and column <code>'polar</code>.) So,
+Louis' invocation produces an error.
+</p>
+
+<p>
+Alyssa's code adds to the table four objects. Those objects are the
+generic procedures defined on page 84, which are themselves designed
+to look for and use an object in the table.
+</p>
+
+<p>
+So, now, when Louis calls <code>(magnitude z)</code>, we look for a table item
+which exists. It's the item which has been installed by Alyssa with
+this line:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(put 'magnitude '(complex) magnitude)
+</pre>
+</div>
+
+<p>
+Given that we find an item in the table, <code>apply-generic</code> applies it to
+the <code>contents</code> of <code>z</code>. These are the <code>contents</code> of <code>z</code>:
+</p>
+
+<pre class="example">
+    [o|o]------&gt;[o|o]
+     |           | |
+     v           v v
+'rectangular     3 4
+</pre>
+
+<p>
+Applying <code>magnitude</code> to these contents means, again, looking for an
+item in the table. This time we are looking for the item specified the
+row <code>'magnitude</code> and the column <code>'rectangular</code>. That item is found and
+applied to the contents.
+</p>
+
+<p>
+Table before Alyssa's change:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">rectangular</th>
+<th scope="col" class="org-left">polar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">magnitude</td>
+<td class="org-left">magnitude-rectangular</td>
+<td class="org-left">magnitude-polar</td>
+</tr>
+
+<tr>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+Table after Alyssa's change:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">complex</th>
+<th scope="col" class="org-left">rectangular</th>
+<th scope="col" class="org-left">polar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">magnitude</td>
+<td class="org-left">magnitude</td>
+<td class="org-left">magnitude-rectangular</td>
+<td class="org-left">magnitude-polar</td>
+</tr>
+
+<tr>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+When evaluating <code>(magnitude z)</code>, after Alyssa's contribution,
+<code>apply-generic</code> is called twice. The first time it dispatches to
+<code>magnitude</code> to itself (in a sense, <code>magnitude</code>, through
+<code>apply-generic</code>, is dispatching to itself). The second time it
+dispatches to <code>magnitude-rectangular</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(magnitude z) <span style="color: #595959;">;; </span><span style="color: #595959;">z:  --&gt;[o|o]--&gt;[o|o]--------&gt;[o|o]</span>
+              <span style="color: #595959;">;;         </span><span style="color: #595959;">|       |             | |</span>
+              <span style="color: #595959;">;;         </span><span style="color: #595959;">v       v             v v</span>
+              <span style="color: #595959;">;;     </span><span style="color: #595959;">'complex  'rectangular    3 4</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">V</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">apply-generic</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">V</span>
+(magnitude z') <span style="color: #595959;">;; </span><span style="color: #595959;">z': --&gt;[o|o]--------&gt;[o|o]</span>
+               <span style="color: #595959;">;;         </span><span style="color: #595959;">|             | |</span>
+               <span style="color: #595959;">;;         </span><span style="color: #595959;">v             v v</span>
+               <span style="color: #595959;">;;       </span><span style="color: #595959;">'rectangular    3 4</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">V</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">apply-generic</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">V</span>
+(magnitude z'') <span style="color: #595959;">;; </span><span style="color: #595959;">z'': --&gt;[o|o]</span>
+                <span style="color: #595959;">;;          </span><span style="color: #595959;">| |</span>
+                <span style="color: #595959;">;;          </span><span style="color: #595959;">v v</span>
+                <span style="color: #595959;">;;          </span><span style="color: #595959;">3 4</span>
+</pre>
+</div>
+
+<p>
+Basically, Alyssa's line, has the effect of making <code>magnitude</code>
+stripping off <code>'complex</code> before dispatching to someone else.
+</p>
+</div>
+</div>
+<div id="outline-container-org38eaad5" class="outline-3">
+<h3 id="org38eaad5">Exercise 2.78</h3>
+<div class="outline-text-3" id="text-org38eaad5">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The internal procedures in the <code>scheme-number</code> package are essentially
+nothing more than calls to the primitive procedures <code>+</code>, <code>-</code>, etc. It
+was not possible to use the primitives of the language directly
+because our type-tag system requires that each data object have a type
+attached to it. In fact, however, all Lisp implementations do have a
+type system, which they use internally. Primitive predicates such as
+<code>symbol?</code> and <code>number?</code> determine whether data objects have particular
+types. Modify the definitions of <code>type-tag</code>, <code>contents</code>, and
+<code>attach-tag</code> from section 2-4-2 so that our generic system takes
+advantage of Scheme's internal type system. That is to say, the system
+should work as before except that ordinary numbers should be
+represented simply as Scheme numbers rather than as pairs whose <code>car</code>
+is the symbol <code>scheme-number</code>.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">type-tag</span> datum)
+  (<span style="color: #531ab6;">cond</span> ((number? datum) 'scheme-number)
+        ((pair? datum) (car datum))
+        (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Bad tagged datum -- TYPE-TAG"</span> datum))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">contents</span> datum)
+  (<span style="color: #531ab6;">cond</span> ((number? datum) datum)
+        ((pair? datum) (cdr datum))
+        (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Bad tagged datum -- CONTENTS"</span> datum))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">attach-tag</span> type-tag contents)
+  (<span style="color: #531ab6;">if</span> (number? contents)
+      contents
+      (cons type-tag contents)))
+<span style="color: #595959;">;; </span><span style="color: #595959;">alternatively</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">attach-tag</span> type-tag contents)
+  (<span style="color: #531ab6;">if</span> (eq? type-tag 'scheme-number)
+      contents
+      (cons type-tag contents)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6a4009a" class="outline-3">
+<h3 id="org6a4009a">Exercise 2.79</h3>
+<div class="outline-text-3" id="text-org6a4009a">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Define a generic equality predicate <code>equ?</code> that tests the equality of
+two numbers, and install it in the generic arithmetic package. This
+operation should work for ordinary numbers, rational numbers, and
+complex numbers.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+I guess, first of all:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">equ?</span> x y) apply-generic 'equ? x y)
+</pre>
+</div>
+
+<p>
+After this, we should put the specific procedures for the types of
+numbers we have:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put 'equ? '(scheme-number scheme-number)
+     (<span style="color: #531ab6;">lambda</span> (x y) (= x y)))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put 'equ? '(rational rational)
+     (<span style="color: #531ab6;">lambda</span> (x y) (<span style="color: #531ab6;">and</span> (= (car x) (car y))
+                        (= (cdr x) (cdr y)))))
+</pre>
+</div>
+<p>
+(if <code>equ?</code> for rational numbers was defined within the
+<code>install-rational-package</code> procedure we could make use of <code>number</code> and
+<code>denom</code>)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put 'equ? '(complex complex)
+     (<span style="color: #531ab6;">lambda</span> (x y) (<span style="color: #531ab6;">and</span> (= (real-part x) (real-part y))
+                        (= (imag-part x) (imag-part y)))))
+</pre>
+</div>
+<p>
+(<code>Real-part</code> and <code>imag-part</code>, if I'm not wrong, here work correctly
+thanks to the code added by Alyssa P. Hacker in ex. 2.77.)
+</p>
+
+<p>
+(Alternatively, we could have used <code>magnitude</code> and <code>angle</code>, instead of
+<code>real-part</code> and <code>imag-part</code>.)
+</p>
+</div>
+</div>
+<div id="outline-container-orgbf5cbf0" class="outline-3">
+<h3 id="orgbf5cbf0">Exercise 2.80</h3>
+<div class="outline-text-3" id="text-orgbf5cbf0">
+<p>
+Exercise*:
+</p>
+
+<blockquote>
+<p>
+Define a generic predicate <code>=zero?</code> that tests if its argument is
+zero, and install it in the generic arithmetic package. This operation
+should work for ordinary numbers, rational numbers, and complex
+numbers.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">=zero?</span> x)
+  (apply-generic =zero? x))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put '=zero '(scheme-number scheme-number)
+     (<span style="color: #531ab6;">lambda</span> (x) (= x 0)))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put '=zero '(rational rational)
+     (<span style="color: #531ab6;">lambda</span> (x)
+       (<span style="color: #531ab6;">and</span> (= (car x) 0)
+            (not (= (cdr x) 0)))))
+<span style="color: #595959;">;; </span><span style="color: #595959;">the numerator must be zero and the denominator must be non-zero</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put '=zero '(complex)
+     (<span style="color: #531ab6;">lambda</span> (x)
+       (<span style="color: #531ab6;">and</span> (= (real-part x) 0)
+            (= (imag-part x) 0))))
+</pre>
+</div>
+
+<p>
+Alternatively:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(put '=zero '(complex)
+     (<span style="color: #531ab6;">lambda</span> (x)
+       (= (angle x) 0)))
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org92f6040" class="outline-2">
+<h2 id="org92f6040">2.5.2 Combining Data of Different Types</h2>
+<div class="outline-text-2" id="text-org92f6040">
+<p>
+So far we have considered operations on objects of the same type. For
+example, the addition of two ordinary numbers or the multiplication of
+two rational numbers. But this means that the operations we have
+defined ``treat the different data types as being completely
+independent.''. We haven't dealt with, say the addition of an ordinary
+number and a rational number, or the division of a rational number and
+a complex number. How should we introduce ``cross-type'' operations in
+our system?
+</p>
+
+<blockquote>
+<p>
+one way to handle cross-type operations is to design a different
+procedure for each possible combination of types for which the
+operation is valid. [&#x2026;] this technique works, but it is cumbersome.
+</p>
+</blockquote>
+
+<p>
+When we can, we should be ``by taking advantage of additional
+structure that may be latent in our type system'': often an object of
+a certain data type can be seen as an object of a another data
+type. E.g., the rational number 2/2, can be seen as the ordinary
+number 1. Given so, if we are asked to perform an operation on a
+rational number and an ordinary number, we could try to ``coerce'' the
+rational number into an ordinary number. And if we are successful in
+doing so, then we can use our good old procedure that works with
+ordinary numbers.
+</p>
+
+<p>
+The coercion idea can be implement by designing coercion procedures,
+installing them into a coercion table, and then modifying
+<code>apply-generic</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scheme-number-&gt;complex</span> n)
+  (make-complex-from-real-imag (contents n) 0))
+
+(put-coercion 'scheme-number 'complex scheme-number-&gt;complex)
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">For simplicity, only the case in which there are two arguments is</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">considered</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-generic</span> op . args)
+  (<span style="color: #531ab6;">let</span> ((type-tags (<span style="color: #531ab6;">map</span> type-tag args)))
+    (<span style="color: #531ab6;">let</span> ((proc (get op type-tags)))
+      (<span style="color: #531ab6;">if</span> proc
+          (apply proc (<span style="color: #531ab6;">map</span> contents args))
+          (<span style="color: #531ab6;">if</span> (= (length args) 2)
+              (<span style="color: #531ab6;">let</span> ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (<span style="color: #531ab6;">let</span> ((t1-&gt;t2 (get-coercion type1 type2))
+                      (t2-&gt;t1 (get-coercion type2 type1)))
+                  (<span style="color: #531ab6;">cond</span> (t1-&gt;t2
+                         (apply-generic op (t1-&gt;t2 a1) a2))
+                        (t2-&gt;t1
+                         (apply-generic op a1 (t2-&gt;t1 a2)))
+                        (<span style="color: #531ab6;">else</span>
+                         (error <span style="color: #3548cf;">"No method for these types"</span>
+                                (list op type-tags))))))
+              (error <span style="color: #3548cf;">"No method for these types"</span>
+                     (list op type-tags)))))))
+</pre>
+</div>
+
+<p>
+This coercion scheme is useful, but not general enough: there may be
+cases in which it's not possible neither object can be converted into
+the type of the other object, but in which both objects could be
+converted to a third type.
+</p>
+</div>
+
+<div id="outline-container-org20c8655" class="outline-3">
+<h3 id="org20c8655">Exercise 2.81</h3>
+<div class="outline-text-3" id="text-org20c8655">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Louis Reasoner has noticed that <code>apply-generic</code> may try to coerce the
+arguments to each other's type even if they already have the same
+type. Therefore, he reasons, we need to put procedures in the coercion
+table to ``coerce'' arguments of each type to their own type. For
+example, in addition to the <code>scheme-number-&gt;complex</code> coercion shown
+above, he would do:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scheme-number-&gt;scheme-number</span> n) n)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">complex-&gt;complex</span> z) z)
+(put-coercion 'scheme-number 'scheme-number
+scheme-number-&gt;scheme-number)
+(put-coercion 'complex 'complex complex-&gt;complex)
+</pre>
+</div>
+
+<p>
+a. With Louis's coercion procedures installed, what happens if
+<code>apply-generic</code> is called with two arguments of type <code>scheme-number</code>
+or two arguments of type <code>complex</code> for an operation that is not found
+in the table for those types? For example, assume that we've defined a
+generic exponentiation operation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">exp</span> x y) (apply-generic 'exp x y))
+</pre>
+</div>
+
+<p>
+and have put a procedure for exponentiation in the Scheme-number
+package but not in any other package:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">following added to Scheme-number package</span>
+(put 'exp '(scheme-number scheme-number)
+(<span style="color: #531ab6;">lambda</span> (x y) (tag (expt x y)))) <span style="color: #595959;">; </span><span style="color: #595959;">using primitive `expt'</span>
+</pre>
+</div>
+
+<p>
+What happens if we call <code>exp</code> with two complex numbers as arguments?
+</p>
+
+<p>
+b. Is Louis correct that something had to be done about coercion with
+arguments of the same type, or does <code>apply-generic</code> work correctly as
+is?
+</p>
+
+<p>
+c. Modify <code>apply-generic</code> so that it doesn't try coercion if the two
+arguments have the same type.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+</div>
+
+<div id="outline-container-org67d56f4" class="outline-4">
+<h4 id="org67d56f4">a</h4>
+<div class="outline-text-4" id="text-org67d56f4">
+<p>
+If we call <code>exp</code> with two complex numbers, we would call
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(apply-generic 'exp CN1 CN2)
+</pre>
+</div>
+
+<p>
+We are not going to find a procedure, because we don't have an object
+in the table for row <code>'exp</code> and column <code>'(complex complex)</code>.
+</p>
+
+<p>
+So we would go inside the second <code>if</code>.
+</p>
+
+<p>
+Both <code>t1-&gt;t2</code> and <code>t2-&gt;t1</code> would be truthy, thanks to the code added
+by Louis Reasoner.
+</p>
+
+<p>
+Given that the former is truthy, we would call
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(apply-generic 'exp (t1-&gt;t2 CN1) CN2)
+</pre>
+</div>
+
+<p>
+<code>(t1-&gt;t2 CN1)</code> evaluates to CN1, so we would call <code>apply-generic</code>
+again with its original arguments. So: we would be calling
+<code>apply-generic</code> <i>ad infinitum</i> with the same arguments.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6d626c7" class="outline-4">
+<h4 id="org6d626c7">b</h4>
+<div class="outline-text-4" id="text-org6d626c7">
+<p>
+Think about what happens if we call <code>exp</code> with two rational numbers or
+complex numbers without the additional code provided by Louis
+Reasoner.
+</p>
+
+<p>
+<code>Apply-generic</code> would not find a <code>proc</code> (when it uses <code>get</code>), and so
+(given that <code>(= (length args) 2)</code> is true) is going to apply
+<code>get-coercion</code> twice. So, yeah, Louis Reasoner was right. Something
+has to be done.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc10e731" class="outline-4">
+<h4 id="orgc10e731">c</h4>
+<div class="outline-text-4" id="text-orgc10e731">
+<p>
+My first instinct is to turn
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">if</span> (= (length args) 2)
+</pre>
+</div>
+
+<p>
+into
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">if</span> (<span style="color: #531ab6;">and</span> (= (length args) 2)
+         (eq (car (type-tags))
+             (cadr (type-tags))))
+</pre>
+</div>
+
+<p>
+There might be more elegant ways of doing it, but this should work.
+Here is the modified procedure:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-generic</span> op . args)
+  (<span style="color: #531ab6;">let</span> ((type-tags (<span style="color: #531ab6;">map</span> type-tag args)))
+    (<span style="color: #531ab6;">let</span> ((proc (get op type-tags)))
+      (<span style="color: #531ab6;">if</span> proc
+          (apply proc (<span style="color: #531ab6;">map</span> contents args))
+          (<span style="color: #531ab6;">if</span> (<span style="color: #531ab6;">and</span> (= (length args) 2)
+                   (eq (car (type-tags))
+                       (cadr (type-tags))))
+              (<span style="color: #531ab6;">let</span> ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (<span style="color: #531ab6;">let</span> ((t1-&gt;t2 (get-coercion type1 type2))
+                      (t2-&gt;t1 (get-coercion type2 type1)))
+                  (<span style="color: #531ab6;">cond</span> (t1-&gt;t2
+                         (apply-generic op (t1-&gt;t2 a1) a2))
+                        (t2-&gt;t1
+                         (apply-generic op a1 (t2-&gt;t1 a2)))
+                        (<span style="color: #531ab6;">else</span>
+                         (error <span style="color: #3548cf;">"No method for these types"</span>
+                                (list op type-tags))))))
+              (error <span style="color: #3548cf;">"No method for these types"</span>
+                     (list op type-tags)))))))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgfb17cb5" class="outline-3">
+<h3 id="orgfb17cb5">Exercise 2.82</h3>
+<div class="outline-text-3" id="text-orgfb17cb5">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Show how to generalize <code>apply-generic</code> to handle coercion in the
+general case of multiple arguments. One strategy is to attempt to
+coerce all the arguments to the type of the first argument, then to
+the type of the second argument, and so on. Give an example of a
+situation where this strategy (and likewise the two-argument version
+given above) is not sufficiently general. (Hint: Consider the case
+where there are some suitable mixed-type operations present in the
+table that will not be tried.)
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Authors are telling us what to try: ``One strategy is to attempt to
+coerce all the arguments to the type of the first argument, then to
+the type of the second argument, and so on.''
+</p>
+
+<p>
+So we need to ``loop'' over the arguments and, for each one of them,
+we get its type and then try to coerce all the others to that
+type. This sort of ``double loop'' operation probably lends itself to
+be handled in some elegant way using higher-order procedures.
+</p>
+
+<p>
+In the following approach, if the first retrieval of <code>proc</code> fails, I'm
+going to loop over each argument using what I would call ``procedural
+iteration'' (Cf. pp. 32-33). I create the list of the functions needed
+from the coercion table, and create, if possible (if I've found all
+relevant procedures), the list of all coerced arguments. We then try
+to retrieve the relevant <code>proc</code> again. I we succeed we can call
+<code>apply</code>, otherwise we keep iterating.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-generic</span> op . args)
+  (<span style="color: #531ab6;">let</span> ((type-tags (<span style="color: #531ab6;">map</span> type-tag args)))
+    (<span style="color: #531ab6;">let</span> ((proc (get op type-tags)))
+      (<span style="color: #531ab6;">if</span> proc
+          (apply proc (<span style="color: #531ab6;">map</span> contents args))
+          (apply-generic-coerce 0 op . args)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-generic-coerce</span> i op . args)
+  (<span style="color: #531ab6;">if</span> (&gt;= i (length args))
+      (error <span style="color: #3548cf;">"failed to find op"</span>)
+      <span style="color: #595959;">;; </span><span style="color: #595959;">find type of args with index i</span>
+      (<span style="color: #531ab6;">let</span> ((type (type-tag (list-ref args i))))
+        <span style="color: #595959;">;; </span><span style="color: #595959;">build a list of all the functions that are needed from the coercion table</span>
+        <span style="color: #595959;">;; </span><span style="color: #595959;">(when the type is the same we can just use the identity function.</span>
+        (<span style="color: #531ab6;">let</span> ((coercing-funs (<span style="color: #531ab6;">map</span> (<span style="color: #531ab6;">lambda</span> (arg)
+                                    (<span style="color: #531ab6;">if</span> (eq? (type-tag arg) type)
+                                        identity
+                                        (get-coercion (type-tag arg) type)))
+                                  args)))
+          (<span style="color: #531ab6;">if</span> (&gt; (length (filter is-falsy coercing-funs) 0)
+                 <span style="color: #595959;">;; </span><span style="color: #595959;">try with next type</span>
+                 (apply-generic-coerce (+ 1 i) op . args)
+                 (<span style="color: #531ab6;">let</span> ((coerced-args (<span style="color: #531ab6;">map</span> (<span style="color: #531ab6;">lambda</span> (arg)
+                                            ((get-coercion (type-tag arg) type) arg)))))
+                   (<span style="color: #531ab6;">let</span> ((proc (get op (<span style="color: #531ab6;">map</span> type-tags coerced-args))))
+                     (<span style="color: #531ab6;">if</span> proc
+                         <span style="color: #595959;">;; </span><span style="color: #595959;">found proc!</span>
+                         (apply proc (<span style="color: #531ab6;">map</span> contents coerced-args))
+                         <span style="color: #595959;">;; </span><span style="color: #595959;">try with next type</span>
+                         (apply-generic-coerce (+ 1 i) op . args))))))))))
+</pre>
+</div>
+
+<p>
+I suspect that the situations in which the procedure is not going to
+work are those situations in which, in order to find an operation in
+our table, we would have to coerce each argument to some type which
+differs from any of the types of the arguments.  For example, if we
+have in the table an operation <code>foo</code> which works on triangles and we
+try to apply it to an isosceles triangle and a right triangle, trying
+to coerce the isosceles triangle to a right triangle or vice versa
+will not work. We will have instead to coerce both the isosceles and
+the right triangles to a triangle.
+</p>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author:  (<a href="mailto:gp@host-667">gp@host-667</a>)</p>
+<p class="date">Date: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
