@@ -1,0 +1,370 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 3.1 Assignment and Local State
+#+subtitle: 2023-11-15 Wed
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+
+The third chapter of SICP is entitled /Modularity, Objects, and State/
+and is said to be investigating ``two prominent organizational
+strategies arising from two rather different ``world views'' of the
+structure of systems''. The first one of those strategies focuses on
+/objects/. The second one on /streams/. Those two approaches are said
+to raise ``significant linguistic issues'' in programming.
+
+* 3.1 Assignment and Local State
+~Set!~ is introduced. That is to say, /assignment/ is introduced.
+
+#+begin_quote
+Combining ~set!~ with local variables is the general programming
+technique we will use for constructing computational objects with
+local state. (p. 222)
+#+end_quote
+
+On the one hand, introducing assignment has some benefits.
+#+begin_quote
+[V]iewing systems as collections of objects with local state is a
+powerful technique for maintaining a modular design. (p. 225)
+#+end_quote
+
+On the other hand, introducing assignment has some costs. In
+particular, what we have called `substitution model' ceases to be
+adequate model anymore.
+
+* Exercise 3.1
+*Exercise*:
+
+#+begin_quote
+An /accumulator/ is a procedure that is called repeatedly with a
+single numeric argument and accumulates its arguments into a sum.
+Each time it is called, it returns the currently accumulated sum.
+Write a procedure ~make-accumulator~ that generates accumulators, each
+maintaining an independent sum.  The input to ~make-accumulator~
+should specify the initial value of the sum; for example
+
+#+begin_src scheme
+  (define A (make-accumulator 5))
+
+  (A 10)
+  15
+
+  (A 10)
+  25
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (make-accumulator initial)
+    (lambda (val)
+      (begin (set! initial (+ val initial))
+             initial)))
+
+  (define A (make-accumulator 5))
+  (A 10) ;; => 15
+  (A 10) ;; => 25
+
+  (define B (make-accumulator 938))
+  (B 1) ;; => 939
+  (B 2) ;; => 941
+#+end_src
+* Exercise 3.2
+*Exercise*:
+
+#+begin_quote
+In software-testing applications, it is useful to be able to count the
+number of times a given procedure is called during the course of a
+computation.  Write a procedure `make-monitored' that takes as input a
+procedure, ~f~, that itself takes one input.  The result returned by
+~make-monitored~ is a third procedure, say ~mf~, that keeps track of
+the number of times it has been called by maintaining an internal
+counter.  If the input to ~mf~ is the special symbol
+~how-many-calls?~, then ~mf~ returns the value of the counter.  If the
+input is the special symbol ~reset-count~, then ~mf~ resets the
+counter to zero.  For any other input, ~mf~ returns the result of
+calling ~f~ on that input and increments the counter.  For instance,
+we could make a monitored version of the ~sqrt~ procedure:
+
+#+begin_src scheme
+  (define s (make-monitored sqrt))
+
+  (s 100)
+  10
+
+  (s 'how-many-calls?)
+  1
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (make-monitored f)
+    (let ((counter 0))
+      (lambda (x)
+        (cond ((eq? x 'how-many-calls?) counter)
+              ((eq? x 'reset-count) (set! counter 0))
+              (else (begin (set! counter (+ counter 1))
+                           (f x)))))))
+
+  (define s (make-monitored sqrt))
+
+  (s 100) ;; => 10
+
+  (s 'how-many-calls?) ;; => 1
+#+end_src
+* Exercise 3.3
+*Exercise*:
+
+#+begin_quote
+Modify the ~make-account~ procedure so that it creates
+password-protected accounts.  That is, ~make-account~ should take a
+symbol as an additional argument, as in
+
+#+begin_src scheme
+  (define acc (make-account 100 'secret-password))
+#+end_src
+
+The resulting account object should process a request only if it
+is accompanied by the password with which the account was created,
+and should otherwise return a complaint:
+
+#+begin_src scheme
+  ((acc 'secret-password 'withdraw) 40)
+  60
+
+  ((acc 'some-other-password 'deposit) 50)
+  "Incorrect password"
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (make-account balance pwd)
+    (define (withdraw amount)
+      (if (>= balance amount)
+          (begin (set! balance (- balance amount))
+                 balance)
+          "Insufficient funds"))
+    (define (deposit amount)
+      (set! balance (+ balance amount))
+      balance)
+    (define (dispatch p m)
+      (cond ((not (eq? p pwd)) (lambda (a) "Incorrect password"))
+            ((eq? m 'withdraw) withdraw)
+            ((eq? m 'deposit) deposit)
+            (else (error "Unknown request -- MAKE-ACCOUNT"
+                         m))))
+    dispatch)
+
+  (define acc (make-account 100 'foo))
+
+  ((acc 'foo 'withdraw) 40) ;; => 60
+
+  ((acc 'bar 'withdraw) 40) ;; => "Incorrect password"
+#+end_src
+* Exercise 3.4
+*Exercise*:
+
+#+begin_quote
+Modify the ~make-account~ procedure of Exercise 3-3 by adding another
+local state variable so that, if an account is accessed more than
+seven consecutive times with an incorrect password, it invokes the
+procedure ~call-the-cops~.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+(define (call-the-cops)
+  "Calling the cops!")
+
+(define (make-account balance pwd)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (let ((counter 0))
+    (define (dispatch p m)
+      (if (not (eq? p pwd))
+          (begin (set! counter (+ counter 1))
+                 (cond ((> counter 7)
+                        (call-the-cops)
+                        (lambda (a) "We called the cops"))
+                       (else (lambda (a) "Incorrect password"))))
+          (begin (set! counter 0)
+                 (cond ((eq? m 'withdraw) withdraw)
+                       ((eq? m 'deposit) deposit)
+                       (else (error "Unknown request -- MAKE-ACCOUNT"
+                                    m))))))
+    dispatch))
+
+(define acc (make-account 100 'foo))
+((acc 'foo 'withdraw) 59) ;; => 41
+((acc 'fo 'withdraw) 59) ;; => "Incorrect password"
+((acc 'fo 'withdraw) 59) ;; => "Incorrect password"
+((acc 'fo 'withdraw) 59) ;; => "Incorrect password"
+((acc 'fo 'withdraw) 59) ;; => "Incorrect password"
+((acc 'fo 'withdraw) 59) ;; => "Incorrect password"
+((acc 'fo 'withdraw) 59) ;; => "Incorrect password"
+((acc 'fo 'withdraw) 59) ;; => "Incorrect password"
+((acc 'fo 'withdraw) 59) ;; => "We called the cops"
+((acc 'fo 'withdraw) 59) ;; => "We called the cops"
+((acc 'fo 'withdraw) 59) ;; => "We called the cops"
+((acc 'foo 'withdraw) 40) ;; => 1
+#+end_src
+
+* Exercise 3.6
+*Exercise*:
+
+#+begin_quote
+It is useful to be able to reset a random-number generator to produce
+a sequence starting from a given value.  Design a new ~rand~ procedure
+that is called with an argument that is either the symbol ~generate~
+or the symbol ~reset~ and behaves as follows: ~(rand 'generate)~
+produces a new random number; ~((rand 'reset) <NEW-VALUE>)~ resets the
+internal state variable to the designated <NEW-VALUE>.  Thus, by
+resetting the state, one can generate repeatable sequences.  These are
+very handy to have when testing and debugging programs that use random
+numbers.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  ;; mock rand-update
+  (define (rand-update x)
+    (+ x 1))
+
+  (define random-init 1)
+
+  (define rand
+    (let ((val random-init))
+      (lambda (s)
+        (cond ((eq? s 'generate)
+               (set! val (rand-update val))
+               val)
+              ((eq? s 'reset)
+               (lambda (new-val) (set! val new-val)))
+              (else (error "Unknown symbol"))))))
+
+  (rand 'generate) ;; => 2
+  (rand 'generate) ;; => 3
+  (rand 'generate) ;; => 4
+  (rand 'generate) ;; => 5
+  ((rand 'reset) 15)
+  (rand 'generate) ;; => 16
+  (rand 'generate) ;; => 17
+  (rand 'generate) ;; => 18
+  (rand 'generate) ;; => 19
+#+end_src
+
+* Exercise 3.7
+*Exercise*:
+
+#+begin_quote
+Consider the bank account objects created by ~make-account~, with the
+password modification described in Exercise 3-3.  Suppose that our
+banking system requires the ability to make joint accounts.  Define a
+procedure ~make-joint~ that accomplishes this.  ~Make-joint~ should
+take three arguments.  The first is a password-protected account.  The
+second argument must match the password with which the account was
+defined in order for the ~make-joint~ operation to proceed.  The third
+argument is a new password.  ~Make-joint~ is to create an additional
+access to the original account using the new password.  For example,
+if ~peter-acc~ is a bank account with password ~open-sesame~, then
+
+#+begin_src scheme
+  (define paul-acc
+    (make-joint peter-acc 'open-sesame 'rosebud))
+#+end_src
+
+will allow one to make transactions on ~peter-acc~ using the name
+~paul-acc~ and the password ~rosebud~.  You may wish to modify your
+solution to *Note Exercise 3-3 to accommodate this new feature.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  ;; So:
+  ;;(make-joint peter-acc 'open-sesame 'rosebud)
+  ;;             |
+  ;;        evaluates to
+  ;;             |
+  ;;             V
+  ;;          joint-acc
+  ;;
+  ;;          such that
+  ;;
+  ;;       (joint-acc 'rosebud 'withdraw)
+  ;;
+  ;; will perform the same operation performed by
+  ;;
+  ;;       (peter-acc 'open-sesame 'withdraw)
+
+
+  ;; So, this should work:
+  (define (make-joint orig-acc 'orig-pwd 'pwd)
+    (define (wrapper p m)
+      (if (eq? p pwd)
+          (orig-acc 'orig-pwd m)
+          (lambda (a) "wrong password")))
+    wrapper)
+#+end_src
+
+* Exercise 3.8
+*Exercise*:
+
+#+begin_quote
+When we defined the evaluation model in section *Note 1-1-3, we said
+that the first step in evaluating an expression is to evaluate its
+subexpressions.  But we never specified the order in which the
+subexpressions should be evaluated (e.g., left to right or right to
+left).  When we introduce assignment, the order in which the arguments
+to a procedure are evaluated can make a difference to the result.
+Define a simple procedure ~f~ such that evaluating ~(+ (f 0) (f 1))~
+will return 0 if the arguments to ~+~ are evaluated from left to right
+but will return 1 if the arguments are evaluated from right to left.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define f
+    (let ((to-return 0))
+      (lambda (x)
+        (define tmp to-return)
+        (set! to-return x)
+        tmp)))
+#+end_src
+
+Here I'm using ~let~ to establish an environment with a local variable
+~to-return~, bound to the initial value 0. Each time ~f~ is applied to
+a value foo, ~f~ is evaluates to the value currently stored in
+~to-return~ and updates the value stored in ~to-return~, by setting it
+to foo.
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
