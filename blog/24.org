@@ -1,0 +1,435 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 3.2 The Environment Model of Evaluation
+#+subtitle: 2023-12-25 Mon
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+
+The notions of /frames/ and /environments/ are introduced.
+
+Despite the switch to the environment model of evaluation, the rules
+for evaluating a combination remain the same:
+
+#+begin_quote
+- To evaluate a combination:
+  1. Evaluate the subexpression of the combination.
+  2. Apply the value of the operator subexpression to the value of the
+     operand subexpression. (p. 238)
+#+end_quote
+
+The environment model of evaluation changes, though, what it means to
+apply a procedure.
+
+#+begin_quote
+The environment model of procedure application can be summarized by
+two rules:
+
+- A procedure object is applied to a set of arguments by constructing
+  a frame, binding the formal parameters of the procedure to the
+  arguments of the call, and then evaluating the body of the procedure
+  in the context of the new environment constructed.  The new frame
+  has as its enclosing environment the environment part of the
+  procedure object being applied.
+
+- A procedure is created by evaluating a ~lambda~ expression relative
+  to a given environment.  The resulting procedure object is a pair
+  consisting of the text of the ~lambda~ expression and a pointer to
+  the environment in which the procedure was created. (p. 240)
+#+end_quote
+* Exercise 3.9
+*Exercise*:
+
+#+begin_quote
+In section 1.2.1 we used the substitution model to analyze two
+procedures for computing factorials, a recursive version
+
+#+begin_src scheme
+  (define (factorial n)
+    (if (= n 1)
+        1
+        (* n (factorial (- n 1)))))
+#+end_src
+
+and an iterative version
+
+#+begin_src scheme
+  (define (factorial n)
+    (fact-iter 1 1 n))
+
+  (define (fact-iter product counter max-count)
+    (if (> counter max-count)
+        product
+        (fact-iter (* counter product)
+                   (+ counter 1)
+                   max-count)))
+#+end_src
+
+Show the environment structures created by evaluating ~(factorial 6)~
+using each version of the `factorial' procedure.
+#+end_quote
+
+*Answer*:
+
+Recursive version:
+#+begin_src
+                    +------------------------------------------------------------------------------------+
+          global -->|                                                                                    |
+          env       +------------------------------------------------------------------------------------+
+                      ^              ^              ^               ^               ^               ^
+    (factorial 6)     |              |              |               |               |               |
+                 +------+       +------+       +------+        +------+        +------+        +------+
+            E1 ->| n: 6 |  E2 ->| n: 5 |  E3 ->| n: 4 |  E4 -->| n: 3 |   E5 ->| n: 2 |  E6 -->| n: 1 |
+                 |      |       |      |       |      |        |      |        |      |        |      |
+                 +------+       +------+       +------+        +------+        +------+        +------+
+   (if (= n 1)
+       1                           same           same           same            same             same
+       (* n factorial (- n 1)))
+#+end_src
+
+Iterative version:
+
+#+begin_src
+                    +------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+          global -->|                                                                                                                                                                        |
+          env       +------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+                      ^              ^                                  ^                     ^                     ^                     ^                      ^                      ^
+    (factorial 6)     |              |                                  |                     |                     |                     |                      |                      |
+                 +------+       +-------------+                    +-------------+       +-------------+       +-------------+       +--------------+       +--------------+       +--------------+
+            E1 ->| n: 6 |  E2 ->| product: 1  |               E3 ->| product: 1  |  E4 ->| product: 2  |  E5 ->| product:  6 |  E6 ->| product:  24 |  E7 ->| product: 120 |  E8 ->| product: 720 |
+                 |      |       | counter: 1  |                    | counter: 2  |       | counter: 3  |       | counter:  4 |       | counter:  5  |       | counter:  6  |       | counter:  7  |
+                 |      |       | max-count: 6|                    | max-count: 6|       | max-count: 6|       | max-count: 6|       | max-count: 6 |       | max-count: 6 |       | max-count: 6 |
+                 +------+       +-------------+                    +-------------+       +-------------+       +-------------+       +--------------+       +--------------+       +--------------+
+        (fact-iter 1 1 n)       (if (> counter max-count)                same                  same                  same                  same                  same                  same
+                                    product
+                                    (fact-iter (* counter product)
+                                               (+ counter 1)
+                                               max-count))
+#+end_src
+
+* Exercise 3.10
+*Exercise*:
+
+#+begin_quote
+In the ~make-withdraw~ procedure, the local variable ~balance~ is
+created as a parameter of ~make-withdraw~.  We could also create the
+local state variable explicitly, using ~let~, as follows:
+
+#+begin_src scheme
+  (define (make-withdraw initial-amount)
+    (let ((balance initial-amount))
+      (lambda (amount)
+        (if (>= balance amount)
+            (begin (set! balance (- balance amount))
+                   balance)
+            "Insufficient funds"))))
+#+end_src
+
+Recall from section 1.3.2 that ~let~ is simply syntactic sugar for
+a procedure call:
+
+#+begin_src
+(let ((<VAR> <EXP>)) <BODY>)
+#+end_src
+
+is interpreted as an alternate syntax for
+
+#+begin_src
+((lambda (<VAR>) <BODY>) <EXP>)
+#+end_src
+
+Use the environment model to analyze this alternate version of
+~make-withdraw~, drawing figures like the ones above to illustrate the
+interactions
+
+#+begin_src scheme
+  (define W1 (make-withdraw 100))
+
+  (W1 50)
+
+  (define W2 (make-withdraw 100))
+#+end_src
+
+Show that the two versions of ~make-withdraw~ create objects with the
+same behavior.  How do the environment structures differ for the two
+versions?
+#+end_quote
+
+*Answer*:
+
+Environments created by evaluating ~(define w1 (make-withdraw 100))~:
+#+begin_src
+       GLOBAL ENV
+       +---------------------------------------------------------------------------------------------------------+
+       | make-withdraw:---+                   w1:---+                                                            |
+       |                  |                         |                                                            |
+       |                  |                         |                                                            |
+       |                  |            +------------+                                                            |
+       |                  |            |                                                                         |
+       |                  |            |                                                                         |
+       +------------------+------------+-------------------------------------------------------------------------+
+                          |   ↑        |       E1
+         +----------------+   |        |       +----------------------+
+         |                    |        |       | initial-amout: 100   |
+         ↓                    |        |       |                      |
+       +-+-+---+              |        |       |                      |
+       |   |   +--------------+        |       +----------------------+
+       +-+-+---+                       |                  ↑      ↑
+         ↓                             |                  |      |
+         λ                             |                  |      |
+                                       |       +---+---+  |      |
+                                       |       |   |   +--+      |
+                                       |       +-+-+---+         |
+                                       |         ↓               |
+                                       |         λ               |
+                                       |                         |
+                                       |                         |
+                                       |                         |
+                                       |                         |
+                                       |       E2                |
+                                       |       +-----------------+-----+
+                                       |       | balance: 100          |
+                                       |       |                       |
+                                       |       |                       |
+                                       |       +-----------------------+
+                                       |                  ↑      ↑
+                                       |                  |      |
+                                       |                  |      |
+                                       |       +---+---+  |      |
+                                       +------→|   |   +--+      |
+                                               +-+-+---+         |
+                                                 ↓               |
+                                                 λ               |
+                                                                 |
+                                                                 |
+                                                                 |
+                                                                 |
+                                                                 |
+                                               E3                |
+                                               +-----------------+------+
+                                               | amount: 50             |
+                                               |                        |
+                                               |                        |
+                                               +------------------------+
+#+end_src
+
+After the evaluation:
+
+#+begin_src
+GLOBAL ENV
+       +---------------------------------------------------------------------------------------------------------+
+       | make-withdraw:---+                   w1:---+                                                            |
+       |                  |                         |                                                            |
+       |                  |                         |                                                            |
+       |                  |            +------------+                                                            |
+       |                  |            |                                                                         |
+       |                  |            |                                                                         |
+       +------------------+------------+-------------------------------------------------------------------------+
+                          |   ↑        |       E1
+         +----------------+   |        |       +----------------------+
+         |                    |        |       | initial-amout: 100   |
+         ↓                    |        |       |                      |
+       +-+-+---+              |        |       |                      |
+       |   |   +--------------+        |       +----------------------+
+       +-+-+---+                       |                  ↑      ↑
+         ↓                             |                  |      |
+         λ                             |                  |      |
+                                       |       +---+---+  |      |
+                                       |       |   |   +--+      |
+                                       |       +-+-+---+         |
+                                       |         ↓               |
+                                       |         λ               |
+                                       |                         |
+                                       |                         |
+                                       |                         |
+                                       |                         |
+                                       |       E2                |
+                                       |       +-----------------+-----+
+                                       |       | balance: 50           |
+                                       |       |                       |
+                                       |       |                       |
+                                       |       +-----------------------+
+                                       |                  ↑
+                                       |                  |
+                                       |                  |
+                                       |       +---+---+  |
+                                       +------→|   |   +--+
+                                               +-+-+---+
+                                                 ↓
+                                                 λ
+#+end_src
+
+Evaluating ~(define w2 (make-withdraw 100))~:
+
+#+begin_src
+       GLOBAL ENV
+       +---------------------------------------------------------------------------------------------------------+
+       | make-withdraw:---+                   w1:---+                                  w2:---+                   |
+       |                  |                         |                                        |                   |
+       |                  |                         |                                        |                   |
+       |                  |            +------------+                             +----------+                   |
+       |                  |            |                                          |                              |
+       |                  |            |                                          |                              |
+       +------------------+------------+------------------------------------------+------------------------------+
+                          |   ↑        |       E1                                 |       E4
+         +----------------+   |        |       +----------------------+           |       +----------------------+
+         |                    |        |       | initial-amout: 100   |           |       | initial-amout: 100   |
+         ↓                    |        |       |                      |           |       |                      |
+       +-+-+---+              |        |       |                      |           |       |                      |
+       |   |   +--------------+        |       +----------------------+           |       +----------------------+
+       +-+-+---+                       |                  ↑      ↑                |                  ↑      ↑
+         ↓                             |                  |      |                |                  |      |
+         λ                             |                  |      |                |                  |      |
+                                       |       +---+---+  |      |                |       +---+---+  |      |
+                                       |       |   |   +--+      |                |       |   |   +--+      |
+                                       |       +-+-+---+         |                |       +-+-+---+         |
+                                       |         ↓               |                |         |               |
+                                       |         λ ←-------------+---------------+---------+                |
+                                       |                         |                |                         |
+                                       |                         |                |                         |
+                                       |                         |                |                         |
+                                       |                         |                |                         |
+                                       |       E2                |                |       E5                |
+                                       |       +-----------------+-----+          |       +-----------------+-----+
+                                       |       | balance: 50           |          |       | balance: 100          |
+                                       |       |                       |          |       |                       |
+                                       |       |                       |          |       |                       |
+                                       |       +-----------------------+          |       +-----------------------+
+                                       |                  ↑                       |                  ↑
+                                       |                  |                       |                  |
+                                       |                  |                       |                  |
+                                       |       +---+---+  |                       |       +---+---+  |
+                                       +------→|   |   +--+                       +------→|   |   +--+
+                                               +-+-+---+                                  +-+-+---+
+                                                 ↓                                        |
+                                                 λ←-----------------------=---------------+
+#+end_src
+
+The environment structures of the two versions of ~make-withdraw~
+differ in that the second version creates one frame more than the
+first version. That's the frame holding the ~initial-amount~ binding.
+
+* Exercise 3.11
+*Exercise*:
+
+#+begin_quote
+In section 3.2.3 we saw how the environment model described the
+behavior of procedures with local state.  Now we have seen how
+internal definitions work.  A typical message-passing procedure
+contains both of these aspects.  Consider the bank account procedure
+of section 3.1.1:
+
+ #+begin_src scheme
+   (define (make-account balance)
+     (define (withdraw amount)
+       (if (>= balance amount)
+           (begin (set! balance (- balance amount))
+                  balance)
+           "Insufficient funds"))
+     (define (deposit amount)
+       (set! balance (+ balance amount))
+       balance)
+     (define (dispatch m)
+       (cond ((eq? m 'withdraw) withdraw)
+             ((eq? m 'deposit) deposit)
+             (else (error "Unknown request -- MAKE-ACCOUNT"
+                          m))))
+     dispatch)
+#+end_src
+
+ Show the environment structure generated by the sequence of
+ interactions
+
+#+begin_src scheme
+  (define acc (make-account 50))
+
+  ((acc 'deposit) 40)
+  90
+
+  ((acc 'withdraw) 60)
+  30
+#+end_src
+
+Where is the local state for ~acc~ kept?  Suppose we define another
+account
+
+#+begin_src scheme
+  (define acc2 (make-account 100))
+#+end_src
+
+How are the local states for the two accounts kept distinct?  Which
+parts of the environment structure are shared between ~acc~ and
+~acc2~?
+#+end_quote
+
+*Answer*:
+
+#+begin_src
+       global env
+       +---------------------------------------------------------------------------------------------------------+
+       |  make-account:---+                  acc:-------------------------------------------------------------+  |
+       |                  |                                                                                   |  |
+       |                  |                                                                                   |  |
+       |                  |                                                                                   |  |
+       |                  |                                                                                   |  |
+       |                  |                                                                                   |  |
+       +------------------+-----------------------------------------------------------------------------------+--+
+                          |   ↑                                                                               |
+         +----------------+   |                                                                               |
+         |                    |           +-------------------------------------------------------------+     |
+         ↓                    |           | balance: 50  withdraw:.  deposit:.  dispatch:.              |     |
+       +---+---+              |           |                       |          |           |              |     |
+       |   |   |--------------+           |                       |          |           |              |     |
+       +-+-+---+                          |                       | ---------+           |              |     |
+         ↓                                |+----------------------+ |                    |              |     |
+         λ                                ||                        |                    |              |     |
+                                          ||                        |                    |              |     |
+                                          ++------------------------+--------------------+---------------     |
+                                           | ↑   ↑         ↑        |   |         ↑    ↑ |       ↑            |
+                                         +-+ |   |         |        |   |         |    | |       |            |
+                                         |   |   |         |        |   |         |    | +--+ +--+------------+
+                                         |   |   |         |        |   |         |    |    | |  |
+                                         ↓   |   |         |        ↓   |         |    |    ↓ ↓  |
+                                       +---+---+ |         |      +---+---+       |    |   +---+---+
+                                       |   |   | |         |      |   |   |       |    |   |   |   |
+                                       +---+---+ |         |      +---+---+       |    |   +---+---+
+                                         ↓       |         |        ↓             |    |     ↓
+                                         λ       |         |        λ             |    |     λ
+                                                 |         |             +--------+    |
+                                                 |         |             |             |
+                                      +----------+-------+ |             |  +----------+-------+
+                                      |m: 'deposit       | |             |  |amount: 40        |
+                                      |                  | |             |  |                  |
+                                      |                  | |             |  |                  |
+                                      +------------------+ |             |  +------------------+
+                                                           |             |
+                                                           |             |
+                                               +-----------+             +------------+
+                                               |                                      |
+                                      +--------+---------+                  +---------+--------+
+                                      |m: 'withdraw      |                  |amount: 60        |
+                                      |                  |                  |                  |
+                                      |                  |                  |                  |
+                                      +------------------+                  +------------------+
+#+end_src
+
+The local state for ~acc~ is kept in the frame created by calling
+~make-account~. If we define another account with ~(define acc2
+(make-account 100))~, then the local states for the two accounts are
+kept distinct, because each call to make-account creates a frame (and
+that is the frame where, as we we have seen, we keep the local state
+of an account).
+
+~acc~ and ~acc2~ share the text of the procedure objects ~widthdraw~,
+~deposit~, and ~dispatch~.
