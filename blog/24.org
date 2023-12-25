@@ -313,7 +313,7 @@ Evaluating ~(define w2 (make-withdraw 100))~:
                                        +------→|   |   +--+                       +------→|   |   +--+
                                                +-+-+---+                                  +-+-+---+
                                                  ↓                                        |
-                                                 λ←-----------------------=---------------+
+                                                 λ←---------------------------------------+
 #+end_src
 
 The environment structures of the two versions of ~make-withdraw~
