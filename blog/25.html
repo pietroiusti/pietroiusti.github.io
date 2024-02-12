@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-02-12 Mon 22:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 3.3.1 Modeling with Mutable Data - Mutable List Structure</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 3.3.1 Modeling with Mutable Data - Mutable List Structure
+<br />
+<span class="subtitle">2024-02-12 Mon</span>
+</h1>
+
+<div id="outline-container-orgebe48be" class="outline-2">
+<h2 id="orgebe48be">3.3 Modeling with Mutable Data</h2>
+<div class="outline-text-2" id="text-orgebe48be">
+<p>
+Chapter 2 showed how data abstraction can be achieved with
+<i>constructors</i> and <i>selectors</i>.
+</p>
+
+<p>
+However, now
+</p>
+<blockquote>
+<p>
+``[t]he desire to model systems composed of objects that have changing
+state leads us to the need to modify compound data objects, as well as
+to construct and select from them.'' (251-2)
+</p>
+</blockquote>
+
+<p>
+That is to say, we also want <i>mutators</i>.
+</p>
+
+<blockquote>
+<p>
+Data objects for which mutators are defined are known as objects
+"mutable data objects". (252)
+</p>
+</blockquote>
+
+<p>
+Our beloved pairs can, of course, be use to build mutable data
+objects. Let's define mutators for them.
+</p>
+</div>
+<div id="outline-container-org7cc28f1" class="outline-3">
+<h3 id="org7cc28f1">3.3.1 Mutable List Structure</h3>
+<div class="outline-text-3" id="text-org7cc28f1">
+<p>
+<code>cons</code>, <code>car</code> and <code>cdr</code>, as well as those operations implement in
+terms of them (e.g., <code>append</code>, <code>list</code>), <i>construct</i> list
+structure. They do <i>not</i> modify it.
+</p>
+
+<p>
+Here are our mutators for pairs:
+</p>
+<ul class="org-ul">
+<li><code>set-car!</code></li>
+<li><code>set-cdr!</code></li>
+</ul>
+
+<p>
+How do they work? Think.
+</p>
+</div>
+<div id="outline-container-org507d4a7" class="outline-4">
+<h4 id="org507d4a7">Exercise 3.12</h4>
+<div class="outline-text-4" id="text-org507d4a7">
+<blockquote>
+<p>
+<b>Exercise:</b> The following procedure for appending lists was
+introduced in section 2-2-1:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">append</span> x y)
+  (<span style="color: #531ab6;">if</span> (null? x)
+      y
+      (cons (car x) (append (cdr x) y))))
+</pre>
+</div>
+
+<p>
+<code>Append</code> forms a new list by successively <code>cons</code>-ing the elements of
+<code>x</code> onto <code>y</code>.  The procedure <code>append!</code> is similar to <code>append</code>, but it
+is a mutator rather than a constructor.  It appends the lists by
+splicing them together, modifying the final pair of <code>x</code> so that its
+<code>cdr</code> is now <code>y</code>.  (It is an error to call <code>append!</code> with an empty
+<code>x</code>.)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">append!</span> x y)
+  (set-cdr! (last-pair x) y)
+  x)
+</pre>
+</div>
+
+<p>
+Here <code>last-pair</code> is a procedure that returns the last pair in its
+argument:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">last-pair</span> x)
+  (<span style="color: #531ab6;">if</span> (null? (cdr x))
+      x
+      (last-pair (cdr x))))
+</pre>
+</div>
+
+<p>
+Consider the interaction
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> (list 'a 'b))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">y</span> (list 'c 'd))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">z</span> (append x y))
+
+z
+(a b c d)
+
+(cdr x)
+<span style="color: #005f5f;">&lt;RESPONSE&gt;</span>
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">w</span> (append! x y))
+
+w
+(a b c d)
+
+(cdr x)
+<span style="color: #005f5f;">&lt;RESPONSE&gt;</span>
+</pre>
+</div>
+
+<p>
+What are the missing &lt;RESPONSE&gt;s?  Draw box-and-pointer diagrams to
+explain your answer.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+First response: '(b)
+</p>
+
+<pre class="example">
+Box-and-pointer diagram representing the situation after evaluating (define z (append x y)):
+
+x--&gt;[·|·]--&gt;[·|/]
+     |       |
+     v       v
+     a       b
+     ^       ^
+     |       |
+z--&gt;[·|·]--&gt;[·|·]
+               |
+               v
+          y--&gt;[·|·]--&gt;[·|/]
+               |       |
+               v       v
+               c       d
+</pre>
+
+
+<p>
+Second response: '(b c d)
+</p>
+
+<pre class="example">
+Box-and-pointer diagram representing the situation after evaluating (define w (append! x y))
+
+w--&gt;x--&gt;[·|·]--&gt;[·|·|]
+         |       | |
+         v       v |
+         a       b |
+                   v
+              y--&gt;[·|·]--&gt;[·|/]
+                   |       |
+                   v       v
+                   c       d
+</pre>
+</div>
+</div>
+<div id="outline-container-org92a4864" class="outline-4">
+<h4 id="org92a4864">Exercise 3.13</h4>
+<div class="outline-text-4" id="text-org92a4864">
+<p>
+<b>Exercise</b>:
+</p>
+
+<p>
+Consider the following <code>make-cycle</code> procedure, which uses the
+<code>last-pair</code> procedure defined in Exercise 3-12.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-cycle</span> x)
+  (set-cdr! (last-pair x) x)
+  x)
+</pre>
+</div>
+
+<p>
+Draw a box-and-pointer diagram that shows the structure `z'
+created by
+</p>
+
+<p>
+(define z (make-cycle (list 'a 'b 'c)))
+</p>
+
+<p>
+What happens if we try to compute `(last-pair z)'?
+</p>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Diagram:
+</p>
+<pre class="example">
+-----&gt; z--&gt;[·|·]--&gt;[·|·]--&gt;[·|·]--
+|                                 \
+----\                              |
+     |                             /
+     ---\                  -------/
+         \--      --------/
+            \----/
+</pre>
+
+<p>
+Evaluating <code>(last-pair z)</code> should initiate an infinite evaluation,
+because the condition in <code>last-pair</code> will never be false.
+</p>
+
+<p>
+If I evaluate the corresponding elisp expression in Emacs, an
+<code>excessive-lisp-nesting</code> error is displayed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5443a7" class="outline-4">
+<h4 id="orgc5443a7">Sharing and identity</h4>
+<div class="outline-text-4" id="text-orgc5443a7">
+<p>
+The theoretical issues of <i>sameness</i> and <i>change</i> are not so
+philosophical anymore when our programming duties have to deal with
+pairs that are shared among different data objects. Sharing can be as
+dangerous as it is powerful.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb29371a" class="outline-4">
+<h4 id="orgb29371a">Exercise 3.15</h4>
+<div class="outline-text-4" id="text-orgb29371a">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Draw box-and-pointer diagrams to explain the effect of <code>set-to-wow!</code>
+on the structures <code>z1</code> and <code>z2</code> above.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<pre class="example">
+z1 before:
+
+        +---+---+
+  z1 --&gt;| * | * |
+        +-|-+-|-+
+          V   V
+        +---+---+     +---+---+
+   x --&gt;| * | *-+----&gt;| * | / |
+        +-|-+---+     +-|-+---+
+          V             V
+        +---+         +---+
+        | a |         | b |
+        +---+         +---+
+
+z1 after:
+
+        +---+---+
+  z1 --&gt;| * | * |
+        +-|-+-|-+
+          V   V
+        +---+---+     +---+---+
+   x --&gt;| * | *-+----&gt;| * | / |
+        +-|-+---+     +-|-+---+
+          V             V
+        +---+         +---+
+        |wow|         | b |
+        +---+         +---+
+</pre>
+
+<pre class="example">
+z2 before:
+
+        +---+---+     +---+---+     +---+---+
+  z2 --&gt;| * | *-+----&gt;| * | *-+----&gt;| * | / |
+        +-|-+---+     +-|-+---+     +-|-+---+
+          |             V             V
+          |           +---+         +---+
+          |           | a |         | b |
+          |           +---+         +---+
+          |             ^             ^
+          |             |             |
+          |           +-|-+---+     +-|-+---+
+          +----------&gt;| * | *-+----&gt;| * | / |
+                      +---+---+     +---+---+
+z2 after:
+
+        +---+---+     +---+---+     +---+---+
+  z2 --&gt;| * | *-+----&gt;| * | *-+----&gt;| * | / |
+        +-|-+---+     +-|-+---+     +-|-+---+
+          |             V             V
+          |           +---+         +---+
+          |           | a |         | b |
+          |           +---+         +---+
+          |                           ^
+          |                           |
+          |           +---+---+     +-|-+---+
+          +----------&gt;| * | *-+----&gt;| * | / |
+                      +-|-+---+     +---+---+
+                        V
+                      +---+
+                      |wow|
+                      +---+
+</pre>
+</div>
+</div>
+<div id="outline-container-org6226d6b" class="outline-4">
+<h4 id="org6226d6b">Exercise 3.16</h4>
+<div class="outline-text-4" id="text-org6226d6b">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle decides to write a procedure to count the number of
+pairs in any list structure.  "It's easy," he reasons.  "The number of
+pairs in any structure is the number in the <code>car</code> plus the number in
+the <code>cdr</code> plus one more to count the current pair."  So Ben writes the
+following procedure:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(define (count-pairs x)
+        (<span style="color: #531ab6;">if</span> (not (pair? x))
+            0
+          (+ (count-pairs (car x))
+             (count-pairs (cdr x))
+             1)))
+</pre>
+</div>
+
+<p>
+Show that this procedure is not correct.  In particular, draw
+box-and-pointer diagrams representing list structures made up of
+exactly three pairs for which Ben's procedure would return 3;
+return 4; return 7; never return at all.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+(I can't be bothered adding the drawings.)
+</p>
+
+<p>
+List structure for which Ben's procedure would return 3:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(list 1 2 3)
+</pre>
+</div>
+
+<p>
+List structure for which Ben's procedure would return 4:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> (list 2))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">y</span> (cons x x))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">z</span> (cons 1 y))
+</pre>
+</div>
+
+<p>
+List structure for which Ben's procedure would return 7:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> (list 2))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">y</span> (cons x x))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">z</span> (cons y y))
+</pre>
+</div>
+
+<p>
+List structure for which Ben's procedure would never return:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">cf. ex. 3.13</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">last-pair</span> x)
+  (<span style="color: #531ab6;">if</span> (null? (cdr x))
+      x
+      (last-pair (cdr x))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-cycle</span> x)
+  (set-cdr! (last-pair x) x)
+  x)
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> (list 1 2 3))
+
+(make-cycle x)
+<span style="color: #595959;">;; </span><span style="color: #595959;">trying to count the pairs of x would never stop</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9b90335" class="outline-4">
+<h4 id="org9b90335">Exercise 3.17</h4>
+<div class="outline-text-4" id="text-org9b90335">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Devise a correct version of the <code>count-pairs</code> procedure of Exercise
+3-16 that returns the number of distinct pairs in any structure.
+(Hint: Traverse the structure, maintaining an auxiliary data structure
+that is used to keep track of which pairs have already been counted.)
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">return #t if el is in seq, false otherwise</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">find</span> el seq)
+  (<span style="color: #531ab6;">cond</span> ((null? seq) #f)
+        ((eq? (car seq) el) #t)
+        (<span style="color: #531ab6;">else</span> (find el (cdr seq)))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">list in which we store the references of those pairs we have</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">already taken into account</span>
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">checked</span> '())
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">gp/count-pairs</span> x)
+  (<span style="color: #531ab6;">if</span> (not (pair? x))
+      0
+      (<span style="color: #531ab6;">if</span> (not (find x checked))
+          (<span style="color: #531ab6;">begin</span>
+            (set! checked (cons x checked))
+            (+ (gp/count-pairs (car x))
+               (gp/count-pairs (cdr x))
+               1))
+          0)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org38fef01" class="outline-4">
+<h4 id="org38fef01">Exercise 3.18</h4>
+<div class="outline-text-4" id="text-org38fef01">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Write a procedure that examines a list and determines whether it
+contains a cycle, that is, whether a program that tried to find the
+end of the list by taking successive <code>cdr</code>'s would go into an infinite
+loop. Exercise 3-13 constructed such lists.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">last-pair</span> x)
+  (<span style="color: #531ab6;">if</span> (null? (cdr x))
+      x
+      (last-pair (cdr x))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-cycle</span> x)
+  (set-cdr! (last-pair x) x)
+  x)
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">z</span> (make-cycle (list 1 2 3)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">is-cycle</span> x)
+  (<span style="color: #531ab6;">let</span> ((checked '()))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">traverse</span> y)
+      (<span style="color: #531ab6;">cond</span> ((null? y) #f)
+            ((includes? checked (cdr y)) #t)
+            (<span style="color: #531ab6;">else</span>
+             (set! checked (cons y checked))
+             (traverse (cdr y)))))
+    (traverse x)))
+
+(is-cycle '(1 2 3)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;  #f</span>
+(is-cycle z) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; #t</span>
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-cycle2</span> x)
+  (set-cdr! (last-pair x) x)
+  (cdr x))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">foo</span> '(1 2 3 4 5))
+(is-cycle2 foo) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; #f</span>
+(make-cycle2 foo)
+(is-cycle2 foo) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; #t</span>
+</pre>
+</div>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</span></p>
+</div>
+</body>
+</html>

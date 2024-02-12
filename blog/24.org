@@ -433,3 +433,9 @@ of an account).
 
 ~acc~ and ~acc2~ share the text of the procedure objects ~widthdraw~,
 ~deposit~, and ~dispatch~.
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export

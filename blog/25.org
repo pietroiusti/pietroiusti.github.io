@@ -1,0 +1,414 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 3.3.1 Modeling with Mutable Data - Mutable List Structure
+#+subtitle: 2024-02-12 Mon
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)
+
+* 3.3 Modeling with Mutable Data
+Chapter 2 showed how data abstraction can be achieved with
+/constructors/ and /selectors/.
+
+However, now
+#+begin_quote
+``[t]he desire to model systems composed of objects that have changing
+state leads us to the need to modify compound data objects, as well as
+to construct and select from them.'' (251-2)
+#+end_quote
+
+That is to say, we also want /mutators/.
+
+#+begin_quote
+Data objects for which mutators are defined are known as objects
+"mutable data objects". (252)
+#+end_quote
+
+Our beloved pairs can, of course, be use to build mutable data
+objects. Let's define mutators for them.
+** 3.3.1 Mutable List Structure
+~cons~, ~car~ and ~cdr~, as well as those operations implement in
+terms of them (e.g., ~append~, ~list~), /construct/ list
+structure. They do /not/ modify it.
+
+Here are our mutators for pairs:
+- ~set-car!~
+- ~set-cdr!~
+
+How do they work? Think.
+*** Exercise 3.12
+#+begin_quote
+*Exercise:* The following procedure for appending lists was
+introduced in section 2-2-1:
+
+#+begin_src scheme
+  (define (append x y)
+    (if (null? x)
+	y
+	(cons (car x) (append (cdr x) y))))
+#+end_src
+
+~Append~ forms a new list by successively ~cons~-ing the elements of
+~x~ onto ~y~.  The procedure ~append!~ is similar to ~append~, but it
+is a mutator rather than a constructor.  It appends the lists by
+splicing them together, modifying the final pair of ~x~ so that its
+~cdr~ is now ~y~.  (It is an error to call ~append!~ with an empty
+~x~.)
+
+#+begin_src scheme
+  (define (append! x y)
+    (set-cdr! (last-pair x) y)
+    x)
+#+end_src
+
+Here ~last-pair~ is a procedure that returns the last pair in its
+argument:
+
+#+begin_src scheme
+(define (last-pair x)
+  (if (null? (cdr x))
+      x
+      (last-pair (cdr x))))
+#+end_src
+
+Consider the interaction
+
+#+begin_src scheme
+  (define x (list 'a 'b))
+
+  (define y (list 'c 'd))
+
+  (define z (append x y))
+
+  z
+  (a b c d)
+
+  (cdr x)
+  <RESPONSE>
+
+  (define w (append! x y))
+
+  w
+  (a b c d)
+
+  (cdr x)
+  <RESPONSE>
+#+end_src
+
+What are the missing <RESPONSE>s?  Draw box-and-pointer diagrams to
+explain your answer.
+#+end_quote
+
+*Answer*:
+
+First response: '(b)
+
+#+begin_src
+Box-and-pointer diagram representing the situation after evaluating (define z (append x y)):
+
+x-->[·|·]-->[·|/]
+     |       |
+     v       v
+     a       b
+     ^       ^
+     |       |
+z-->[·|·]-->[·|·]
+               |
+               v
+          y-->[·|·]-->[·|/]
+               |       |
+               v       v
+               c       d
+#+end_src
+
+
+Second response: '(b c d)
+
+#+begin_src
+Box-and-pointer diagram representing the situation after evaluating (define w (append! x y))
+
+w-->x-->[·|·]-->[·|·|]
+         |       | |
+         v       v |
+         a       b |
+                   v
+              y-->[·|·]-->[·|/]
+                   |       |
+                   v       v
+                   c       d
+#+end_src
+*** Exercise 3.13
+*Exercise*:
+
+Consider the following ~make-cycle~ procedure, which uses the
+~last-pair~ procedure defined in Exercise 3-12.
+
+#+begin_src scheme
+  (define (make-cycle x)
+    (set-cdr! (last-pair x) x)
+    x)
+#+end_src
+
+Draw a box-and-pointer diagram that shows the structure `z'
+created by
+
+(define z (make-cycle (list 'a 'b 'c)))
+
+What happens if we try to compute `(last-pair z)'?
+
+*Answer*:
+
+Diagram:
+#+begin_src
+ -----> z-->[·|·]-->[·|·]-->[·|·]--
+ |                                 \
+ ----\                              |
+      |                             /
+      ---\                  -------/
+          \--      --------/
+             \----/
+#+end_src
+
+Evaluating ~(last-pair z)~ should initiate an infinite evaluation,
+because the condition in ~last-pair~ will never be false.
+
+If I evaluate the corresponding elisp expression in Emacs, an
+~excessive-lisp-nesting~ error is displayed.
+*** Sharing and identity
+The theoretical issues of /sameness/ and /change/ are not so
+philosophical anymore when our programming duties have to deal with
+pairs that are shared among different data objects. Sharing can be as
+dangerous as it is powerful.
+*** Exercise 3.15
+*Exercise*:
+
+#+begin_quote
+Draw box-and-pointer diagrams to explain the effect of ~set-to-wow!~
+on the structures ~z1~ and ~z2~ above.
+#+end_quote
+
+*Answer*:
+
+#+begin_src
+z1 before:
+
+        +---+---+
+  z1 -->| * | * |
+        +-|-+-|-+
+          V   V
+        +---+---+     +---+---+
+   x -->| * | *-+---->| * | / |
+        +-|-+---+     +-|-+---+
+          V             V
+        +---+         +---+
+        | a |         | b |
+        +---+         +---+
+
+z1 after:
+
+        +---+---+
+  z1 -->| * | * |
+        +-|-+-|-+
+          V   V
+        +---+---+     +---+---+
+   x -->| * | *-+---->| * | / |
+        +-|-+---+     +-|-+---+
+          V             V
+        +---+         +---+
+        |wow|         | b |
+        +---+         +---+
+#+end_src
+
+#+begin_src
+z2 before:
+
+        +---+---+     +---+---+     +---+---+
+  z2 -->| * | *-+---->| * | *-+---->| * | / |
+        +-|-+---+     +-|-+---+     +-|-+---+
+          |             V             V
+          |           +---+         +---+
+          |           | a |         | b |
+          |           +---+         +---+
+          |             ^             ^
+          |             |             |
+          |           +-|-+---+     +-|-+---+
+          +---------->| * | *-+---->| * | / |
+                      +---+---+     +---+---+
+z2 after:
+
+        +---+---+     +---+---+     +---+---+
+  z2 -->| * | *-+---->| * | *-+---->| * | / |
+        +-|-+---+     +-|-+---+     +-|-+---+
+          |             V             V
+          |           +---+         +---+
+          |           | a |         | b |
+          |           +---+         +---+
+          |                           ^
+          |                           |
+          |           +---+---+     +-|-+---+
+          +---------->| * | *-+---->| * | / |
+                      +-|-+---+     +---+---+
+                        V
+                      +---+
+                      |wow|
+                      +---+
+#+end_src
+*** Exercise 3.16
+*Exercise*:
+
+#+begin_quote
+Ben Bitdiddle decides to write a procedure to count the number of
+pairs in any list structure.  "It's easy," he reasons.  "The number of
+pairs in any structure is the number in the ~car~ plus the number in
+the ~cdr~ plus one more to count the current pair."  So Ben writes the
+following procedure:
+
+#+begin_src emacs-lisp
+  (define (count-pairs x)
+          (if (not (pair? x))
+              0
+            (+ (count-pairs (car x))
+               (count-pairs (cdr x))
+               1)))
+#+end_src
+
+Show that this procedure is not correct.  In particular, draw
+box-and-pointer diagrams representing list structures made up of
+exactly three pairs for which Ben's procedure would return 3;
+return 4; return 7; never return at all.
+#+end_quote
+
+*Answer*:
+
+(I can't be bothered adding the drawings.)
+
+List structure for which Ben's procedure would return 3:
+#+begin_src scheme
+  (list 1 2 3)
+#+end_src
+
+List structure for which Ben's procedure would return 4:
+#+begin_src scheme
+  (define x (list 2))
+  (define y (cons x x))
+  (define z (cons 1 y))
+#+end_src
+
+List structure for which Ben's procedure would return 7:
+#+begin_src scheme
+  (define x (list 2))
+  (define y (cons x x))
+  (define z (cons y y))
+#+end_src
+
+List structure for which Ben's procedure would never return:
+#+begin_src scheme
+  ;; cf. ex. 3.13
+  (define (last-pair x)
+    (if (null? (cdr x))
+        x
+        (last-pair (cdr x))))
+
+  (define (make-cycle x)
+    (set-cdr! (last-pair x) x)
+    x)
+
+  (define x (list 1 2 3))
+
+  (make-cycle x)
+  ;; trying to count the pairs of x would never stop
+#+end_src
+*** Exercise 3.17
+*Exercise*:
+
+#+begin_quote
+Devise a correct version of the ~count-pairs~ procedure of Exercise
+3-16 that returns the number of distinct pairs in any structure.
+(Hint: Traverse the structure, maintaining an auxiliary data structure
+that is used to keep track of which pairs have already been counted.)
+#+end_quote
+
+#+begin_src scheme
+  ;; return #t if el is in seq, false otherwise
+  (define (find el seq)
+    (cond ((null? seq) #f)
+          ((eq? (car seq) el) #t)
+          (else (find el (cdr seq)))))
+
+  ;; list in which we store the references of those pairs we have
+  ;; already taken into account
+  (define checked '())
+
+  (define (gp/count-pairs x)
+    (if (not (pair? x))
+        0
+        (if (not (find x checked))
+            (begin
+              (set! checked (cons x checked))
+              (+ (gp/count-pairs (car x))
+                 (gp/count-pairs (cdr x))
+                 1))
+            0)))
+#+end_src
+*** Exercise 3.18
+*Exercise*:
+
+#+begin_quote
+Write a procedure that examines a list and determines whether it
+contains a cycle, that is, whether a program that tried to find the
+end of the list by taking successive ~cdr~'s would go into an infinite
+loop. Exercise 3-13 constructed such lists.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (last-pair x)
+    (if (null? (cdr x))
+        x
+        (last-pair (cdr x))))
+
+  (define (make-cycle x)
+    (set-cdr! (last-pair x) x)
+    x)
+
+  (define z (make-cycle (list 1 2 3)))
+
+  (define (is-cycle x)
+    (let ((checked '()))
+      (define (traverse y)
+        (cond ((null? y) #f)
+              ((includes? checked (cdr y)) #t)
+              (else
+               (set! checked (cons y checked))
+               (traverse (cdr y)))))
+      (traverse x)))
+
+  (is-cycle '(1 2 3)) ;; =>  #f
+  (is-cycle z) ;; => #t
+
+  (define (make-cycle2 x)
+    (set-cdr! (last-pair x) x)
+    (cdr x))
+  (define foo '(1 2 3 4 5))
+  (is-cycle2 foo) ;; => #f
+  (make-cycle2 foo)
+  (is-cycle2 foo) ;; => #t
+#+end_src
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
