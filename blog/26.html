@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-03-03 Sun 11:52 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 3.3.2 Representing Queues</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 3.3.2 Representing Queues
+<br />
+<span class="subtitle">2024-03-03 Sun</span>
+</h1>
+
+<div id="outline-container-org041d60f" class="outline-2">
+<h2 id="org041d60f">3.3.2 Representing Queues</h2>
+<div class="outline-text-2" id="text-org041d60f">
+<p>
+A queue is defined in terms of a its interface:
+</p>
+
+<ul class="org-ul">
+<li>a constructor: <code>(make-queue)</code>;</li>
+<li>two selectors:
+<ul class="org-ul">
+<li><code>(empty-queue? &lt;QUEUE&gt;)</code></li>
+<li><code>(front-queue &lt;QUEUE&gt;)</code></li>
+</ul></li>
+<li>two mutators:
+<ul class="org-ul">
+<li><code>(insert-queue! &lt;QUEUE&gt; &lt;ITEM&gt;)</code></li>
+<li><code>(delete-queue! &lt;QUEUE&gt;)</code>.</li>
+</ul></li>
+</ul>
+
+<p>
+We could represent a queue as an ordinary list. However, if we did so,
+then inserting an element at the end of it would require traversing
+the whole list, thereby requiring O(n) steps. Authors present the
+implementation of a queue with allows to insert an item in O(1). This
+is possible by representing the queue as an ordinary list while also
+retaining a pointer to the end of it.
+</p>
+
+<pre class="example">
+  *Figure 3.19:* Implementation of a queue as a list with front and
+     rear pointers.
+
+                 +---+---+
+            q --&gt;| * | *-+-------------------+
+                 +-|-+---+                   |
+                   |                         |
+                   | front-ptr               | rear-ptr
+                   V                         V
+               +---+---+    +---+---+    +---+---+
+               | * | *-+---&gt;| * | *-+---&gt;| * | / |
+               +-|-+---+    +-|-+---+    +-|-+---+
+                 V            V            V
+               +---+        +---+        +---+
+               | a |        | b |        | c |
+               +---+        +---+        +---+
+
+[Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
+</pre>
+
+<p>
+Here is the code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">front-ptr</span> queue) (car queue))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rear-ptr</span> queue) (cdr queue))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">set-front-ptr!</span> queue item) (set-car! queue item))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">set-rear-ptr!</span> queue item) (set-cdr! queue item))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">empty-queue?</span> queue) (null? (front-ptr queue)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-queue</span>) (cons '() '()))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">front-queue</span> queue)
+  (<span style="color: #531ab6;">if</span> (empty-queue? queue)
+      (error <span style="color: #3548cf;">"FRONT called with an empty queue"</span> queue)
+      (car (front-ptr queue))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">insert-queue!</span> queue item)
+  (<span style="color: #531ab6;">let</span> ((new-pair (cons item '())))
+    (<span style="color: #531ab6;">cond</span> ((empty-queue? queue)
+           (set-front-ptr! queue new-pair)
+           (set-rear-ptr! queue new-pair)
+           queue)
+          (<span style="color: #531ab6;">else</span>
+           (set-cdr! (rear-ptr queue) new-pair)
+           (set-rear-ptr! queue new-pair)
+           queue))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">delete-queue!</span> queue)
+  (<span style="color: #531ab6;">cond</span> ((empty-queue? queue)
+         (error <span style="color: #3548cf;">"DELETE! called with an empty queue"</span> queue))
+        (<span style="color: #531ab6;">else</span>
+         (set-front-ptr! queue (cdr (front-ptr queue)))
+         queue)))
+</pre>
+</div>
+</div>
+<div id="outline-container-org4e9a510" class="outline-3">
+<h3 id="org4e9a510">Exercise 3.21</h3>
+<div class="outline-text-3" id="text-org4e9a510">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle decides to test the queue implementation described
+above.  He types in the procedures to the Lisp interpreter and
+proceeds to try them out:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">q1</span> (make-queue))
+
+(insert-queue! q1 'a)
+((a) a)
+
+(insert-queue! q1 'b)
+((a b) b)
+
+(delete-queue! q1)
+((b) b)
+
+(delete-queue! q1)
+(() b)
+</pre>
+</div>
+
+<p>
+"It's all wrong!" he complains.  "The interpreter's response shows
+that the last item is inserted into the queue twice.  And when I
+delete both items, the second <code>b</code> is still there, so the queue isn't
+empty, even though it's supposed to be."  Eva Lu Ator suggests that
+Ben has misunderstood what is happening.  "It's not that the items are
+going into the queue twice," she explains.  "It's just that the
+standard Lisp printer doesn't know how to make sense of the queue
+representation.  If you want to see the queue printed correctly,
+you'll have to define your own print procedure for queues." Explain
+what Eva Lu is talking about.  In particular, show why Ben's examples
+produce the printed results that they do.  Define a procedure
+<code>print-queue</code> that takes a queue as input and prints the sequence of
+items in the queue.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+The interpreter is printing the structures <i>qua</i> lists, not <i>qua</i>
+queues. Such lists represent queues only because we have established a
+convention according to which a queue is represented by a pair whose
+<code>car</code> points to a simple list of elements and whose <code>cdr</code> points to
+the last element of the same list the <code>car</code> points to. The interpreter
+just prints that pair as if it was a normal pair.
+</p>
+
+<p>
+The following creates a list whose <code>car</code> is a list which contains <code>'a</code>
+only and whose <code>cdr</code> is that list too.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">q1</span> (make-queue))
+(insert-queue! q1 'a)
+</pre>
+</div>
+
+<p>
+So <code>((a) a)</code> is exactly what we would expect the interpreter to
+print. <i>Mutatis mutandis</i> for structures created by <code>(insert-queue! q1
+'b)</code>, <code>(delete-queue! q1)</code>, and <code>(delete-queue! q1)</code>.
+</p>
+
+<p>
+To print the queue we can simply print the ``ordinary list'' the front
+pointer is pointing at:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">print-queue</span> queue)
+  (display (front-ptr queue)))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd75812d" class="outline-3">
+<h3 id="orgd75812d">Exercise 3.22</h3>
+<div class="outline-text-3" id="text-orgd75812d">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Instead of representing a queue as a pair of pointers, we can build a
+queue as a procedure with local state.  The local state will consist
+of pointers to the beginning and the end of an ordinary list.  Thus,
+the `make-queue' procedure will have the form
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-queue</span>)
+  (<span style="color: #531ab6;">let</span> ((front-ptr ... )
+        (rear-ptr ... ))
+    &lt;DEFINITIONS OF INTERNAL PROCEDURES&gt;
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> m) ...)
+    dispatch))
+</pre>
+</div>
+
+<p>
+Complete the definition of <code>make-queue</code> and provide implementations of
+the queue operations using this representation.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-queue</span>)
+  (<span style="color: #531ab6;">let</span> ((front-ptr nil)
+        (rear-ptr nil))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> m)
+      (<span style="color: #531ab6;">cond</span> ((eq? m 'empty-queue?) (null? front-ptr))
+            ((eq? m 'front-queue)
+             (<span style="color: #531ab6;">cond</span> ((null? front-ptr)
+                    (error <span style="color: #3548cf;">"FRONT called with an empty queue"</span>))
+                   (<span style="color: #531ab6;">else</span> (car front-ptr))))
+            ((eq? m 'insert-queue) (<span style="color: #531ab6;">lambda</span> (item)
+                                     (<span style="color: #531ab6;">let</span> ((new-pair (cons item '())))
+                                       (<span style="color: #531ab6;">cond</span> ((null? front-ptr)
+                                              (set! front-ptr new-pair)
+                                              (set! rear-ptr new-pair)
+                                              front-ptr)
+                                             (<span style="color: #531ab6;">else</span>
+                                              (set-cdr! rear-ptr new-pair)
+                                              (set! rear-ptr new-pair)
+                                              front-ptr)))))
+            ((eq? m 'delete-queue)
+             (<span style="color: #531ab6;">cond</span> ((null? front-ptr)
+                    (error <span style="color: #3548cf;">"DELETE! called with an empty queue"</span>))
+                   (<span style="color: #531ab6;">else</span>
+                    (set! front-ptr (cdr front-ptr))
+                    front-ptr)))
+            (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"unknown request sorry (at least for now)"</span>))))
+    dispatch))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">queue</span> (make-queue))
+(queue 'empty-queue?) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; #t</span>
+((queue 'insert-queue) 'hello) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (hello)</span>
+(queue 'empty-queue?) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; #f</span>
+(queue 'front-queue) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; hello</span>
+((queue 'insert-queue) 'world) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (hello world)</span>
+(queue 'empty-queue?) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; #f</span>
+(queue 'front-queue) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; hello</span>
+(queue 'delete-queue) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (world)</span>
+(queue 'front-queue) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; world</span>
+(queue 'delete-queue) <span style="color: #595959;">;; </span><span style="color: #595959;">()</span>
+(queue 'empty-queue?) <span style="color: #595959;">;; </span><span style="color: #595959;">#t</span>
+</pre>
+</div>
+
+<p>
+In Emacs-lisp:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="color: #595959;">;; </span><span style="color: #595959;">-*- lexical-binding: t -*-</span>
+
+(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">make-queue</span> ()
+  (<span style="color: #531ab6;">let</span> ((front-ptr nil)
+        (rear-ptr nil))
+    (<span style="color: #531ab6;">lambda</span> (m)
+      (<span style="color: #531ab6;">cond</span> ((eq m 'empty-queue) (null front-ptr))
+            ((eq m 'front-queue)
+             (<span style="color: #531ab6;">cond</span> ((null front-ptr)
+                    (<span style="color: #884900;">error</span> <span style="color: #3548cf;">"FRONT called with an empty queue"</span>))
+                   (t (car front-ptr))))
+            ((eq m 'insert-queue) (<span style="color: #531ab6;">lambda</span> (item)
+                                    (<span style="color: #531ab6;">let</span> ((new-pair (cons item '())))
+                                      (<span style="color: #531ab6;">cond</span> ((null front-ptr)
+                                             (<span style="color: #531ab6;">setq</span> front-ptr new-pair)
+                                             (<span style="color: #531ab6;">setq</span> rear-ptr new-pair)
+                                             front-ptr)
+                                            (t
+                                             (setcdr rear-ptr new-pair)
+                                             (<span style="color: #531ab6;">setq</span> rear-ptr new-pair)
+                                             front-ptr)))))
+            ((eq m 'delete-queue)
+             (<span style="color: #531ab6;">cond</span> ((null front-ptr)
+                    (<span style="color: #884900;">error</span> <span style="color: #3548cf;">"DELETE! called with an empty queue"</span>))
+                   (t
+                    (<span style="color: #531ab6;">setq</span> front-ptr (cdr front-ptr))
+                    front-ptr)))
+            (t (<span style="color: #884900;">error</span> <span style="color: #3548cf;">"unknown request sorry (at least for now)"</span>))))))
+
+(<span style="color: #531ab6;">let</span> ((queue (make-queue)))
+  (message <span style="color: #3548cf;">"Queue initially empty: %s"</span> (funcall queue 'empty-queue)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; t</span>
+
+  (funcall (funcall queue 'insert-queue) 'hello) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (hello)</span>
+
+  (message <span style="color: #3548cf;">"Queue empty after insertion: %s"</span> (funcall queue 'empty-queue)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; nil</span>
+
+  (message <span style="color: #3548cf;">"Front of queue: %s"</span> (funcall queue 'front-queue)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; hello</span>
+
+  (funcall (funcall queue 'insert-queue) 'world) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (hello world)</span>
+
+  (funcall queue 'delete-queue) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (world)</span>
+
+  (message <span style="color: #3548cf;">"Front of queue after deletion: %s"</span> (funcall queue 'front-queue)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; world</span>
+
+  (funcall queue 'delete-queue) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; nil</span>
+
+  (message <span style="color: #3548cf;">"Queue empty after all deletions: %s"</span> (funcall queue 'empty-queue)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; t</span>
+  )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbd47f95" class="outline-3">
+<h3 id="orgbd47f95">Exercise 3.23</h3>
+<div class="outline-text-3" id="text-orgbd47f95">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+A "deque" ("double-ended queue") is a sequence in which items can be
+inserted and deleted at either the front or the rear.  Operations on
+deques are the constructor <code>make-deque</code>, the predicate <code>empty-deque?</code>,
+selectors <code>front-deque</code> and <code>rear-deque</code>, and mutators
+<code>front-insert-deque!</code>, <code>rear-insert-deque!</code>, <code>front-delete-deque!</code>,
+and <code>rear-delete-deque!</code>.  Show how to represent deques using pairs,
+and give implementations of the operations.(2) All operations should
+be accomplished in [theta](1) steps.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Here is what the structure of my deque's implementation looks like:
+</p>
+<pre class="example">
+         +---+---+
+deque --&gt;| * | *-+---------------------------+
+         +-|-+---+                           |
+           |                                 |
+           | front-ptr                       | rear-ptr
+           V                                 V
+       +---+---+        +---+---+        +---+---+
+       | * | *-+-------&gt;| * | *-+-------&gt;| * | / |
+       +-|-+---+        +-|-+---+        +-|-+---+
+         |   ^______      |   ^______      |
+         V          \     V          \     V
+       +---+---+     \  +---+---+     \  +---+---+
+       | \ | * +      \-|-* | * |      \-|-* | * |
+       +---+-|-+        +---+-|-+        +---+-|-+
+             V                V                V
+            'a               'b               'c
+</pre>
+
+<p>
+Basically, instead of having a head-and-tail pointer for a list of
+values, like in the queue's case, we have a head-and-tail pointer for
+a list of pairs, each of which holds (in the <code>car</code>) a pointer to the
+previous pair and (in the <code>cdr</code>) a value. This is one way in which we
+can use pairs to build a so-called doubly-linked lists.
+</p>
+
+<p>
+Here is the scheme:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-deque</span>)
+  (<span style="color: #531ab6;">let</span> ((front-ptr nil)
+        (rear-ptr nil))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> m)
+      (<span style="color: #531ab6;">cond</span> ((eq? m 'empty-deque?) (null? front-ptr))
+            ((eq? m 'front-deque)
+             (<span style="color: #531ab6;">cond</span> ((null? front-ptr)
+                    (error <span style="color: #3548cf;">"FRONT called with an empty deque"</span>))
+                   (<span style="color: #531ab6;">else</span> (cdar front-ptr))))
+            ((eq? m 'rear-deque)
+             (<span style="color: #531ab6;">cond</span> ((null? rear-ptr)
+                    (error <span style="color: #3548cf;">"REAR called with an empty deque"</span>))
+                   (<span style="color: #531ab6;">else</span> (cdar rear-ptr))))
+            ((eq? m 'front-insert-deque!) (<span style="color: #531ab6;">lambda</span> (item)
+                                            (<span style="color: #531ab6;">let</span> ((prev-and-value-pair (cons nil item)))
+                                              (<span style="color: #531ab6;">let</span> ((new-pair (cons prev-and-value-pair front-ptr)))
+                                                (<span style="color: #531ab6;">cond</span> ((null? front-ptr)
+                                                       (set! front-ptr new-pair)
+                                                       (set! rear-ptr new-pair))
+                                                      (<span style="color: #531ab6;">else</span>
+                                                       (set-car! (car front-ptr) new-pair)
+                                                       (set! front-ptr new-pair)))))))
+            ((eq? m 'rear-insert-deque!) (<span style="color: #531ab6;">lambda</span> (item)
+                                           (<span style="color: #531ab6;">let</span> ((prev-and-value-pair (cons rear-ptr item)))
+                                             (<span style="color: #531ab6;">let</span> ((new-pair (cons prev-and-value-pair nil)))
+                                               (<span style="color: #531ab6;">cond</span> ((null? rear-ptr)
+                                                      (set! front-ptr new-pair)
+                                                      (set! rear-ptr new-pair))
+                                                     (<span style="color: #531ab6;">else</span>
+                                                      (set-cdr! rear-ptr new-pair)
+                                                      (set! rear-ptr new-pair)))))))
+            ((eq? m 'front-delete-deque!)
+             (<span style="color: #531ab6;">cond</span> ((null? front-ptr)
+                    (error <span style="color: #3548cf;">"DELETE! called with an empty deque"</span>))
+                   ((eq? front-ptr rear-ptr) <span style="color: #595959;">;; </span><span style="color: #595959;">if so there is only one el</span>
+                    (set! front-ptr nil)
+                    (set! rear-ptr nil)
+                    front-ptr)
+                   (<span style="color: #531ab6;">else</span>
+                    (set! front-ptr (cdr front-ptr))
+                    (<span style="color: #531ab6;">and</span> front-ptr
+                         (cdar front-ptr)))))
+            ((eq? m 'rear-delete-deque!)
+             (<span style="color: #531ab6;">cond</span> ((null? rear-ptr)
+                    (error <span style="color: #3548cf;">"DELETE! called with an empty deque"</span>))
+                   ((eq? front-ptr rear-ptr)  <span style="color: #595959;">;; </span><span style="color: #595959;">if so there is only one el</span>
+                    (set! front-ptr nil)
+                    (set! rear-ptr nil)
+                    rear-ptr)
+                   (<span style="color: #531ab6;">else</span>
+                    (set! rear-ptr (caar rear-ptr))
+                    (<span style="color: #531ab6;">and</span> rear-ptr (cdar rear-ptr)))))))
+    dispatch))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">my-deque</span> (make-deque))
+
+((my-deque 'front-insert-deque!) 'hello)
+
+(my-deque 'front-deque) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; hello</span>
+(my-deque 'rear-deque) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; hello</span>
+
+((my-deque 'rear-insert-deque!) 'world)
+
+(my-deque 'front-deque) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; hello</span>
+(my-deque 'rear-deque) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; world</span>
+
+(my-deque 'front-delete-deque!) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; world</span>
+
+(my-deque 'front-deque) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; world</span>
+(my-deque 'rear-deque) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; world</span>
+
+(my-deque 'rear-delete-deque!) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; ()</span>
+
+(my-deque 'front-deque) <span style="color: #595959;">;; </span><span style="color: #595959;">error: FRONT called with an empty deque</span>
+</pre>
+</div>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.2.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
+</div>
+</body>
+</html>

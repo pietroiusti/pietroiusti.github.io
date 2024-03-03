@@ -1,0 +1,409 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 3.3.2 Representing Queues
+#+subtitle: 2024-03-03 Sun
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.2.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
+
+* 3.3.2 Representing Queues
+
+A queue is defined in terms of a its interface:
+
+- a constructor: ~(make-queue)~;
+- two selectors:
+  - ~(empty-queue? <QUEUE>)~
+  - ~(front-queue <QUEUE>)~
+- two mutators:
+  - ~(insert-queue! <QUEUE> <ITEM>)~
+  - ~(delete-queue! <QUEUE>)~.
+
+We could represent a queue as an ordinary list. However, if we did so,
+then inserting an element at the end of it would require traversing
+the whole list, thereby requiring O(n) steps. Authors present the
+implementation of a queue with allows to insert an item in O(1). This
+is possible by representing the queue as an ordinary list while also
+retaining a pointer to the end of it.
+
+#+begin_src
+  *Figure 3.19:* Implementation of a queue as a list with front and
+     rear pointers.
+
+                 +---+---+
+            q -->| * | *-+-------------------+
+                 +-|-+---+                   |
+                   |                         |
+                   | front-ptr               | rear-ptr
+                   V                         V
+               +---+---+    +---+---+    +---+---+
+               | * | *-+--->| * | *-+--->| * | / |
+               +-|-+---+    +-|-+---+    +-|-+---+
+                 V            V            V
+               +---+        +---+        +---+
+               | a |        | b |        | c |
+               +---+        +---+        +---+
+
+[Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
+#+end_src
+
+Here is the code:
+
+#+begin_src scheme
+  (define (front-ptr queue) (car queue))
+
+  (define (rear-ptr queue) (cdr queue))
+
+  (define (set-front-ptr! queue item) (set-car! queue item))
+
+  (define (set-rear-ptr! queue item) (set-cdr! queue item))
+
+  (define (empty-queue? queue) (null? (front-ptr queue)))
+
+  (define (make-queue) (cons '() '()))
+
+  (define (front-queue queue)
+    (if (empty-queue? queue)
+        (error "FRONT called with an empty queue" queue)
+        (car (front-ptr queue))))
+
+  (define (insert-queue! queue item)
+    (let ((new-pair (cons item '())))
+      (cond ((empty-queue? queue)
+             (set-front-ptr! queue new-pair)
+             (set-rear-ptr! queue new-pair)
+             queue)
+            (else
+             (set-cdr! (rear-ptr queue) new-pair)
+             (set-rear-ptr! queue new-pair)
+             queue))))
+
+  (define (delete-queue! queue)
+    (cond ((empty-queue? queue)
+           (error "DELETE! called with an empty queue" queue))
+          (else
+           (set-front-ptr! queue (cdr (front-ptr queue)))
+           queue)))
+#+end_src
+** Exercise 3.21
+*Exercise*:
+
+#+begin_quote
+Ben Bitdiddle decides to test the queue implementation described
+above.  He types in the procedures to the Lisp interpreter and
+proceeds to try them out:
+
+#+begin_src scheme
+(define q1 (make-queue))
+
+(insert-queue! q1 'a)
+((a) a)
+
+(insert-queue! q1 'b)
+((a b) b)
+
+(delete-queue! q1)
+((b) b)
+
+(delete-queue! q1)
+(() b)
+#+end_src
+
+"It's all wrong!" he complains.  "The interpreter's response shows
+that the last item is inserted into the queue twice.  And when I
+delete both items, the second ~b~ is still there, so the queue isn't
+empty, even though it's supposed to be."  Eva Lu Ator suggests that
+Ben has misunderstood what is happening.  "It's not that the items are
+going into the queue twice," she explains.  "It's just that the
+standard Lisp printer doesn't know how to make sense of the queue
+representation.  If you want to see the queue printed correctly,
+you'll have to define your own print procedure for queues." Explain
+what Eva Lu is talking about.  In particular, show why Ben's examples
+produce the printed results that they do.  Define a procedure
+~print-queue~ that takes a queue as input and prints the sequence of
+items in the queue.
+#+end_quote
+
+*Answer*:
+
+The interpreter is printing the structures /qua/ lists, not /qua/
+queues. Such lists represent queues only because we have established a
+convention according to which a queue is represented by a pair whose
+~car~ points to a simple list of elements and whose ~cdr~ points to
+the last element of the same list the ~car~ points to. The interpreter
+just prints that pair as if it was a normal pair.
+
+The following creates a list whose ~car~ is a list which contains ~'a~
+only and whose ~cdr~ is that list too.
+
+#+begin_src scheme
+(define q1 (make-queue))
+(insert-queue! q1 'a)
+#+end_src
+
+So ~((a) a)~ is exactly what we would expect the interpreter to
+print. /Mutatis mutandis/ for structures created by ~(insert-queue! q1
+'b)~, ~(delete-queue! q1)~, and ~(delete-queue! q1)~.
+
+To print the queue we can simply print the ``ordinary list'' the front
+pointer is pointing at:
+
+#+begin_src scheme
+  (define (print-queue queue)
+    (display (front-ptr queue)))
+#+end_src
+
+** Exercise 3.22
+*Exercise*:
+
+#+begin_quote
+Instead of representing a queue as a pair of pointers, we can build a
+queue as a procedure with local state.  The local state will consist
+of pointers to the beginning and the end of an ordinary list.  Thus,
+the `make-queue' procedure will have the form
+
+#+begin_src scheme
+  (define (make-queue)
+    (let ((front-ptr ... )
+          (rear-ptr ... ))
+      <DEFINITIONS OF INTERNAL PROCEDURES>
+      (define (dispatch m) ...)
+      dispatch))
+#+end_src
+
+Complete the definition of ~make-queue~ and provide implementations of
+the queue operations using this representation.
+#+end_quote
+
+*Answer*:
+#+begin_src scheme
+  (define (make-queue)
+    (let ((front-ptr nil)
+          (rear-ptr nil))
+      (define (dispatch m)
+        (cond ((eq? m 'empty-queue?) (null? front-ptr))
+              ((eq? m 'front-queue)
+               (cond ((null? front-ptr)
+                      (error "FRONT called with an empty queue"))
+                     (else (car front-ptr))))
+              ((eq? m 'insert-queue) (lambda (item)
+                                       (let ((new-pair (cons item '())))
+                                         (cond ((null? front-ptr)
+                                                (set! front-ptr new-pair)
+                                                (set! rear-ptr new-pair)
+                                                front-ptr)
+                                               (else
+                                                (set-cdr! rear-ptr new-pair)
+                                                (set! rear-ptr new-pair)
+                                                front-ptr)))))
+              ((eq? m 'delete-queue)
+               (cond ((null? front-ptr)
+                      (error "DELETE! called with an empty queue"))
+                     (else
+                      (set! front-ptr (cdr front-ptr))
+                      front-ptr)))
+              (else (error "unknown request sorry (at least for now)"))))
+      dispatch))
+
+  (define queue (make-queue))
+  (queue 'empty-queue?) ;; => #t
+  ((queue 'insert-queue) 'hello) ;; => (hello)
+  (queue 'empty-queue?) ;; => #f
+  (queue 'front-queue) ;; => hello
+  ((queue 'insert-queue) 'world) ;; => (hello world)
+  (queue 'empty-queue?) ;; => #f
+  (queue 'front-queue) ;; => hello
+  (queue 'delete-queue) ;; => (world)
+  (queue 'front-queue) ;; => world
+  (queue 'delete-queue) ;; ()
+  (queue 'empty-queue?) ;; #t
+#+end_src
+
+In Emacs-lisp:
+#+begin_src emacs-lisp
+  ;; -*- lexical-binding: t -*-
+
+  (defun make-queue ()
+    (let ((front-ptr nil)
+          (rear-ptr nil))
+      (lambda (m)
+        (cond ((eq m 'empty-queue) (null front-ptr))
+              ((eq m 'front-queue)
+               (cond ((null front-ptr)
+                      (error "FRONT called with an empty queue"))
+                     (t (car front-ptr))))
+              ((eq m 'insert-queue) (lambda (item)
+                                      (let ((new-pair (cons item '())))
+                                        (cond ((null front-ptr)
+                                               (setq front-ptr new-pair)
+                                               (setq rear-ptr new-pair)
+                                               front-ptr)
+                                              (t
+                                               (setcdr rear-ptr new-pair)
+                                               (setq rear-ptr new-pair)
+                                               front-ptr)))))
+              ((eq m 'delete-queue)
+               (cond ((null front-ptr)
+                      (error "DELETE! called with an empty queue"))
+                     (t
+                      (setq front-ptr (cdr front-ptr))
+                      front-ptr)))
+              (t (error "unknown request sorry (at least for now)"))))))
+
+  (let ((queue (make-queue)))
+    (message "Queue initially empty: %s" (funcall queue 'empty-queue)) ;; => t
+
+    (funcall (funcall queue 'insert-queue) 'hello) ;; => (hello)
+
+    (message "Queue empty after insertion: %s" (funcall queue 'empty-queue)) ;; => nil
+
+    (message "Front of queue: %s" (funcall queue 'front-queue)) ;; => hello
+
+    (funcall (funcall queue 'insert-queue) 'world) ;; => (hello world)
+
+    (funcall queue 'delete-queue) ;; => (world)
+
+    (message "Front of queue after deletion: %s" (funcall queue 'front-queue)) ;; => world
+
+    (funcall queue 'delete-queue) ;; => nil
+
+    (message "Queue empty after all deletions: %s" (funcall queue 'empty-queue)) ;; => t
+    )
+#+end_src
+
+** Exercise 3.23
+*Exercise*:
+
+#+begin_quote
+A "deque" ("double-ended queue") is a sequence in which items can be
+inserted and deleted at either the front or the rear.  Operations on
+deques are the constructor ~make-deque~, the predicate ~empty-deque?~,
+selectors ~front-deque~ and ~rear-deque~, and mutators
+~front-insert-deque!~, ~rear-insert-deque!~, ~front-delete-deque!~,
+and ~rear-delete-deque!~.  Show how to represent deques using pairs,
+and give implementations of the operations.(2) All operations should
+be accomplished in [theta](1) steps.
+#+end_quote
+
+*Answer*:
+
+Here is what the structure of my deque's implementation looks like:
+#+begin_src
+                 +---+---+
+        deque -->| * | *-+---------------------------+
+                 +-|-+---+                           |
+                   |                                 |
+                   | front-ptr                       | rear-ptr
+                   V                                 V
+               +---+---+        +---+---+        +---+---+
+               | * | *-+------->| * | *-+------->| * | / |
+               +-|-+---+        +-|-+---+        +-|-+---+
+                 |   ^______      |   ^______      |
+                 V          \     V          \     V
+               +---+---+     \  +---+---+     \  +---+---+
+               | \ | * +      \-|-* | * |      \-|-* | * |
+               +---+-|-+        +---+-|-+        +---+-|-+
+                     V                V                V
+                    'a               'b               'c
+#+end_src
+
+Basically, instead of having a head-and-tail pointer for a list of
+values, like in the queue's case, we have a head-and-tail pointer for
+a list of pairs, each of which holds (in the ~car~) a pointer to the
+previous pair and (in the ~cdr~) a value. This is one way in which we
+can use pairs to build a so-called doubly-linked lists.
+
+Here is the scheme:
+
+#+begin_src scheme
+  (define (make-deque)
+    (let ((front-ptr nil)
+          (rear-ptr nil))
+      (define (dispatch m)
+        (cond ((eq? m 'empty-deque?) (null? front-ptr))
+              ((eq? m 'front-deque)
+               (cond ((null? front-ptr)
+                      (error "FRONT called with an empty deque"))
+                     (else (cdar front-ptr))))
+              ((eq? m 'rear-deque)
+               (cond ((null? rear-ptr)
+                      (error "REAR called with an empty deque"))
+                     (else (cdar rear-ptr))))
+              ((eq? m 'front-insert-deque!) (lambda (item)
+                                              (let ((prev-and-value-pair (cons nil item)))
+                                                (let ((new-pair (cons prev-and-value-pair front-ptr)))
+                                                  (cond ((null? front-ptr)
+                                                         (set! front-ptr new-pair)
+                                                         (set! rear-ptr new-pair))
+                                                        (else
+                                                         (set-car! (car front-ptr) new-pair)
+                                                         (set! front-ptr new-pair)))))))
+              ((eq? m 'rear-insert-deque!) (lambda (item)
+                                             (let ((prev-and-value-pair (cons rear-ptr item)))
+                                               (let ((new-pair (cons prev-and-value-pair nil)))
+                                                 (cond ((null? rear-ptr)
+                                                        (set! front-ptr new-pair)
+                                                        (set! rear-ptr new-pair))
+                                                       (else
+                                                        (set-cdr! rear-ptr new-pair)
+                                                        (set! rear-ptr new-pair)))))))
+              ((eq? m 'front-delete-deque!)
+               (cond ((null? front-ptr)
+                      (error "DELETE! called with an empty deque"))
+                     ((eq? front-ptr rear-ptr) ;; if so there is only one el
+                      (set! front-ptr nil)
+                      (set! rear-ptr nil)
+                      front-ptr)
+                     (else
+                      (set! front-ptr (cdr front-ptr))
+                      (and front-ptr
+                           (cdar front-ptr)))))
+              ((eq? m 'rear-delete-deque!)
+               (cond ((null? rear-ptr)
+                      (error "DELETE! called with an empty deque"))
+                     ((eq? front-ptr rear-ptr)  ;; if so there is only one el
+                      (set! front-ptr nil)
+                      (set! rear-ptr nil)
+                      rear-ptr)
+                     (else
+                      (set! rear-ptr (caar rear-ptr))
+                      (and rear-ptr (cdar rear-ptr)))))))
+      dispatch))
+
+  (define my-deque (make-deque))
+
+  ((my-deque 'front-insert-deque!) 'hello)
+
+  (my-deque 'front-deque) ;; => hello
+  (my-deque 'rear-deque) ;; => hello
+
+  ((my-deque 'rear-insert-deque!) 'world)
+
+  (my-deque 'front-deque) ;; => hello
+  (my-deque 'rear-deque) ;; => world
+
+  (my-deque 'front-delete-deque!) ;; => world
+
+  (my-deque 'front-deque) ;; => world
+  (my-deque 'rear-deque) ;; => world
+
+  (my-deque 'rear-delete-deque!) ;; => ()
+
+  (my-deque 'front-deque) ;; error: FRONT called with an empty deque
+#+end_src
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
