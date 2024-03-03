@@ -19,7 +19,7 @@
 
 * 3.3.2 Representing Queues
 
-A queue is defined in terms of a its interface:
+A queue is defined in terms of its interface:
 
 - a constructor: ~(make-queue)~;
 - two selectors:
