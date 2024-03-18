@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-03-18 Mon 22:00 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 3.3.3 Representing Tables</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 3.3.3 Representing Tables
+<br />
+<span class="subtitle">2024-03-18 Mon</span>
+</h1>
+
+<div id="outline-container-org8567224" class="outline-2">
+<h2 id="org8567224">3.3.3 Representing Queues</h2>
+<div class="outline-text-2" id="text-org8567224">
+<p>
+Authors show how to implement tables. It is not surprising that they
+show how to implement tables in terms of pairs.
+</p>
+
+<p>
+What is a table? Again, a table can be defined in terms of its
+interface &#x2014; data abstraction!
+</p>
+
+<p>
+One can <code>insert!</code> a value under one or more keys. One can then
+<code>lookup</code> the value using the key(s).
+</p>
+
+<p>
+Authors show the implementation of one-dimensional tables &#x2014; tables
+in which values are stored under one key &#x2014; and two-dimensional
+tables &#x2014; tables in which values are stored under two keys.
+</p>
+</div>
+<div id="outline-container-orgad27930" class="outline-3">
+<h3 id="orgad27930">Exercise 3.24</h3>
+<div class="outline-text-3" id="text-orgad27930">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+In the table implementations above, the keys are tested for equality
+using <code>equal?</code> (called by <code>assoc</code>).  This is not always the
+appropriate test.  For instance, we might have a table with numeric
+keys in which we don't need an exact match to the number we're looking
+up, but only a number within some tolerance of it.  Design a table
+constructor <code>make-table</code> that takes as an argument a <code>same-key?</code>
+procedure that will be used to test "equality" of keys.  <code>Make-table</code>
+should return a <code>dispatch</code> procedure that can be used to access
+appropriate <code>lookup</code> and <code>insert!</code> procedures for a local table.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-table</span> same-key?)
+  (<span style="color: #531ab6;">let</span> ((local-table (list '*table*)))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assoc-mod</span> key records)
+      (<span style="color: #531ab6;">cond</span> ((null? records) false)
+            ((same-key? key (caar records)) (car records))
+            (<span style="color: #531ab6;">else</span> (assoc-mod key (cdr records)))))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup</span> key-1 key-2)
+      (<span style="color: #531ab6;">let</span> ((subtable (assoc-mod key-1 (cdr local-table))))
+        (<span style="color: #531ab6;">if</span> subtable
+            (<span style="color: #531ab6;">let</span> ((record (assoc-mod key-2 (cdr subtable))))
+              (<span style="color: #531ab6;">if</span> record
+                  (cdr record)
+                  false))
+            false)))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">insert!</span> key-1 key-2 value)
+      (<span style="color: #531ab6;">let</span> ((subtable (assoc-mod key-1 (cdr local-table))))
+        (<span style="color: #531ab6;">if</span> subtable
+            (<span style="color: #531ab6;">let</span> ((record (assoc-mod key-2 (cdr subtable))))
+              (<span style="color: #531ab6;">if</span> record
+                  (set-cdr! record value)
+                  (set-cdr! subtable
+                            (cons (cons key-2 value)
+                                  (cdr subtable)))))
+            (set-cdr! local-table
+                      (cons (list key-1
+                                  (cons key-2 value))
+                            (cdr local-table)))))
+      'ok)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> m)
+      (<span style="color: #531ab6;">cond</span> ((eq? m 'lookup-proc) lookup)
+            ((eq? m 'insert-proc!) insert!)
+            (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown operation -- TABLE"</span> m))))
+    dispatch))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgae59f33" class="outline-3">
+<h3 id="orgae59f33">Exercise 3.25</h3>
+<div class="outline-text-3" id="text-orgae59f33">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Generalizing one- and two-dimensional tables, show how to implement a
+table in which values are stored under an arbitrary number of keys and
+different values may be stored under different numbers of keys.  The
+<code>lookup</code> and <code>insert!</code> procedures should take as input a list of keys
+used to access the table.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">gp-make-table</span>)
+  (list '*table*))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">try to find record</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">return pair</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">if cdr of return-value is nil, then record has been found, and the</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">car is the record</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">if cdr of return-value is not nil, then record has not been found;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">car is the last key found, cdr is the list of keys to be added</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">find-rec</span> t keys)
+  (<span style="color: #531ab6;">cond</span> ((null? keys)
+         (cons t keys))
+        ((not (pair? (cdr t)))
+         (cons t keys))
+        (<span style="color: #531ab6;">else</span> (<span style="color: #531ab6;">let</span> ((found (assoc (car keys) (cdr t))))
+                (<span style="color: #531ab6;">cond</span> (found
+                       (find-rec found (cdr keys)))
+                      (<span style="color: #531ab6;">else</span> (cons t keys)))))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">to-insert</span> keys val)
+  (<span style="color: #531ab6;">if</span> (= (length keys) 1)
+      (cons (car keys) val)
+      (list (car keys)
+            (to-insert (cdr keys) val))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup</span> t keys)
+  (<span style="color: #531ab6;">let</span> ((found (car (find-rec t keys)))
+        (rest-of-keys (cdr (find-rec t keys))))
+    (<span style="color: #531ab6;">if</span> (null? rest-of-keys)
+        (cdr found)
+        false)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">insert</span> t keys val)
+  (<span style="color: #531ab6;">let</span> ((found (car (find-rec t keys)))
+        (rest-of-keys (cdr (find-rec t keys))))
+    (<span style="color: #531ab6;">cond</span> ((null? rest-of-keys)
+           (set-cdr! found val))
+          ((= (length rest-of-keys) 1)
+           (set-cdr! found
+                     (cons
+                      (cons (car rest-of-keys) val)
+                      (cdr found))))
+          (<span style="color: #531ab6;">else</span>
+           <span style="color: #3548cf;">"adding subtable"</span>
+           (set-cdr! found
+                     (cons
+                      (to-insert rest-of-keys val)
+                      (cdr found)))))))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">t</span> (gp-make-table))
+(insert t '(letters a) 97)
+t <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (*table* (letters (a . 97)))</span>
+(insert t '(letters b) 98)
+t <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (*table* (letters (b . 98) (a . 97)))</span>
+(insert t '(continents europe cities barcelona population)  1620343)
+t <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (*table* (continents (europe (cities (barcelona (population . 1620343))))) (letters (b . 98) (a . 97)))</span>
+(lookup t '(continents europe cities barcelona population)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; 1620343</span>
+(lookup t '(letters b)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; 98</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0c0d454" class="outline-3">
+<h3 id="org0c0d454">Exercise 3.26</h3>
+<div class="outline-text-3" id="text-org0c0d454">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+To search a table as implemented above, one needs to scan through the
+list of records.  This is basically the unordered list representation
+of 2-3-3.  For large tables, it may be more efficient to structure the
+table in a different manner.  Describe a table implementation where
+the (key, value) records are organized using a binary tree, assuming
+that keys can be ordered in some way (e.g., numerically or
+alphabetically).  (Compare Exercise 2-66 of Chapter 2.)
+</p>
+</blockquote>
+
+<p>
+Exercise 2.66 asked for a set of records structured as a binary
+tree. In terms of its interface, the solution I've given already
+satisfies the requirements for a one dimensional table. You feed a key
+to the lookup function, you get the record, if any.
+</p>
+
+<p>
+In order to make a multi-dimensional table, we could simply allow the
+values of the tree (table) to be trees (subtables) themselves.
+</p>
+
+<p>
+For example, here is a tree I've used in responding exercise 2.66:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(list-&gt;tree '( (1 <span style="color: #3548cf;">"el with key 1"</span>) (2 <span style="color: #3548cf;">"el with key 2"</span>) (3 <span style="color: #3548cf;">"etc"</span>) (4 <span style="color: #3548cf;">"foo"</span>) (6 <span style="color: #3548cf;">"bar"</span>) (7 <span style="color: #3548cf;">"baz"</span>)))
+</pre>
+</div>
+
+<p>
+That tree has this structure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>:
+</p>
+
+<pre class="example">
+"
+[o|o]---[o|o]---[o|o]---[o|o]---[o|o]---[o|/]
+ |       |       |       |       |       |
+ |       |       |       |       |      [o|o]---[o|/]
+ |       |       |       |       |       |       |
+ |       |       |       |       |       7      "baz"
+ |       |       |       |       |
+ |       |       |       |      [o|o]---[o|/]
+ |       |       |       |       |       |
+ |       |       |       |       6      "bar"
+ |       |       |       |
+ |       |       |      [o|o]---[o|/]
+ |       |       |       |       |
+ |       |       |       4      "foo"
+ |       |       |
+ |       |      [o|o]---[o|/]
+ |       |       |       |
+ |       |       3      "etc"
+ |       |
+ |      [o|o]---[o|/]
+ |       |       |
+ |       2      "el wit..."
+ |
+[o|o]---[o|/]
+ |       |
+ 1      "el wit..."
+"
+</pre>
+
+<p>
+Given the function <code>lookup</code>, that tree can be used as a one
+dimensional table:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup</span> given-key set)
+  (<span style="color: #531ab6;">cond</span> ((null? set) false)
+        ((= given-key (key (entry set)))
+         (cadr (entry set)))
+        ((&lt; given-key (key (entry set)))
+         (lookup given-key (left-branch set)))
+        (<span style="color: #531ab6;">else</span> (lookup given-key (right-branch set)))))
+
+(lookup 1 (tree)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; "table el 1"</span>
+</pre>
+</div>
+
+<p>
+If we add an entries whose value is a tree itself, then we can see
+that we can use this structure as a multi-dimensional table.  Here,
+for example, I build a tree with a key 999 whose value is a tree
+itself.  Then I retrieve the value under the keys 1 and 999:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">tree</span> (list-&gt;tree '( (1 <span style="color: #3548cf;">"table el 1"</span>) (2 <span style="color: #3548cf;">"table el 2"</span>) (3 <span style="color: #3548cf;">"table el 3"</span>)
+                            (4 <span style="color: #3548cf;">"table el 4"</span>) (6 <span style="color: #3548cf;">"table el 6"</span>) (7 <span style="color: #3548cf;">"table el 7"</span>)
+                            (999 ((1 <span style="color: #3548cf;">"subtable el 1"</span>) () ((2 <span style="color: #3548cf;">"subtable el 2"</span>) () ()))))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">structure of the tree:</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">[o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |      [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |      [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |       ()      ()</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |      [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |      999     [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |       ()     [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |               |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |               |       ()      ()</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |               |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |              [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |               |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |               2      "subta..."</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |              [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |               1      "subtab..."</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |      [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       ()      ()</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |      [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       6      "table..."</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |      [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       7      "table..."</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|      [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |      [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       ()      ()</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |      [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       3      "table..."</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |      [o|o]---[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       ()      ()</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |      [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       1      "table..."</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|      [o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       2      "table..."</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">[o|o]---[o|/]</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">|       |</span>
+<span style="color: #595959;">;;  </span><span style="color: #595959;">4      "table..."</span>
+
+(lookup 1 tree) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; "table el 1"</span>
+
+(lookup 999 tree) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; ((1 "subtable el 1") () ((2 "subtable el 2") () ()))</span>
+
+(lookup 1 (lookup 999 tree)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; "subtable el 1"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org672576c" class="outline-3">
+<h3 id="org672576c">Exercise 3.27</h3>
+<div class="outline-text-3" id="text-org672576c">
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+This exercise was somehow particularly confusing. Looking at
+<a href="https://github.com/kana/sicp/blob/master/ex-3.27.md">https://github.com/kana/sicp/blob/master/ex-3.27.md</a> helped a
+lot. After having looked at kana's solution and (beautiful diagram) I
+tried to redo it on my own until I got it.
+</p>
+
+<pre class="example">
+ Before evaluating (memo-fib 3).
+
+             +------------------------------------------------------------------------------------------------------+
+global env.-&gt;| memo-fib                                                                                    memoize  |
+             |   |                                                                                           |      |
+             +---+-------------------------+-----------------------------------------------------------------+------+
+                 |    ^                    ^                                                                 |   ^
+        +---------    |                    |                                                                 |   |
+        |    +--------+-------+      +---+-+-+                                                               V   |
+        |    | f: o-----------+-----&gt;| o | o |                                                             +---+-+-+
+        |    |                |      +-+-+---+                                                             | o | o |
+        |    |                |        |                                                                   +-+-+---+
+        |    |                |        |                                                                     |
+        |    +--------+-------+        V                                                                     |
+        |             ^              p: n                                                                    V
+        |             |              b: (cond ...)                                                         p: f
+        |             |                                                                                    b: (let ...)
+        |             |
+        |    +--------+-------+
+        |    | table: {...}   |
+        |    |                |
+        |    |                |
+        |    |                |
+        |    |                |
+        |    +----------------+
+        |           ^
+        |           |
+        +------+    |
+               v    |
+             +---+--+-+
+             | o |  | |
+             +-+-+----+
+               |
+               |
+               V
+            p: x
+            b: (let ...)
+</pre>
+
+<p>
+<code>memoize</code> is bound in the global env to a pair whose cdr is a pointer
+to the global env and whose car points to param <code>f</code> and body
+<code>(let...)</code>.
+</p>
+
+<p>
+<code>memo-fib</code> is bound in the global env to the value returned by the
+application of memoize to a lambda expression. That value is a lambda,
+therefore a procedure object, therefore a pair.
+</p>
+
+<p>
+Applying <code>memoize</code> entails
+</p>
+<ul class="org-ul">
+<li>1) the creation of a frame which points to the global environment
+&#x2014; the environment the <code>memoize</code> pairs points to &#x2014; and in which
+<code>f</code> is bound to a procedure object &#x2014; corresponding to the lambda
+expression passed to <code>memoize</code> &#x2014; which is a pair whose cdr points
+to the global env. and whose care points to param <code>n</code> and body
+<code>(cond ...)</code>.</li>
+<li>2) the evaluation of the body of <code>memoize</code> within the
+frame/environment describe in 1).</li>
+</ul>
+
+<p>
+The evaluation of the body of <code>memoize</code> creates a frame in which
+<code>table</code> is bound to the value return by <code>make-table</code>, and evaluates a
+lambda expression within it, which produces a pair whose cdr points to
+the frame in which <code>table</code> is defined and whose car points to param
+<code>x</code> and body <code>(let...)</code>.
+</p>
+
+<pre class="example">
+Evaluating (memo-fib 3).
+
+              +------------------------------------------------------------------------------------------------------+
+ global env.-&gt;| memo-fib                                                                                    memoize  |
+              |   |                                                                                           |      |
+              +---+-------------------------+-----------------------------------------------------------------+------+
+                  |    ^                    ^         ^               ^             ^             ^           |   ^
+         +---------    |                    |         |               |             |             |           |   |
+         |    +--------+-------+      +---+-+-+       |               |             |             |           V   |
+         |    | f: o-----------+-----&gt;| o | o |       |               |             |             |         +---+-+-+
+         |    |                |      +-+-+---+       |               |             |             |         | o | o |
+         |    |                |        |             |               |             |             |         +-+-+---+
+         |    |                |        |             |               |             |             |           |
+         |    +--------+-------+        V             |               |             |             |           |
+         |             ^              p: n            |               |             |             |           V
+         |             |              b: (cond ...)   |               |             |             |         p: f
+         |             |                              |               |             |             |         b: (let ...)
+         |             |                       +------+-----+ +-------+----+ +------+-----+ +-----+------+
+         |    +--------+-------+               | n: 3       | | n: 2       | | n: 1       | | n: 0       |
+         |    | table: {...}   |               |            | |            | |            | |            |
+         |    |                |               |            | |            | |            | |            |
+         |    |                |               |            | |            | |            | |            |
+         |    |                |&lt;----+         +------------+ +------------+ +------------+ +------------+
+         |    |                |&lt;--+ |
+         |    +----------------+   | |
+         |           ^    ^ ^ ^    | +--------------------------------------------------------------+
+         |           |    | | |    +-------------------------------------------------+              |
+         +------+    |    | | +---------------------------------------+              |              |
+                v    |    | +--------------------------+              |              |              |
+              +---+--+-+  +-------------+              |              |              |              |
+              | o |  o |                |              |              |              |              |
+              +-+-+----+         +------+-----+ +------+-----+ +------+-----+ +------+-----+ +------+-----+
+                |                | x: 3       | | x: 2       | | x: 1       | | x: 0       | | x: 1       |
+                |                |            | |            | |            | |            | |            |
+                V                |            | |            | |            | |            | |            |
+             p: x                |            | |            | |            | |            | |            |
+             b: (let ...)        +------------+ +------------+ +------------+ +------------+ +------------+
+</pre>
+
+<p>
+<code>memo-fib</code> computes the nth Fibonacci number in a number of steps
+proportional to <code>n</code>, because <code>memo-fib</code> never makes the same
+computation more than once.
+</p>
+
+<p>
+The scheme would not work if we had simply defined <code>memo-fib</code> to be
+<code>(memoize fib)</code>, because, in that case, the call <code>(memo-fib 3)</code> would
+end up calling <code>(fib 3)</code> which would continue in the old non-memoized
+way.
+</p>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">To draw the structure I'm using <a href="https://github.com/pietroiusti/draw-tree">draw-tree</a></p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.2.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
+</div>
+</body>
+</html>
