@@ -17,7 +17,7 @@
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.2.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
 
-* 3.3.3 Representing Queues
+* 3.3.3 Representing Tables
 Authors show how to implement tables. It is not surprising that they
 show how to implement tables in terms of pairs.
 
