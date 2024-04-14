@@ -1,0 +1,591 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 3.4 Concurrency: Time Is of the Essence
+#+subtitle: 2024-04-14 Sun
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
+
+- We have seen that computational objects with local state are
+  powerful tools for modeling.
+
+- We had to pay a price though:
+  - Loss of referential transparency;
+  - Adoption of a more intricate environment model.
+
+- ``The central issue lurking beneath the complexity of state,
+  sameness, and change is that by introducing assignment we are forced
+  to admit time into our computational models. Before we introduced
+  assignment, all our programs were timeless, in the sense that any
+  expression that has a value always has the same value.''
+
+- ``Building models in terms of computational objects with local state
+  forces us to confront time as an essential concept in programming.''
+
+- ``We can go further in structuring computational models to match our
+  perception of the physical world.  Objects in the world do not
+  change one at a time in sequence.  Rather we perceive them as acting
+  "concurrently" --- all at once.''
+
+- Introducing assignment means admitting /time/.
+
+- Our programs are not timeless anymore.
+  - Successive evaluations of the same expression can yield different
+    values.
+  - The result of an evaluation now depends not only on the expression
+    itself, but also on whether the evaluation occurs before or after
+    one the moments delineated by the execution of assignment
+    statements.
+
+- For any event A and B: either A happens and then B happens, or B
+  happens and then A happens, or A and B happen at the same time.
+
+- Authors give the example of Peter and Paul withdrawing from an
+  account at the same. Concurrency, in the example, is not handled
+  correctly.
+  - ``The general phenomenon illustrated here is that several processes
+    may share a common state variable.''
+  - ``The above example typifies the subtle bugs that can creep into
+    concurrent programs.  The root of this complexity lies in the
+    assignments to variables that are shared among the different
+    processes.''
+
+- Consider two processes, each of which with three ordered
+  events. Respectively: (a, b, c), and (x, y, z). There are 20
+  possible orderings. (See p. 303)
+
+- Consider a parallel execution of ~(set! x (* x x))~ and ~(set! x (+
+  x 1))~.
+  - We can do so using ~parallel-execute~:
+    #+begin_src emacs-lisp
+      (define x 10)
+
+      (parallel-execute (lambda () (set! x (* x x)))
+                        (lambda () (set! x (+ x 1))))
+    #+end_src
+  - There are five possible final values for the variable ~x~.
+  - If we use a /serializer/, though, there are only two possible final
+    values.
+    - here is how we would use a serializer:
+      #+begin_src emacs-lisp
+        (define x 10)
+
+        (define s (make-serializer))
+
+        (parallel-execute (s (lambda () (set! x (* x x))))
+                          (s (lambda () (set! x (+ x 1)))))
+      #+end_src
+
+- We can now write a safer version of ~make-account~:
+  #+begin_src emacs-lisp
+    (define (make-account balance)
+            (define (withdraw amount)
+                    (if (>= balance amount)
+                        (begin (set! balance (- balance amount))
+                               balance)
+                      "Insufficient funds"))
+            (define (deposit amount)
+                    (set! balance (+ balance amount))
+                    balance)
+            (let ((protected (make-serializer)))
+              (define (dispatch m)
+                      (cond ((eq? m 'withdraw) (protected withdraw))
+                            ((eq? m 'deposit) (protected deposit))
+                            ((eq? m 'balance) balance)
+                            (else (error "Unknown request -- MAKE-ACCOUNT"
+                                         m))))
+              dispatch))
+  #+end_src
+
+- Consider this procedure which swaps the value of two accounts:
+  #+begin_src emacs-lisp
+    (define (exchange account1 account2)
+            (let ((difference (- (account1 'balance)
+                                 (account2 'balance))))
+              ((account1 'withdraw) difference)
+              ((account2 'deposit) difference)))
+  #+end_src
+
+  - ``For correct behavior, we must arrange for the ~exchange~ procedure
+    to lock out any other concurrent accesses to the accounts during the
+    entire time of the exchange.''
+
+- Authors show how to implement a serializer using a /mutex/ (aka
+  /lock/).
+  #+begin_src emacs-lisp
+    (define (make-serializer)
+            (let ((mutex (make-mutex)))
+              (lambda (p)
+                (define (serialized-p . args)
+                        (mutex 'acquire)
+                        (let ((val (apply p args)))
+                          (mutex 'release)
+                          val))
+                serialized-p)))
+
+    (define (make-mutex)
+            (let ((cell (list false)))
+              (define (the-mutex m)
+                      (cond ((eq? m 'acquire)
+                             (if (test-and-set! cell)
+                                 (the-mutex 'acquire))) ; retry
+                            ((eq? m 'release) (clear! cell))))
+              the-mutex))
+
+    (define (clear! cell)
+            (set-car! cell false))
+
+
+    (define (test-and-set! cell)
+            (if (car cell)
+                true
+              (begin (set-car! cell true)
+                     false)))
+  #+end_src
+
+  - Very important detail: the `test-and-set!' operation must be
+    performed "atomically". (This operation is also known as Compare And
+    Swap, (CAS). See Fedor Pikus' presentation:
+    https://youtu.be/ZQFzMfHIxng?t=1028)
+
+- Authors explain what a /deadlock/ is.
+
+* Exercise 3.38
+*Exercise*:
+
+#+begin_quote
+Suppose that Peter, Paul, and Mary share a joint bank account that
+initially contains $100.  Concurrently, Peter deposits $10, Paul
+withdraws $20, and Mary withdraws half the money in the account, by
+executing the following commands:
+
+    Peter: ~(set! balance (+ balance 10))~
+    Paul:  ~(set! balance (- balance 20))~
+    Mary:  ~(set! balance (- balance (/ balance 2)))~
+
+ a. List all the different possible values for `balance' after these
+    three transactions have been completed, assuming that the banking
+    system forces the three processes to run sequentially in some
+    order.
+
+ b. What are some other values that could be produced if the system
+    allows the processes to be interleaved?  Draw timing diagrams like
+    the one in *Note Figure 3-29 to explain how these values can occur.
+
+#+end_quote
+
+*Answer*:
+
+a:
+
+#+begin_src
+| peter | peter |  mary |  paul |  paul |  mary |
+|  paul |  mary | peter | peter |  mary |  paul |
+|  mary |  paul |  paul |  mary | peter | peter |
+|-------+-------+-------+-------+-------+-------|
+|   110 |   110 |    50 |    80 |    80 |    50 |
+|    90 |    55 |    30 |    90 |    40 |    30 |
+|    45 |    35 |    40 |    45 |    50 |    40 |
+#+end_src
+
+b:
+
+Here is an example of how we could end up with 110 in the bank:
+#+begin_src
+  |              Peter            Paul            Bank            Mary
+  |
+  |               +----------------+--------------100--------------+
+  |               |                |                               |
+  |               |                V                               |
+  |               |           Access val: 100                      |
+  |               |                |                               |
+  |               |                |                               V
+  |               |                |                        Access val: 100
+  |               |                |                               |
+  |               V                |                               |
+  |      Access val: 100           |                               |
+  |               |                |                               |
+  |               |                V                               |
+  |               |            New val: 80                         |
+  |               |                |                               V
+  |               |                |                          New val: 50
+  |               V                |                               |
+  |         New val: 110           |                               |
+  |               |                V                               |
+  |               |            Set 80 ----------->80               |
+  |               |                                                |
+  |               |                                                |
+  |               |                                                V
+  |               |                               50<----------Set 50
+  |               |
+  |               V
+  |            Set 110--------------------------->110
+  V
+time
+#+end_src
+
+* Exercise 3.39
+*Exercise*:
+
+#+begin_quote
+Which of the five possibilities in the parallel
+execution shown above remain if we instead serialize execution as
+follows:
+
+#+begin_src scheme
+  (define x 10)
+
+  (define s (make-serializer))
+
+  (parallel-execute (lambda () (set! x ((s (lambda () (* x x))))))
+                    (s (lambda () (set! x (+ x 1)))))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+I believe there are three possibilities:
+
+- first:
+  1. execution of ~(* x x)~. A ~100~ value is created but not
+     assigned;
+  2. execution of ~(set! x (+ x 1))~. ~x~ is now ~11~;
+  3. execution of ~(set! x 100)~. x is now ~100~;
+- second:
+  1. execution of ~(* x x)~. A ~100~ value is created but not
+     assigned;
+  2. execution of ~(set! x 100)~. x is now ~100~;
+  3. execution of ~(set! x (+ x 1))~. ~x~ is now ~101~;
+- third:
+  1. execution of ~(set! x (+ x 1))~. ~x~ is now ~11~;
+  2. execution of ~(* x x)~. A ~121~ value is created but not
+     assigned;
+  3. execution of ~(set! x 121)~. x is now ~121~;
+
+* Exercise 3.40
+*Exercise*:
+
+#+begin_quote
+Give all possible values of `x' that can result from executing
+
+#+begin_src scheme
+  (define x 10)
+
+  (parallel-execute (lambda () (set! x (* x x)))
+                    (lambda () (set! x (* x x x))))
+#+end_src
+
+Which of these possibilities remain if we instead use serialized
+procedures:
+
+#+begin_src scheme
+  (define x 10)
+
+  (define s (make-serializer))
+
+  (parallel-execute (s (lambda () (set! x (* x x))))
+                    (s (lambda () (set! x (* x x x)))))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+- The first λ involves three events:
+  - two accesses of the variable ~x~; let's called them `1a' and `1b';
+  - one ~set!~; let's call it `1s'.
+- The second λ involves four events:
+  - three accesses of the variable ~x~; let's called them `2a', `2b',
+    and `2c';
+  - one ~set!~; let's call it `1s'.
+
+- If we serialize, then there are only two possible sequences.
+
+- Here is one:
+  - 1a (x is accessed as 10)
+  - 1b (x is accessed as 10)
+  - 1s (x = 10 * 10 = 100);
+  - 2a (x is accessed as 100)
+  - 2b (x is accessed as 100)
+  - 2c (x is accessed as 100)
+  - 2s (x = 100 * 100 * 100 = 1000000)
+
+- Here is the other:
+  - 2a (x is accesses as 10)
+  - 2b (x is accesses as 10)
+  - 2c (x is accesses as 10)
+  - 2s (x = 10 * 10 * 10 = 1000)
+  - 1a (x is accesses as 1000)
+  - 1b (x is accesses as 1000)
+  - 1s (x = 1000 * 1000 = 1000000)
+
+- If we don't serialize, then, besides the two sequences above, other
+  sequences are possible.
+
+- Here is one:
+  - 1a (x is accessed as 10)
+  - 2a (x is accessed as 10)
+  - 1b (x is accessed as 10)
+  - 1s (x = 10 * 10 = 100)
+  - 2b (x is accessed as 100)
+  - 2c (x is accessed as 100)
+  - 2s (x = 10 * 100 * 100 = 100000)
+
+* Exercise 3.41
+*Exercise*
+
+#+begin_quote
+Ben Bitdiddle worries that it would be better to implement the bank
+account as follows (where the commented line has been changed):
+
+#+begin_src scheme
+  (define (make-account balance)
+    (define (withdraw amount)
+      (if (>= balance amount)
+          (begin (set! balance (- balance amount))
+                 balance)
+          "Insufficient funds"))
+    (define (deposit amount)
+      (set! balance (+ balance amount))
+      balance)
+    ;; continued on next page
+
+    (let ((protected (make-serializer)))
+      (define (dispatch m)
+        (cond ((eq? m 'withdraw) (protected withdraw))
+              ((eq? m 'deposit) (protected deposit))
+              ((eq? m 'balance)
+               ((protected (lambda () balance)))) ; serialized
+              (else (error "Unknown request -- MAKE-ACCOUNT"
+                           m))))
+      dispatch))
+#+end_src
+
+because allowing unserialized access to the bank balance can result in
+anomalous behavior.  Do you agree?  Is there any scenario that
+demonstrates Ben's concern?
+#+end_quote
+
+*Answer*:
+
+The only reason I can think of why one might want to adopt Ben
+Bitdiddle's implementation is the following.
+
+Without BB's serialization, if one attempts to access the balance,
+while somebody else is depositing/withdrawing, then one could get a
+value which is would to change immediately after. With BB's
+serialization, this would not happen. (The analogous ``problem'' of
+somebody depositing/withdrawing when someone else is accessing would
+remained. The person accessing the value would get a value which is
+going to change immediately after the access.)
+
+However, it's far-fetched to consider that as an anomaly. As far as I
+can see, unserialized access to the bank balance is safe.
+
+* Exercise 3.42
+*Exercise*:
+
+#+begin_quote
+Ben Bitdiddle suggests that it's a waste of time to create a new
+serialized procedure in response to every `withdraw' and `deposit'
+message.  He says that `make-account' could be changed so that the
+calls to `protected' are done outside the `dispatch' procedure.  That
+is, an account would return the same serialized procedure (which was
+created at the same time as the account) each time it is asked for a
+withdrawal procedure.
+
+#+begin_src scheme
+  (define (make-account balance)
+    (define (withdraw amount)
+      (if (>= balance amount)
+          (begin (set! balance (- balance amount))
+                 balance)
+          "Insufficient funds"))
+    (define (deposit amount)
+      (set! balance (+ balance amount))
+      balance)
+    (let ((protected (make-serializer)))
+      (let ((protected-withdraw (protected withdraw))
+            (protected-deposit (protected deposit)))
+        (define (dispatch m)
+          (cond ((eq? m 'withdraw) protected-withdraw)
+                ((eq? m 'deposit) protected-deposit)
+                ((eq? m 'balance) balance)
+                (else (error "Unknown request -- MAKE-ACCOUNT"
+                             m))))
+        dispatch)))
+#+end_src
+
+Is this a safe change to make?  In particular, is there any difference
+in what concurrency is allowed by these two versions of
+`make-account'?
+#+end_quote
+
+*Answer*:
+
+The change seems safe to me. I don't see any change in the
+concurrency. The only difference is that the calls ~(protected
+withdraw)~ and ~(protected-deposit)~ are done only once.
+
+* Exercise 3.43
+*Exercise*:
+#+begin_quote
+Suppose that the balances in three accounts start out as $10, $20, and
+$30, and that multiple processes run, exchanging the balances in the
+accounts.  Argue that if the processes are run sequentially, after any
+number of concurrent exchanges, the account balances should be $10,
+$20, and $30 in some order.  Draw a timing diagram like the one in
+Figure 3-29 to show how this condition can be violated if the
+exchanges are implemented using the first version of the
+account-exchange program in this section.  On the other hand, argue
+that even with this `exchange' program, the sum of the balances in the
+accounts will be preserved.  Draw a timing diagram to show how even
+this condition would be violated if we did not serialize the
+transactions on individual accounts.
+#+end_quote
+
+*Answer*:
+
+- ``Argue that if the processes are run sequentially, after any number
+  of concurrent exchanges, the account balances should be $10, $20,
+  and $30 in some order.''
+
+  An exchange just moves the value of a variable ~foo~ into another
+  variable ~bar~, as well as the value of ~bar~ in ~foo~. So, if any
+  exchange is atomic (that is, cannot be be interleaved with another
+  exchange), then the final value values of the variable involved can
+  only change in their order
+
+- ``Draw a timing diagram like the one in Figure 3-29 to show how this
+  condition can be violated if the exchanges are implemented using the
+  first version of the account-exchange program in this section.''
+
+  An example (without the diagram) is offered by Authors themselves at
+  page 308.
+
+  #+begin_src
+      Peters swaps A1 and A2, and Paul swaps A1 and A3:
+
+    -------------------------------------------------------------
+
+   |   Peter             A1     A2     A3        Paul
+   |
+   |                     10     20     30
+   |
+   |   calculates
+   |   diff A1/A2
+   |   (-10)
+   |                                           calculates
+   |                                           diff A1/A3
+   |                                           (-20)
+   |
+   |                     30<-------------------withdraw -20 A1
+   |
+   |                                   10<-----deposit -20 A3
+   |
+   |   withdraw -10 A1-->40
+   |
+   |   deposit -10 A2---------->10
+   V
+  time
+  #+end_src
+
+- ``On the other hand, argue that even with this `exchange' program,
+  the sum of the balances in the accounts will be preserved.''
+
+  Each exchange adds and removes the /same/ amount to a variable and
+  from another variable. This is enough to conclude that the sum of
+  everything cannot change.
+
+- ``Draw a timing diagram to show how even this condition would be
+  violated if we did not serialize the transactions on individual
+  accounts''
+
+  In order to violate the condition we can reproduce the kind of
+  situation previously presented by Authors at page 301 (interleaving
+  the events of two withdrawals):
+
+  #+begin_src
+    Peters swaps A1 and A2, and Paul swaps A1 and A3:
+
+    -------------------------------------------------------------
+
+    |    Peter             A1     A2     A3        Paul
+    |
+    |                      10     20     30
+    |
+    |  calculates
+    |  diff (-10)
+    |
+    |                                             calculates
+    |                                             diff (-20)
+    |
+    |  accesses A1 (10)
+    |
+    |                                             accesses A1 (10)
+    |
+    |  computes 20
+    |
+    |                                             computes 30
+    |
+    |    sets A1 to 20---->20
+    |
+    |                      30<--------------------sets A1 to 30
+    |
+    |    deposits -10 2---------->20
+    |
+    |                                    10<------deposits -20 3
+    V
+  time
+  #+end_src
+
+* Exercise 3.46
+*Exercise*:
+#+begin_quote
+Suppose that we implement ~test-and-set!~ using an ordinary procedure
+as shown in the text, without attempting to make the operation atomic.
+Draw a timing diagram like the one in Figure 3-29 to demonstrate how
+the mutex implementation can fail by allowing two processes to acquire
+the mutex at the same time.
+#+end_quote
+
+*Answer*:
+#+begin_src
+  |    Peter             mutex             Paul
+  |      |                                  |
+  |      |               false              |
+  |      |                                  |
+  |    test:                                |
+  |    okay                                 |
+  |      |                                  |
+  |      |                                test:
+  |      |                                okay
+  |      |                                  |
+  |      |                                does
+  |      |                                stuff
+  |      |                                  |
+  |     does                                |
+  |     stuff                               |
+  |      |                                  |
+  |     set------------->true               |
+  |                                         |
+  V                      true<-------------set
+time
+#+end_src
+
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export

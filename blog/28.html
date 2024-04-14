@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-04-14 Sun 12:06 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 3.4 Concurrency: Time Is of the Essence</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 3.4 Concurrency: Time Is of the Essence
+<br />
+<span class="subtitle">2024-04-14 Sun</span>
+</h1>
+<ul class="org-ul">
+<li>We have seen that computational objects with local state are
+powerful tools for modeling.</li>
+
+<li>We had to pay a price though:
+<ul class="org-ul">
+<li>Loss of referential transparency;</li>
+<li>Adoption of a more intricate environment model.</li>
+</ul></li>
+
+<li>``The central issue lurking beneath the complexity of state,
+sameness, and change is that by introducing assignment we are forced
+to admit time into our computational models. Before we introduced
+assignment, all our programs were timeless, in the sense that any
+expression that has a value always has the same value.''</li>
+
+<li>``Building models in terms of computational objects with local state
+forces us to confront time as an essential concept in programming.''</li>
+
+<li>``We can go further in structuring computational models to match our
+perception of the physical world.  Objects in the world do not
+change one at a time in sequence.  Rather we perceive them as acting
+"concurrently" &#x2014; all at once.''</li>
+
+<li>Introducing assignment means admitting <i>time</i>.</li>
+
+<li>Our programs are not timeless anymore.
+<ul class="org-ul">
+<li>Successive evaluations of the same expression can yield different
+values.</li>
+<li>The result of an evaluation now depends not only on the expression
+itself, but also on whether the evaluation occurs before or after
+one the moments delineated by the execution of assignment
+statements.</li>
+</ul></li>
+
+<li>For any event A and B: either A happens and then B happens, or B
+happens and then A happens, or A and B happen at the same time.</li>
+
+<li>Authors give the example of Peter and Paul withdrawing from an
+account at the same. Concurrency, in the example, is not handled
+correctly.
+<ul class="org-ul">
+<li>``The general phenomenon illustrated here is that several processes
+may share a common state variable.''</li>
+<li>``The above example typifies the subtle bugs that can creep into
+concurrent programs.  The root of this complexity lies in the
+assignments to variables that are shared among the different
+processes.''</li>
+</ul></li>
+
+<li>Consider two processes, each of which with three ordered
+events. Respectively: (a, b, c), and (x, y, z). There are 20
+possible orderings. (See p. 303)</li>
+
+<li>Consider a parallel execution of <code>(set! x (* x x))</code> and <code>(set! x (+
+  x 1))</code>.
+<ul class="org-ul">
+<li><p>
+We can do so using <code>parallel-execute</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(define x 10)
+
+(parallel-execute (<span style="color: #531ab6;">lambda</span> () (set! x (* x x)))
+                  (<span style="color: #531ab6;">lambda</span> () (set! x (+ x 1))))
+</pre>
+</div></li>
+<li>There are five possible final values for the variable <code>x</code>.</li>
+<li>If we use a <i>serializer</i>, though, there are only two possible final
+values.
+<ul class="org-ul">
+<li><p>
+here is how we would use a serializer:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(define x 10)
+
+(define s (make-serializer))
+
+(parallel-execute (s (<span style="color: #531ab6;">lambda</span> () (set! x (* x x))))
+                  (s (<span style="color: #531ab6;">lambda</span> () (set! x (+ x 1)))))
+</pre>
+</div></li>
+</ul></li>
+</ul></li>
+
+<li><p>
+We can now write a safer version of <code>make-account</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(define (make-account balance)
+        (define (withdraw amount)
+                (<span style="color: #531ab6;">if</span> (&gt;= balance amount)
+                    (begin (set! balance (- balance amount))
+                           balance)
+                  <span style="color: #3548cf;">"Insufficient funds"</span>))
+        (define (deposit amount)
+                (set! balance (+ balance amount))
+                balance)
+        (<span style="color: #531ab6;">let</span> ((protected (make-serializer)))
+          (define (dispatch m)
+                  (<span style="color: #531ab6;">cond</span> ((eq? m 'withdraw) (protected withdraw))
+                        ((eq? m 'deposit) (protected deposit))
+                        ((eq? m 'balance) balance)
+                        (else (<span style="color: #884900;">error</span> <span style="color: #3548cf;">"Unknown request -- MAKE-ACCOUNT"</span>
+                                     m))))
+          dispatch))
+</pre>
+</div></li>
+
+<li><p>
+Consider this procedure which swaps the value of two accounts:
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(define (exchange account1 account2)
+        (<span style="color: #531ab6;">let</span> ((difference (- (account1 'balance)
+                             (account2 'balance))))
+          ((account1 'withdraw) difference)
+          ((account2 'deposit) difference)))
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>``For correct behavior, we must arrange for the <code>exchange</code> procedure
+to lock out any other concurrent accesses to the accounts during the
+entire time of the exchange.''</li>
+</ul></li>
+
+<li><p>
+Authors show how to implement a serializer using a <i>mutex</i> (aka
+<i>lock</i>).
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(define (make-serializer)
+        (<span style="color: #531ab6;">let</span> ((mutex (make-mutex)))
+          (<span style="color: #531ab6;">lambda</span> (p)
+            (define (serialized-p . args)
+                    (mutex 'acquire)
+                    (<span style="color: #531ab6;">let</span> ((val (apply p args)))
+                      (mutex 'release)
+                      val))
+            serialized-p)))
+
+(define (make-mutex)
+        (<span style="color: #531ab6;">let</span> ((cell (list false)))
+          (define (the-mutex m)
+                  (<span style="color: #531ab6;">cond</span> ((eq? m 'acquire)
+                         (<span style="color: #531ab6;">if</span> (test-and-set! cell)
+                             (the-mutex 'acquire))) <span style="color: #595959;">; </span><span style="color: #595959;">retry</span>
+                        ((eq? m 'release) (clear! cell))))
+          the-mutex))
+
+(define (clear! cell)
+        (set-car! cell false))
+
+
+(define (test-and-set! cell)
+        (<span style="color: #531ab6;">if</span> (car cell)
+            true
+          (begin (set-car! cell true)
+                 false)))
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Very important detail: the `test-and-set!' operation must be
+performed "atomically". (This operation is also known as Compare And
+Swap, (CAS). See Fedor Pikus' presentation:
+<a href="https://youtu.be/ZQFzMfHIxng?t=1028">https://youtu.be/ZQFzMfHIxng?t=1028</a>)</li>
+</ul></li>
+
+<li>Authors explain what a <i>deadlock</i> is.</li>
+</ul>
+
+<div id="outline-container-org0732348" class="outline-2">
+<h2 id="org0732348">Exercise 3.38</h2>
+<div class="outline-text-2" id="text-org0732348">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Suppose that Peter, Paul, and Mary share a joint bank account that
+initially contains $100.  Concurrently, Peter deposits $10, Paul
+withdraws $20, and Mary withdraws half the money in the account, by
+executing the following commands:
+</p>
+
+<p>
+Peter: <code>(set! balance (+ balance 10))</code>
+Paul:  <code>(set! balance (- balance 20))</code>
+Mary:  <code>(set! balance (- balance (/ balance 2)))</code>
+</p>
+
+<p>
+a. List all the different possible values for `balance' after these
+   three transactions have been completed, assuming that the banking
+   system forces the three processes to run sequentially in some
+   order.
+</p>
+
+<p>
+b. What are some other values that could be produced if the system
+   allows the processes to be interleaved?  Draw timing diagrams like
+   the one in *Note Figure 3-29 to explain how these values can occur.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+a:
+</p>
+
+<pre class="example">
+| peter | peter |  mary |  paul |  paul |  mary |
+|  paul |  mary | peter | peter |  mary |  paul |
+|  mary |  paul |  paul |  mary | peter | peter |
+|-------+-------+-------+-------+-------+-------|
+|   110 |   110 |    50 |    80 |    80 |    50 |
+|    90 |    55 |    30 |    90 |    40 |    30 |
+|    45 |    35 |    40 |    45 |    50 |    40 |
+</pre>
+
+<p>
+b:
+</p>
+
+<p>
+Here is an example of how we could end up with 110 in the bank:
+</p>
+<pre class="example">
+  |              Peter            Paul            Bank            Mary
+  |
+  |               +----------------+--------------100--------------+
+  |               |                |                               |
+  |               |                V                               |
+  |               |           Access val: 100                      |
+  |               |                |                               |
+  |               |                |                               V
+  |               |                |                        Access val: 100
+  |               |                |                               |
+  |               V                |                               |
+  |      Access val: 100           |                               |
+  |               |                |                               |
+  |               |                V                               |
+  |               |            New val: 80                         |
+  |               |                |                               V
+  |               |                |                          New val: 50
+  |               V                |                               |
+  |         New val: 110           |                               |
+  |               |                V                               |
+  |               |            Set 80 -----------&gt;80               |
+  |               |                                                |
+  |               |                                                |
+  |               |                                                V
+  |               |                               50&lt;----------Set 50
+  |               |
+  |               V
+  |            Set 110---------------------------&gt;110
+  V
+time
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgce72320" class="outline-2">
+<h2 id="orgce72320">Exercise 3.39</h2>
+<div class="outline-text-2" id="text-orgce72320">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Which of the five possibilities in the parallel
+execution shown above remain if we instead serialize execution as
+follows:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> 10)
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">s</span> (make-serializer))
+
+(parallel-execute (<span style="color: #531ab6;">lambda</span> () (set! x ((s (<span style="color: #531ab6;">lambda</span> () (* x x))))))
+                  (s (<span style="color: #531ab6;">lambda</span> () (set! x (+ x 1)))))
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+I believe there are three possibilities:
+</p>
+
+<ul class="org-ul">
+<li>first:
+<ol class="org-ol">
+<li>execution of <code>(* x x)</code>. A <code>100</code> value is created but not
+assigned;</li>
+<li>execution of <code>(set! x (+ x 1))</code>. <code>x</code> is now <code>11</code>;</li>
+<li>execution of <code>(set! x 100)</code>. x is now <code>100</code>;</li>
+</ol></li>
+<li>second:
+<ol class="org-ol">
+<li>execution of <code>(* x x)</code>. A <code>100</code> value is created but not
+assigned;</li>
+<li>execution of <code>(set! x 100)</code>. x is now <code>100</code>;</li>
+<li>execution of <code>(set! x (+ x 1))</code>. <code>x</code> is now <code>101</code>;</li>
+</ol></li>
+<li>third:
+<ol class="org-ol">
+<li>execution of <code>(set! x (+ x 1))</code>. <code>x</code> is now <code>11</code>;</li>
+<li>execution of <code>(* x x)</code>. A <code>121</code> value is created but not
+assigned;</li>
+<li>execution of <code>(set! x 121)</code>. x is now <code>121</code>;</li>
+</ol></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf50834d" class="outline-2">
+<h2 id="orgf50834d">Exercise 3.40</h2>
+<div class="outline-text-2" id="text-orgf50834d">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Give all possible values of `x' that can result from executing
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> 10)
+
+(parallel-execute (<span style="color: #531ab6;">lambda</span> () (set! x (* x x)))
+                  (<span style="color: #531ab6;">lambda</span> () (set! x (* x x x))))
+</pre>
+</div>
+
+<p>
+Which of these possibilities remain if we instead use serialized
+procedures:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> 10)
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">s</span> (make-serializer))
+
+(parallel-execute (s (<span style="color: #531ab6;">lambda</span> () (set! x (* x x))))
+                  (s (<span style="color: #531ab6;">lambda</span> () (set! x (* x x x)))))
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li>The first λ involves three events:
+<ul class="org-ul">
+<li>two accesses of the variable <code>x</code>; let's called them `1a' and `1b';</li>
+<li>one <code>set!</code>; let's call it `1s'.</li>
+</ul></li>
+<li>The second λ involves four events:
+<ul class="org-ul">
+<li>three accesses of the variable <code>x</code>; let's called them `2a', `2b',
+and `2c';</li>
+<li>one <code>set!</code>; let's call it `1s'.</li>
+</ul></li>
+
+<li>If we serialize, then there are only two possible sequences.</li>
+
+<li>Here is one:
+<ul class="org-ul">
+<li>1a (x is accessed as 10)</li>
+<li>1b (x is accessed as 10)</li>
+<li>1s (x = 10 * 10 = 100);</li>
+<li>2a (x is accessed as 100)</li>
+<li>2b (x is accessed as 100)</li>
+<li>2c (x is accessed as 100)</li>
+<li>2s (x = 100 * 100 * 100 = 1000000)</li>
+</ul></li>
+
+<li>Here is the other:
+<ul class="org-ul">
+<li>2a (x is accesses as 10)</li>
+<li>2b (x is accesses as 10)</li>
+<li>2c (x is accesses as 10)</li>
+<li>2s (x = 10 * 10 * 10 = 1000)</li>
+<li>1a (x is accesses as 1000)</li>
+<li>1b (x is accesses as 1000)</li>
+<li>1s (x = 1000 * 1000 = 1000000)</li>
+</ul></li>
+
+<li>If we don't serialize, then, besides the two sequences above, other
+sequences are possible.</li>
+
+<li>Here is one:
+<ul class="org-ul">
+<li>1a (x is accessed as 10)</li>
+<li>2a (x is accessed as 10)</li>
+<li>1b (x is accessed as 10)</li>
+<li>1s (x = 10 * 10 = 100)</li>
+<li>2b (x is accessed as 100)</li>
+<li>2c (x is accessed as 100)</li>
+<li>2s (x = 10 * 100 * 100 = 100000)</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0a9ee1b" class="outline-2">
+<h2 id="org0a9ee1b">Exercise 3.41</h2>
+<div class="outline-text-2" id="text-org0a9ee1b">
+<p>
+<b>Exercise</b>
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle worries that it would be better to implement the bank
+account as follows (where the commented line has been changed):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-account</span> balance)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">withdraw</span> amount)
+    (<span style="color: #531ab6;">if</span> (&gt;= balance amount)
+        (<span style="color: #531ab6;">begin</span> (set! balance (- balance amount))
+               balance)
+        <span style="color: #3548cf;">"Insufficient funds"</span>))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">deposit</span> amount)
+    (set! balance (+ balance amount))
+    balance)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">continued on next page</span>
+
+  (<span style="color: #531ab6;">let</span> ((protected (make-serializer)))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> m)
+      (<span style="color: #531ab6;">cond</span> ((eq? m 'withdraw) (protected withdraw))
+            ((eq? m 'deposit) (protected deposit))
+            ((eq? m 'balance)
+             ((protected (<span style="color: #531ab6;">lambda</span> () balance)))) <span style="color: #595959;">; </span><span style="color: #595959;">serialized</span>
+            (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown request -- MAKE-ACCOUNT"</span>
+                         m))))
+    dispatch))
+</pre>
+</div>
+
+<p>
+because allowing unserialized access to the bank balance can result in
+anomalous behavior.  Do you agree?  Is there any scenario that
+demonstrates Ben's concern?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+The only reason I can think of why one might want to adopt Ben
+Bitdiddle's implementation is the following.
+</p>
+
+<p>
+Without BB's serialization, if one attempts to access the balance,
+while somebody else is depositing/withdrawing, then one could get a
+value which is would to change immediately after. With BB's
+serialization, this would not happen. (The analogous ``problem'' of
+somebody depositing/withdrawing when someone else is accessing would
+remained. The person accessing the value would get a value which is
+going to change immediately after the access.)
+</p>
+
+<p>
+However, it's far-fetched to consider that as an anomaly. As far as I
+can see, unserialized access to the bank balance is safe.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgdaaefac" class="outline-2">
+<h2 id="orgdaaefac">Exercise 3.42</h2>
+<div class="outline-text-2" id="text-orgdaaefac">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle suggests that it's a waste of time to create a new
+serialized procedure in response to every `withdraw' and `deposit'
+message.  He says that `make-account' could be changed so that the
+calls to `protected' are done outside the `dispatch' procedure.  That
+is, an account would return the same serialized procedure (which was
+created at the same time as the account) each time it is asked for a
+withdrawal procedure.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-account</span> balance)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">withdraw</span> amount)
+    (<span style="color: #531ab6;">if</span> (&gt;= balance amount)
+        (<span style="color: #531ab6;">begin</span> (set! balance (- balance amount))
+               balance)
+        <span style="color: #3548cf;">"Insufficient funds"</span>))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">deposit</span> amount)
+    (set! balance (+ balance amount))
+    balance)
+  (<span style="color: #531ab6;">let</span> ((protected (make-serializer)))
+    (<span style="color: #531ab6;">let</span> ((protected-withdraw (protected withdraw))
+          (protected-deposit (protected deposit)))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> m)
+        (<span style="color: #531ab6;">cond</span> ((eq? m 'withdraw) protected-withdraw)
+              ((eq? m 'deposit) protected-deposit)
+              ((eq? m 'balance) balance)
+              (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown request -- MAKE-ACCOUNT"</span>
+                           m))))
+      dispatch)))
+</pre>
+</div>
+
+<p>
+Is this a safe change to make?  In particular, is there any difference
+in what concurrency is allowed by these two versions of
+`make-account'?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+The change seems safe to me. I don't see any change in the
+concurrency. The only difference is that the calls <code>(protected
+withdraw)</code> and <code>(protected-deposit)</code> are done only once.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org253be8f" class="outline-2">
+<h2 id="org253be8f">Exercise 3.43</h2>
+<div class="outline-text-2" id="text-org253be8f">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Suppose that the balances in three accounts start out as $10, $20, and
+$30, and that multiple processes run, exchanging the balances in the
+accounts.  Argue that if the processes are run sequentially, after any
+number of concurrent exchanges, the account balances should be $10,
+$20, and $30 in some order.  Draw a timing diagram like the one in
+Figure 3-29 to show how this condition can be violated if the
+exchanges are implemented using the first version of the
+account-exchange program in this section.  On the other hand, argue
+that even with this `exchange' program, the sum of the balances in the
+accounts will be preserved.  Draw a timing diagram to show how even
+this condition would be violated if we did not serialize the
+transactions on individual accounts.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li><p>
+``Argue that if the processes are run sequentially, after any number
+of concurrent exchanges, the account balances should be $10, $20,
+and $30 in some order.''
+</p>
+
+<p>
+An exchange just moves the value of a variable <code>foo</code> into another
+variable <code>bar</code>, as well as the value of <code>bar</code> in <code>foo</code>. So, if any
+exchange is atomic (that is, cannot be be interleaved with another
+exchange), then the final value values of the variable involved can
+only change in their order
+</p></li>
+
+<li><p>
+``Draw a timing diagram like the one in Figure 3-29 to show how this
+condition can be violated if the exchanges are implemented using the
+first version of the account-exchange program in this section.''
+</p>
+
+<p>
+An example (without the diagram) is offered by Authors themselves at
+page 308.
+</p>
+
+<pre class="example">
+    Peters swaps A1 and A2, and Paul swaps A1 and A3:
+
+  -------------------------------------------------------------
+
+ |   Peter             A1     A2     A3        Paul
+ |
+ |                     10     20     30
+ |
+ |   calculates
+ |   diff A1/A2
+ |   (-10)
+ |                                           calculates
+ |                                           diff A1/A3
+ |                                           (-20)
+ |
+ |                     30&lt;-------------------withdraw -20 A1
+ |
+ |                                   10&lt;-----deposit -20 A3
+ |
+ |   withdraw -10 A1--&gt;40
+ |
+ |   deposit -10 A2----------&gt;10
+ V
+time
+</pre></li>
+
+<li><p>
+``On the other hand, argue that even with this `exchange' program,
+the sum of the balances in the accounts will be preserved.''
+</p>
+
+<p>
+Each exchange adds and removes the <i>same</i> amount to a variable and
+from another variable. This is enough to conclude that the sum of
+everything cannot change.
+</p></li>
+
+<li><p>
+``Draw a timing diagram to show how even this condition would be
+violated if we did not serialize the transactions on individual
+accounts''
+</p>
+
+<p>
+In order to violate the condition we can reproduce the kind of
+situation previously presented by Authors at page 301 (interleaving
+the events of two withdrawals):
+</p>
+
+<pre class="example">
+  Peters swaps A1 and A2, and Paul swaps A1 and A3:
+
+  -------------------------------------------------------------
+
+  |    Peter             A1     A2     A3        Paul
+  |
+  |                      10     20     30
+  |
+  |  calculates
+  |  diff (-10)
+  |
+  |                                             calculates
+  |                                             diff (-20)
+  |
+  |  accesses A1 (10)
+  |
+  |                                             accesses A1 (10)
+  |
+  |  computes 20
+  |
+  |                                             computes 30
+  |
+  |    sets A1 to 20----&gt;20
+  |
+  |                      30&lt;--------------------sets A1 to 30
+  |
+  |    deposits -10 2----------&gt;20
+  |
+  |                                    10&lt;------deposits -20 3
+  V
+time
+</pre></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org1a70e89" class="outline-2">
+<h2 id="org1a70e89">Exercise 3.46</h2>
+<div class="outline-text-2" id="text-org1a70e89">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Suppose that we implement <code>test-and-set!</code> using an ordinary procedure
+as shown in the text, without attempting to make the operation atomic.
+Draw a timing diagram like the one in Figure 3-29 to demonstrate how
+the mutex implementation can fail by allowing two processes to acquire
+the mutex at the same time.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+<pre class="example">
+  |    Peter             mutex             Paul
+  |      |                                  |
+  |      |               false              |
+  |      |                                  |
+  |    test:                                |
+  |    okay                                 |
+  |      |                                  |
+  |      |                                test:
+  |      |                                okay
+  |      |                                  |
+  |      |                                does
+  |      |                                stuff
+  |      |                                  |
+  |     does                                |
+  |     stuff                               |
+  |      |                                  |
+  |     set-------------&gt;true               |
+  |                                         |
+  V                      true&lt;-------------set
+time
+</pre>
+
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
+</div>
+</body>
+</html>
