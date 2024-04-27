@@ -68,7 +68,7 @@
 - Consider a parallel execution of ~(set! x (* x x))~ and ~(set! x (+
   x 1))~.
   - We can do so using ~parallel-execute~:
-    #+begin_src emacs-lisp
+    #+begin_src scheme
       (define x 10)
 
       (parallel-execute (lambda () (set! x (* x x)))
@@ -78,7 +78,7 @@
   - If we use a /serializer/, though, there are only two possible final
     values.
     - here is how we would use a serializer:
-      #+begin_src emacs-lisp
+      #+begin_src scheme
         (define x 10)
 
         (define s (make-serializer))
@@ -88,7 +88,7 @@
       #+end_src
 
 - We can now write a safer version of ~make-account~:
-  #+begin_src emacs-lisp
+  #+begin_src scheme
     (define (make-account balance)
             (define (withdraw amount)
                     (if (>= balance amount)
@@ -109,7 +109,7 @@
   #+end_src
 
 - Consider this procedure which swaps the value of two accounts:
-  #+begin_src emacs-lisp
+  #+begin_src scheme
     (define (exchange account1 account2)
             (let ((difference (- (account1 'balance)
                                  (account2 'balance))))
@@ -123,7 +123,7 @@
 
 - Authors show how to implement a serializer using a /mutex/ (aka
   /lock/).
-  #+begin_src emacs-lisp
+  #+begin_src scheme
     (define (make-serializer)
             (let ((mutex (make-mutex)))
               (lambda (p)

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-04-14 Sun 12:06 -->
+<!-- 2024-04-27 Sat 13:24 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 3.4 Concurrency: Time Is of the Essence</title>
@@ -262,7 +262,7 @@ possible orderings. (See p. 303)</li>
 We can do so using <code>parallel-execute</code>:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(define x 10)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> 10)
 
 (parallel-execute (<span style="color: #531ab6;">lambda</span> () (set! x (* x x)))
                   (<span style="color: #531ab6;">lambda</span> () (set! x (+ x 1))))
@@ -276,9 +276,9 @@ values.
 here is how we would use a serializer:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(define x 10)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> 10)
 
-(define s (make-serializer))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">s</span> (make-serializer))
 
 (parallel-execute (s (<span style="color: #531ab6;">lambda</span> () (set! x (* x x))))
                   (s (<span style="color: #531ab6;">lambda</span> () (set! x (+ x 1)))))
@@ -291,21 +291,21 @@ here is how we would use a serializer:
 We can now write a safer version of <code>make-account</code>:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(define (make-account balance)
-        (define (withdraw amount)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-account</span> balance)
+        (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">withdraw</span> amount)
                 (<span style="color: #531ab6;">if</span> (&gt;= balance amount)
-                    (begin (set! balance (- balance amount))
+                    (<span style="color: #531ab6;">begin</span> (set! balance (- balance amount))
                            balance)
                   <span style="color: #3548cf;">"Insufficient funds"</span>))
-        (define (deposit amount)
+        (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">deposit</span> amount)
                 (set! balance (+ balance amount))
                 balance)
         (<span style="color: #531ab6;">let</span> ((protected (make-serializer)))
-          (define (dispatch m)
+          (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> m)
                   (<span style="color: #531ab6;">cond</span> ((eq? m 'withdraw) (protected withdraw))
                         ((eq? m 'deposit) (protected deposit))
                         ((eq? m 'balance) balance)
-                        (else (<span style="color: #884900;">error</span> <span style="color: #3548cf;">"Unknown request -- MAKE-ACCOUNT"</span>
+                        (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown request -- MAKE-ACCOUNT"</span>
                                      m))))
           dispatch))
 </pre>
@@ -315,7 +315,7 @@ We can now write a safer version of <code>make-account</code>:
 Consider this procedure which swaps the value of two accounts:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(define (exchange account1 account2)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">exchange</span> account1 account2)
         (<span style="color: #531ab6;">let</span> ((difference (- (account1 'balance)
                              (account2 'balance))))
           ((account1 'withdraw) difference)
@@ -334,33 +334,33 @@ Authors show how to implement a serializer using a <i>mutex</i> (aka
 <i>lock</i>).
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(define (make-serializer)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-serializer</span>)
         (<span style="color: #531ab6;">let</span> ((mutex (make-mutex)))
           (<span style="color: #531ab6;">lambda</span> (p)
-            (define (serialized-p . args)
+            (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">serialized-p</span> . args)
                     (mutex 'acquire)
                     (<span style="color: #531ab6;">let</span> ((val (apply p args)))
                       (mutex 'release)
                       val))
             serialized-p)))
 
-(define (make-mutex)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-mutex</span>)
         (<span style="color: #531ab6;">let</span> ((cell (list false)))
-          (define (the-mutex m)
+          (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">the-mutex</span> m)
                   (<span style="color: #531ab6;">cond</span> ((eq? m 'acquire)
                          (<span style="color: #531ab6;">if</span> (test-and-set! cell)
                              (the-mutex 'acquire))) <span style="color: #595959;">; </span><span style="color: #595959;">retry</span>
                         ((eq? m 'release) (clear! cell))))
           the-mutex))
 
-(define (clear! cell)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">clear!</span> cell)
         (set-car! cell false))
 
 
-(define (test-and-set! cell)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">test-and-set!</span> cell)
         (<span style="color: #531ab6;">if</span> (car cell)
             true
-          (begin (set-car! cell true)
+          (<span style="color: #531ab6;">begin</span> (set-car! cell true)
                  false)))
 </pre>
 </div>
@@ -375,9 +375,9 @@ Swap, (CAS). See Fedor Pikus' presentation:
 <li>Authors explain what a <i>deadlock</i> is.</li>
 </ul>
 
-<div id="outline-container-org0732348" class="outline-2">
-<h2 id="org0732348">Exercise 3.38</h2>
-<div class="outline-text-2" id="text-org0732348">
+<div id="outline-container-org04e76bb" class="outline-2">
+<h2 id="org04e76bb">Exercise 3.38</h2>
+<div class="outline-text-2" id="text-org04e76bb">
 <p>
 <b>Exercise</b>:
 </p>
@@ -470,9 +470,9 @@ time
 </div>
 </div>
 
-<div id="outline-container-orgce72320" class="outline-2">
-<h2 id="orgce72320">Exercise 3.39</h2>
-<div class="outline-text-2" id="text-orgce72320">
+<div id="outline-container-org30a605e" class="outline-2">
+<h2 id="org30a605e">Exercise 3.39</h2>
+<div class="outline-text-2" id="text-org30a605e">
 <p>
 <b>Exercise</b>:
 </p>
@@ -529,9 +529,9 @@ assigned;</li>
 </div>
 </div>
 
-<div id="outline-container-orgf50834d" class="outline-2">
-<h2 id="orgf50834d">Exercise 3.40</h2>
-<div class="outline-text-2" id="text-orgf50834d">
+<div id="outline-container-org79b1acc" class="outline-2">
+<h2 id="org79b1acc">Exercise 3.40</h2>
+<div class="outline-text-2" id="text-org79b1acc">
 <p>
 <b>Exercise</b>:
 </p>
@@ -623,9 +623,9 @@ sequences are possible.</li>
 </div>
 </div>
 
-<div id="outline-container-org0a9ee1b" class="outline-2">
-<h2 id="org0a9ee1b">Exercise 3.41</h2>
-<div class="outline-text-2" id="text-org0a9ee1b">
+<div id="outline-container-org163e2c8" class="outline-2">
+<h2 id="org163e2c8">Exercise 3.41</h2>
+<div class="outline-text-2" id="text-org163e2c8">
 <p>
 <b>Exercise</b>
 </p>
@@ -693,9 +693,9 @@ can see, unserialized access to the bank balance is safe.
 </div>
 </div>
 
-<div id="outline-container-orgdaaefac" class="outline-2">
-<h2 id="orgdaaefac">Exercise 3.42</h2>
-<div class="outline-text-2" id="text-orgdaaefac">
+<div id="outline-container-orgf6e0c23" class="outline-2">
+<h2 id="orgf6e0c23">Exercise 3.42</h2>
+<div class="outline-text-2" id="text-orgf6e0c23">
 <p>
 <b>Exercise</b>:
 </p>
@@ -753,9 +753,9 @@ withdraw)</code> and <code>(protected-deposit)</code> are done only once.
 </div>
 </div>
 
-<div id="outline-container-org253be8f" class="outline-2">
-<h2 id="org253be8f">Exercise 3.43</h2>
-<div class="outline-text-2" id="text-org253be8f">
+<div id="outline-container-org3d326fc" class="outline-2">
+<h2 id="org3d326fc">Exercise 3.43</h2>
+<div class="outline-text-2" id="text-org3d326fc">
 <p>
 <b>Exercise</b>:
 </p>
@@ -893,9 +893,9 @@ time
 </div>
 </div>
 
-<div id="outline-container-org1a70e89" class="outline-2">
-<h2 id="org1a70e89">Exercise 3.46</h2>
-<div class="outline-text-2" id="text-org1a70e89">
+<div id="outline-container-org4559893" class="outline-2">
+<h2 id="org4559893">Exercise 3.46</h2>
+<div class="outline-text-2" id="text-org4559893">
 <p>
 <b>Exercise</b>:
 </p>
