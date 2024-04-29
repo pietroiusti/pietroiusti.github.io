@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-04-29 Mon 23:45 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>5/5.1 Streams. Streams Are Delayed Lists</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">5/5.1 Streams. Streams Are Delayed Lists</h1>
+<p>
+Is there a alternative approach to assignment when it comes to
+modeling state? Think of the way a mathematical function of time x(t)
+describes the time-varying behavior of a quantity x. In a certain
+sense, it describes the history of values. Streams, the new data
+structure introduced in this section, allow us to ``model change in
+terms of sequences that represent the time histories of the systems
+being modeled.'' So, yes. Systems with state can be modeled without
+ever using assignment (or mutable data). Assignment's drawbacks are
+sidestepped, but new challenges show up.
+</p>
+
+<div id="outline-container-org851372e" class="outline-2">
+<h2 id="org851372e">Streams Are Delayed Lists</h2>
+<div class="outline-text-2" id="text-org851372e">
+<p>
+Sequences have proven themselves useful for formulating powerful
+abstractions (think of <code>map</code>, <code>filter</code>, etc.). However, representing
+sequences as lists means buying elegance at the price of (space and
+time) inefficiency. Think of how outrageously inefficient the
+following operation is<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(car (cdr (filter prime? (enumerate-interval 10000 1000000))))
+</pre>
+</div>
+
+<p>
+As far as I understand, stream are just a different, more efficient,
+implementation of sequences. This means we can get elegance without
+inefficiency. The trick is ``delayed evaluation''; a streams construct
+itself only when somebody needs it. Construction and use are
+interleaved. ``On the surface, streams are just lists with different
+names for the procedures that manipulate them.'' (319)
+</p>
+</div>
+
+<div id="outline-container-org1f1b1a6" class="outline-3">
+<h3 id="org1f1b1a6">Exercise 3.50</h3>
+<div class="outline-text-3" id="text-org1f1b1a6">
+<p>
+<b>Exercise</b>:
+</p>
+
+<p>
+Complete the following definition, which generalizes <code>stream-map</code> to
+allow procedures that take multiple arguments, analogous to <code>map</code> in
+section 2-2-3, footnote 12.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stream-map</span> proc . argstreams)
+  (<span style="color: #531ab6;">if</span> (<span style="color: #005f5f;">&lt;??&gt;</span> (car argstreams))
+      the-empty-stream
+      (<span style="color: #005f5f;">&lt;??&gt;</span>
+       (apply proc (<span style="color: #531ab6;">map</span> <span style="color: #005f5f;">&lt;??&gt;</span> argstreams))
+       (apply stream-map
+              (cons proc (<span style="color: #531ab6;">map</span> <span style="color: #005f5f;">&lt;??&gt;</span> argstreams))))))
+</pre>
+</div>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+As far as I can see, Authors haven't shown the implementation of the
+<code>map</code> procedure presented in the footnote 12. Let's implement that
+first. I will call it <code>map*</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">map*</span> proc . args)
+  (<span style="color: #531ab6;">if</span> (null? (car args))
+      nil
+      (cons
+       (apply proc (<span style="color: #531ab6;">map</span> car args))
+       (apply map* (cons proc (<span style="color: #531ab6;">map</span> cdr args))))))
+</pre>
+</div>
+
+<p>
+Here is the stream version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stream-map</span> proc . argstreams)
+  (<span style="color: #531ab6;">if</span> (stream-null? (car argstreams))
+      (the-empty-stream
+       (cons
+        (apply proc (<span style="color: #531ab6;">map</span> stream-car argstreams))
+        (apply stream-map
+               (cons proc (<span style="color: #531ab6;">map</span> stream-cdr argstreams)))))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org41eb181" class="outline-3">
+<h3 id="org41eb181">Exercise 3.51</h3>
+<div class="outline-text-3" id="text-org41eb181">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+In order to take a closer look at delayed evaluation, we will use the
+following procedure, which simply returns its argument after printing
+it:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">show</span> x)
+  (display-line x)
+  x)
+</pre>
+</div>
+
+<p>
+What does the interpreter print in response to evaluating each
+expression in the following sequence?(7)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">x</span> (stream-map show (stream-enumerate-interval 0 10)))
+
+(stream-ref x 5)
+
+(stream-ref x 7)
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">relevant code</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stream-car</span> stream) (car stream))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stream-cdr</span> stream) (<span style="color: #531ab6;">force</span> (cdr stream)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">show</span> x)
+  (display-line x)
+  x)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">display-line</span> x)
+  (newline)
+  (display x))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stream-map</span> proc s)
+  (<span style="color: #531ab6;">if</span> (stream-null? s)
+      the-empty-stream
+      (cons-stream (proc (stream-car s))
+                   (stream-map proc (stream-cdr s)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stream-enumerate-interval</span> low high)
+  (<span style="color: #531ab6;">if</span> (&gt; low high)
+      the-empty-stream
+      (cons-stream low
+                   (stream-enumerate-interval (+ low 1) high))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stream-ref</span> s n)
+  (<span style="color: #531ab6;">if</span> (= n 0)
+      (stream-car s)
+      (stream-ref (- n 1) (stream-cdr s))))
+</pre>
+</div>
+
+<p>
+Executing <code>(define x (stream-map show (stream-enumerate-interval 0
+10)))</code> only prints <code>0</code>.
+</p>
+
+<p>
+First, <code>(stream-enumerate-interval 0 10)</code> evaluates to a list (stream)
+whose <code>car</code> is 0 and whose <code>cdr</code> is a promise:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(0 . #&lt;promise&gt;)
+</pre>
+</div>
+
+<p>
+Then we apply <code>stream-map</code> to <code>show</code> and to that list (stream) <code>(0
+. #&lt;promise&gt;)</code>.
+</p>
+
+<p>
+<code>stream-map</code> evaluates to a list whose <code>cdr</code> is a promise; its <code>car</code>
+is <code>(show (stream-car (0 . #&lt;promise&gt;)))</code>. This latter expression
+evaluates to 0, but it also has the side effect of printing a new line
+and 0.
+</p>
+
+<p>
+So, when evaluating <code>(define x (stream-map show
+(stream-enumerate-interval 0 10)))</code>, the interpreter prints 0.
+</p>
+
+<p>
+When we evaluate <code>(stream-ref x 5)</code>, <code>stream-cdr</code> is repeatedly called
+and the stream is consumed until the value 5 is found. Therefore, we
+print all the numbers from 1 to 5 (and the whole expression evaluates
+to 5).
+</p>
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See p. 318 for another, less outrageous,
+example.</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
+</div>
+</body>
+</html>
