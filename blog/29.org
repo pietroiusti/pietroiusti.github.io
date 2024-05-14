@@ -13,7 +13,7 @@
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
 #+title: 5/5.1 Streams. Streams Are Delayed Lists
-#+subtitle: 
+#+subtitle: 2024-04-29 (updated on 2024-05-14)
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
 
@@ -82,11 +82,11 @@ Here is the stream version:
 #+begin_src scheme
   (define (stream-map proc . argstreams)
     (if (stream-null? (car argstreams))
-        (the-empty-stream
-         (cons
-          (apply proc (map stream-car argstreams))
-          (apply stream-map
-                 (cons proc (map stream-cdr argstreams)))))))
+        the-empty-stream
+        (cons-stream
+         (apply proc (map stream-car argstreams))
+         (apply stream-map
+                (cons proc (map stream-cdr argstreams))))))
 #+end_src
 
 ** Exercise 3.51
