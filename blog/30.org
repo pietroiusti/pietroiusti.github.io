@@ -1,0 +1,107 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: 3.5.2 Infinite Streams
+#+subtitle: 2024-05-19 Sun
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
+
+- We can use streams to represent /infinite/ sequences.
+
+- For example, this is the definition of the stream of positive
+  integers:
+  #+begin_src scheme
+    (define (integers-starting-from n)
+      (cons-streams n (integers-starting-from (+ n 1))))
+
+    (define integers (integers-starting-from n))
+  #+end_src
+
+  ``Our programs will never know that the entire infinite stream is
+  not there.''
+
+- We can now define other infinite streams based on this one, e.g.:
+  #+begin_src scheme
+    (define (divisible? x y) (= (remainder x y) 0))
+
+    (define no-sevens ;; streams of integers that are not divisible by 7
+      (stream-filter (lambda (x) (not (divisible? x 7)))
+                     integers))
+
+    (stream-ref no-sevens 100)
+    ;; => 117
+  #+end_src
+
+- Authors show the analog way to define the infinite streams of
+  Fibonacci numbers.
+
+- Authors show the method, known as the ``sieve of Eratosthenes'', to
+  construct the infinite streams of prime numbers.
+
+- ~integers~ is
+  #+begin_quote
+  defined by specifying ``generating'' procedures that explicitly
+  compute the stream elements one by one. An alternative way to
+  specify streams is to take advantage of delayed evaluation to define
+  streams implicitly. (328)
+  #+end_quote
+
+- Here is an infinite streams of ones:
+  #+begin_src scheme
+    (define ones (cons-stream 1 ones))
+  #+end_src
+
+- Consider the following operation, which uses the generalized version
+  of ~stream-map~ from exercise 3.50:
+  #+begin_src scheme
+    (define (add-stream s1 s2)
+      (stream-map + s1 s2))
+  #+end_src
+
+- Now ~integers~ can be defined as follows:
+  #+begin_src scheme
+    (define integers (cons-stream 1 (add-streams ones integers)))
+  #+end_src
+
+** Exercise 3.53
+*Exercise*:
+
+#+begin_quote
+Without running the program, describe the elements of the stream
+defined by
+
+#+begin_src scheme
+  (define s (cons-stream 1 (add-streams s s)))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+The elements of the streams are the powers of 2.
+
+~s~ is the list whose ~car~ is 1 and whose ~cdr~ is the promise to
+execute ~(add-stream s s)~.
+
+Forcing the ~cdr~ of ~s~ gives us the list whose ~car~ is 2 and whose
+~cdr~ is the promise to execute ~(add-stream (stream-cdr s)
+(stream-cdr s))~.
+
+Forcing the ~cdr~ of the ~cdr~ of ~s~ gives us the list whose car is 4
+and whose ~cdr~...
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
