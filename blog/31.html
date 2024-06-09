@@ -1,0 +1,1497 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-06-09 Sun 23:30 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 4.1.1 and 4.1.2</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 4.1.1 and 4.1.2
+<br />
+<span class="subtitle">2024-06-09 Sun</span>
+</h1>
+
+<div id="outline-container-orgdd4a854" class="outline-2">
+<h2 id="orgdd4a854">4 Metalinguistic abstraction</h2>
+<div class="outline-text-2" id="text-orgdd4a854">
+<p>
+We have seen several techniques that programmers can use to tame
+complexity. So far we have used the Lisp language. But, as complexity
+grows, it will not be sufficient. To the strategies for controlling
+complexity we must add that of establishing new languages:
+<i>metalinguistic abstraction</i>.
+</p>
+
+<blockquote>
+<p>
+Establishing new languages is a powerful strategy for controlling
+complexity in engineering design; we can often enhance our ability to
+deal with a complex problem by adopting a new language that enables us
+to describe (and hence to think about) the problem in a different way,
+using primitives, means of combination, and means of abstraction that
+are particularly well suited to the problem at hand.
+</p>
+</blockquote>
+
+<p>
+In computer programming, not only new languages can be formulated;
+they can also be implemented by constructing <i>evaluators</i> (aka
+<i>interpreters</i>), that is, procedures that, when applied to an
+expression of the relevant language (the language they are evaluators
+of), perform the actions required to evaluate the expression.
+</p>
+
+<blockquote>
+<p>
+It is no exaggeration to regard this as the most fundamental idea in
+programming:
+</p>
+
+<p>
+The evaluator, which determines the meaning of expressions in a
+programming language, is just another program.
+</p>
+
+<p>
+To appreciate this point is to change our images of ourselves as
+programmers.  We come to see ourselves as designers of languages,
+rather than only users of languages designed by others.
+</p>
+
+<p>
+In fact, we can regard almost any program as the evaluator for some
+language.
+</p>
+</blockquote>
+
+<p>
+From a certain perspective,
+</p>
+<blockquote>
+<p>
+the technology for coping with large-scale computer systems merges
+with the technology for building new computer languages, and computer
+science itself becomes no more (and no less) than the discipline of
+constructing appropriate descriptive languages.
+</p>
+</blockquote>
+
+<p>
+That's the technology this chapter explores. More precisely: the
+technology by which languages are established in terms of other
+languages. Needless to say, our evaluators will be written in
+Lisp. The first evaluator will be for Lisp itself (a subset of the
+Scheme dialect).
+</p>
+</div>
+
+<div id="outline-container-orga5a7a6c" class="outline-3">
+<h3 id="orga5a7a6c">4.1 The Metacircular evaluator</h3>
+<div class="outline-text-3" id="text-orga5a7a6c">
+<blockquote>
+<p>
+An evaluator that is written in the same language that it evaluates is
+said to be <i>metacircular</i>.
+</p>
+
+<p>
+The metacircular evaluator is essentially a Scheme formulation of the
+environment model of evaluation described in section 3.2. (362)
+</p>
+</blockquote>
+
+<blockquote>
+<p>
+The evaluation process can be described as the interplay between two
+procedures: `eval' and `apply'.
+</p>
+
+<p>
+Recall that the model has two basic parts&#x2026;
+</p>
+
+<p>
+[&#x2026;]
+</p>
+
+<p>
+The implementation of the evaluator will depend upon procedures that
+define the "syntax" of the expressions to be evaluated.
+</p>
+</blockquote>
+</div>
+
+<div id="outline-container-orgba024b9" class="outline-4">
+<h4 id="orgba024b9">4.1.1 The Core of the Evaluator</h4>
+<div class="outline-text-4" id="text-orgba024b9">
+<p>
+``Abstract syntax'':
+</p>
+<blockquote>
+<p>
+Each type of expression has a predicate that tests for it and an
+abstract means for selecting its parts.
+</p>
+</blockquote>
+
+<ul class="org-ul">
+<li>Primitive expressions</li>
+<li>Special forms
+<ul class="org-ul">
+<li>quoted expressions</li>
+<li>assignments/definitions of a variable</li>
+<li><code>if</code> expressions</li>
+<li><code>lambda</code> expressions</li>
+<li><code>begin</code></li>
+<li><code>cond</code></li>
+</ul></li>
+<li>Combinations</li>
+</ul>
+
+<pre class="example">
+*Figure 4.1:* The `eval'-`apply' cycle exposes the essence of a
+computer language.
+
+                                     .,ad88888888baa,
+                            _    ,d8P"""        ""9888ba.      _
+                           /  .a8"          ,ad88888888888a   |\
+                         /   aP'          ,88888888888888888a   \
+                        /  ,8"           ,88888888888888888888,  \
+                       |  ,8'            (888888888888888888888, |
+                      /  ,8'             `8888888888888888888888  \
+                      |  8)               `888888888888888888888, |
+          Procedure,  |  8                  "88888 Apply 8888888) | Expression
+          Arguments   |  8     Eval          `888888888888888888) | Environment
+                      |  8)                    "8888888888888888  |
+                      \  (b                     "88888888888888'  /
+                       | `8,                     8888888888888)  |
+                       \  "8a                   ,888888888888)  /
+                        \   V8,                 d88888888888"  /
+                        _\| `8b,             ,d8888888888P' _/
+                               `V8a,       ,ad8888888888P'
+                                  ""88888888888888888P"
+                                       """"""""""""
+
+[graphic by Normand Veillux, modified]
+[Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
+</pre>
+
+<p>
+Here is <code>eval</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
+  (<span style="color: #b6a0ff;">cond</span> ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp)
+         (make-procedure (lambda-parameters exp)
+                         (lambda-body exp)
+                         env))
+        ((begin? exp)
+         (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval (cond-&gt;if exp) env))
+        ((application? exp)
+         (apply (eval (operator exp) env)
+                (list-of-values (operands exp) env)))
+        (<span style="color: #b6a0ff;">else</span>
+         (error <span style="color: #79a8ff;">"Unknown expression type -- EVAL"</span> exp))))
+</pre>
+</div>
+
+<p>
+Here is <code>apply</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">apply</span> procedure arguments)
+  (<span style="color: #b6a0ff;">cond</span> ((primitive-procedure? procedure)
+         (apply-primitive-procedure procedure arguments))
+        ((compound-procedure? procedure)
+         (eval-sequence
+          (procedure-body procedure)
+          (extend-environment
+           (procedure-parameters procedure)
+           arguments
+           (procedure-environment procedure))))
+        (<span style="color: #b6a0ff;">else</span>
+         (error
+          <span style="color: #79a8ff;">"Unknown procedure type -- APPLY"</span> procedure))))
+</pre>
+</div>
+
+<p>
+The rest:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values</span> exps env)
+  (<span style="color: #b6a0ff;">if</span> (no-operands? exps)
+      '()
+      (cons (eval (first-operand exps) env)
+            (list-of-values (rest-operands exps) env))))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-if</span> exp env)
+  (<span style="color: #b6a0ff;">if</span> (true? (eval (if-predicate exp) env))
+      (eval (if-consequent exp) env)
+      (eval (if-alternative exp) env)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-sequence</span> exps env)
+  (<span style="color: #b6a0ff;">cond</span> ((last-exp? exps) (eval (first-exp exps) env))
+        (<span style="color: #b6a0ff;">else</span> (eval (first-exp exps) env)
+              (eval-sequence (rest-exps exps) env))))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-assignment</span> exp env)
+  (set-variable-value! (assignment-variable exp)
+                       (eval (assignment-value exp) env)
+                       env)
+  'ok)
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-definition</span> exp env)
+  (define-variable! (definition-variable exp)
+    (eval (definition-value exp) env)
+    env)
+  'ok)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge8367a1" class="outline-4">
+<h4 id="orge8367a1">Exercise 4.1</h4>
+<div class="outline-text-4" id="text-orge8367a1">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Notice that we cannot tell whether the metacircular evaluator
+evaluates operands from left to right or from right to left.  Its
+evaluation order is inherited from the underlying Lisp: If the
+arguments to <code>cons</code> in <code>list-of-values</code> are evaluated from left to
+right, then <code>list-of-values</code> will evaluate operands from left to
+right; and if the arguments to <code>cons</code> are evaluated from right to
+left, then <code>list-of-values</code> will evaluate operands from right to left.
+</p>
+
+<p>
+Write a version of <code>list-of-values</code> that evaluates operands from left
+to right regardless of the order of evaluation in the underlying Lisp.
+Also write a version of <code>list-of-values</code> that evaluates operands from
+right to left.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Looking at the solutions published online, this is the widespread
+approach:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">left to right</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values</span> exps env)
+  (<span style="color: #b6a0ff;">if</span> (no-operands? exps)
+      '()
+      (<span style="color: #b6a0ff;">let</span> ((fst (eval (first-operand exps) env)))
+        (cons fst
+              (list-of-values (rest-operands exps) env)))))
+<span style="color: #989898;">;; </span><span style="color: #989898;">see, for example: https://youtu.be/eoNyHC_cM7w?list=PLVFrD1dmDdvdvWFK8brOVNL7bKHpE-9w0</span>
+</pre>
+</div>
+
+<p>
+Analogously, but without using <code>let</code> (which is just syntactic sugar):
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values-left</span> exp env)
+  (<span style="color: #b6a0ff;">if</span> (no-operands? exp)
+      '()
+      ((<span style="color: #b6a0ff;">lambda</span> (first-value)
+         (cons first-value (list-of-values-left (rest-operands-exps) env)))
+       (eval (first-operand exps) env))))
+<span style="color: #989898;">;; </span><span style="color: #989898;">found here: https://github.com/cmccloud/SICP/blob/master/exercise-4.1.scm</span>
+</pre>
+</div>
+
+<p>
+My solution was a bit more&#x2026; complex. But it should count as valid,
+shouldn't it?
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values</span> exps env)
+  <span style="color: #989898;">;; </span><span style="color: #989898;">return exps as they are except for the nth exp which is evaluated</span>
+  <span style="color: #989898;">;; </span><span style="color: #989898;">as an operand</span>
+  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-nth-operand</span> exps env n)
+    (<span style="color: #b6a0ff;">cond</span> ((no-operands? exps)
+           '())
+          ((= n 0)
+           (cons (eval (first-operand exps) env)
+                 (cdr exps)))
+          (<span style="color: #b6a0ff;">else</span> (cons (car exps)
+                      (eval-nth-operand (cdr exps) env (- n 1))))))
+
+  <span style="color: #989898;">;; </span><span style="color: #989898;">iteratively call eval-nth-operand for each exp</span>
+  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">iter</span> exps env count)
+    (<span style="color: #b6a0ff;">if</span> (= count (length exps))
+        exps
+        (iter (eval-nth-operand exps env count)
+              env
+              (+ count 1))))
+
+  (iter exps env 0))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org42735e9" class="outline-4">
+<h4 id="org42735e9">4.1.2 Representing Expressions</h4>
+<div class="outline-text-4" id="text-org42735e9">
+<p>
+Authors presents the ``specification of the syntax'' of the language:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">self-evaluating?</span> exp)
+  (<span style="color: #b6a0ff;">cond</span> ((number? exp) true)
+        ((string? exp) true)
+        (<span style="color: #b6a0ff;">else</span> false)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">variable?</span> exp) (symbol? exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">quoted?</span> exp)
+  (tagged-list? exp 'quote))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">text-of-quotation</span> exp) (cadr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
+  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment?</span> exp)
+  (tagged-list? exp 'set!))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-variable</span> exp) (cadr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-value</span> exp) (caddr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">definition?</span> exp)
+  (tagged-list? exp 'define))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">definition-variable</span> exp)
+  (<span style="color: #b6a0ff;">if</span> (symbol? (cadr exp))
+      (cadr exp)
+      (caadr exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">definition-value</span> exp)
+  (<span style="color: #b6a0ff;">if</span> (symbol? (cadr exp))
+      (caddr exp)
+      (make-lambda (cdadr exp)   <span style="color: #989898;">; </span><span style="color: #989898;">formal parameters</span>
+                   (cddr exp)))) <span style="color: #989898;">; </span><span style="color: #989898;">body</span>
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda?</span> exp) (tagged-list? exp 'lambda))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-parameters</span> exp) (cadr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-body</span> exp) (cddr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda?</span> exp) (tagged-list? exp 'lambda))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-parameters</span> exp) (cadr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-body</span> exp) (cddr exp))
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Authors provide a constructor as well:</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-lambda</span> parameters body)
+  (cons 'lambda (cons parameters body)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if?</span> exp) (tagged-list? exp 'if))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if-predicate</span> exp) (cadr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if-consequent</span> exp) (caddr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if-alternative</span> exp)
+  (<span style="color: #b6a0ff;">if</span> (not (null? (cdddr exp)))
+      (cadddr exp)
+      'false))
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Authors provide a constructor as well:</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-if</span> predicate consequent alternative)
+  (list 'if predicate consequent alternative))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin?</span> exp) (tagged-list? exp 'begin))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin-actions</span> exp) (cdr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">last-exp?</span> seq) (null? (cdr seq)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">first-exp</span> seq) (car seq))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">rest-exps</span> seq) (cdr seq))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">sequence-&gt;exp</span> seq)
+  (<span style="color: #b6a0ff;">cond</span> ((null? seq) seq)
+        ((last-exp? seq) (first-exp seq))
+        (<span style="color: #b6a0ff;">else</span> (make-begin seq))))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-begin</span> seq) (cons 'begin seq))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">application?</span> exp) (pair? exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operator</span> exp) (car exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operands</span> exp) (cdr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">no-operands?</span> ops) (null? ops))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">first-operand</span> ops) (car ops))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">rest-operands</span> ops) (cdr ops))
+</pre>
+</div>
+
+<p>
+Certain expression are ``derived''. <code>Cond</code> is one of them, since it
+can be transformed into an <code>if</code> expression.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond?</span> exp) (tagged-list? exp 'cond))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-clauses</span> exp) (cdr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-else-clause?</span> clause)
+  (eq? (cond-predicate clause) 'else))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-predicate</span> clause) (car clause))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-actions</span> clause) (cdr clause))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-&gt;if</span> exp)
+  (expand-clauses (cond-clauses exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">expand-clauses</span> clauses)
+  (<span style="color: #b6a0ff;">if</span> (null? clauses)
+      'false                          <span style="color: #989898;">; </span><span style="color: #989898;">no `else' clause</span>
+      (<span style="color: #b6a0ff;">let</span> ((first (car clauses))
+            (rest (cdr clauses)))
+        (<span style="color: #b6a0ff;">if</span> (cond-else-clause? first)
+            (<span style="color: #b6a0ff;">if</span> (null? rest)
+                (sequence-&gt;exp (cond-actions first))
+                (error <span style="color: #79a8ff;">"ELSE clause isn't last -- COND-&gt;IF"</span>
+                       clauses))
+            (make-if (cond-predicate first)
+                     (sequence-&gt;exp (cond-actions first))
+                     (expand-clauses rest))))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1b5a940" class="outline-4">
+<h4 id="org1b5a940">Exercise 4.2:</h4>
+<div class="outline-text-4" id="text-org1b5a940">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Louis Reasoner plans to reorder the <code>cond</code> clauses in <code>eval</code> so that
+the clause for procedure applications appears before the clause for
+assignments.  He argues that this will make the interpreter more
+efficient: Since programs usually contain more applications than
+assignments, definitions, and so on, his modified <code>eval</code> will usually
+check fewer clauses than the original <code>eval</code> before identifying the
+type of an expression.
+</p>
+
+<p>
+a. What is wrong with Louis's plan?  (Hint: What will Louis's
+evaluator do with the expression <code>(define x 3)</code>?)
+</p>
+
+<p>
+b. Louis is upset that his plan didn't work.  He is willing to go to
+any lengths to make his evaluator recognize procedure applications
+before it checks for most other kinds of expressions.  Help him by
+changing the syntax of the evaluated language so that procedure
+applications start with <code>call</code>.  For example, instead of <code>(factorial
+3)</code> we will now have to write <code>(call factorial 3)</code> and instead of <code>(+
+1 2)</code> we will have to write <code>(call + 1 2)</code>.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li><p>
+<b>a)</b> If we do as Louis say, then, the evaluator will think that
+<code>(define x 3)</code> is an application, because <code>(application? exp)</code> will
+return true. Given so, the evaluator will evaluate the expression
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(apply (eval (operator exp) env) (list-of-values (operands exp) env))
+</pre>
+</div>
+
+<p>
+<code>(operator exp)</code> evaluates to <code>x</code>, and <code>(operands exp)</code> evaluates to
+the list <code>(3)</code>.
+</p>
+
+<p>
+So we have
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(apply (eval x env) (list-of-values (3) env))
+</pre>
+</div>
+
+<p>
+The problem is that <code>x</code> in <code>(eval x env)</code> will be taken as a
+variable and, therefore, we will try to evaluate
+<code>(lookup-variable-value x env)</code>.
+</p>
+
+<p>
+We haven't looked at <code>lookup-variable-value</code> yet, but, regardless,
+given that <code>x</code> hasn't been defined, we shouldn't be looking it up.
+</p></li>
+
+<li><p>
+<b>b)</b> This should be enough as far as I can see:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">application?</span> exp)
+  (tagged-list exp 'call))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operator</span> exp)
+  (cadr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operands</span> exp)
+  (cddr exp))
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org6abda7e" class="outline-4">
+<h4 id="org6abda7e">Exercise 4.3</h4>
+<div class="outline-text-4" id="text-org6abda7e">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Rewrite <code>eval</code> so that the dispatch is done in data-directed style.
+Compare this with the data-directed differentiation procedure of
+Exercise 2-73.  (You may use the <code>car</code> of a compound expression as the
+type of the expression, as is appropriate for the syntax implemented
+in this section.)
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+I think the code would look like something like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">type-tag</span> datum) <span style="color: #989898;">;; </span><span style="color: #989898;">p. 176</span>
+  (<span style="color: #b6a0ff;">if</span> (pair? datum)
+      (car datum)
+      (error <span style="color: #79a8ff;">"Bad tagged datum -- TYPE-TAG"</span> datum)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">contents</span> datum) <span style="color: #989898;">;; </span><span style="color: #989898;">p. 176</span>
+  (<span style="color: #b6a0ff;">if</span> (pair? datum)
+      (cdr datum)
+      (error <span style="color: #79a8ff;">"Bad tagged datum -- CONTENTS"</span> datum)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
+  (<span style="color: #b6a0ff;">let</span> ((tag (type-tag exp)))
+    (<span style="color: #b6a0ff;">let</span> ((proc (get 'eval tag))
+          (<span style="color: #b6a0ff;">if</span> proc
+              (apply proc (list contents env))
+              (error <span style="color: #79a8ff;">"no proc found"</span>))))))
+
+(put 'eval
+     'self-evaluating
+     (<span style="color: #b6a0ff;">lambda</span> (exp env) exp))
+
+(put 'eval
+     'variable
+     lookup-variable-value))
+<span style="color: #989898;">;; </span><span style="color: #989898;">etc.</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org172eec6" class="outline-4">
+<h4 id="org172eec6">Exercise 4.4</h4>
+<div class="outline-text-4" id="text-org172eec6">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Recall the definitions of the special forms <code>and</code> and <code>or</code> from
+Chapter 1:
+</p>
+
+<p>
+ <code>and</code>: The expressions are evaluated from left to right.  If any
+expression evaluates to false, false is returned; any remaining
+expressions are not evaluated.  If all the expressions evaluate to
+true values, the value of the last expression is returned.  If there
+are no expressions then true is returned.
+</p>
+
+<p>
+ <code>or</code>: The expressions are evaluated from left to right.  If any
+expression evaluates to a true value, that value is returned; any
+remaining expressions are not evaluated.  If all expressions evaluate
+to false, or if there are no expressions, then false is returned.
+</p>
+
+<p>
+Install <code>and</code> and <code>or</code> as new special forms for the evaluator by
+defining appropriate syntax procedures and evaluation procedures
+<code>eval-and</code> and <code>eval-or</code>.  Alternatively, show how to implement <code>and</code>
+and <code>or</code> as derived expressions.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">syntax procedures</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">and?</span> exp)
+  (tagged-list exp 'and))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">or?</span> exp)
+  (tagged-list exp 'and))
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">evaluation procedures</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-and</span> exp env)
+  (<span style="color: #b6a0ff;">if</span> (null? (conjuncts exp))
+      true
+      (<span style="color: #b6a0ff;">let</span> ((1st-evaluated-conjunct
+             (eval (1st-conjunct exp) env)))
+        (<span style="color: #b6a0ff;">if</span> (false? 1st-evaluated-conjunct)
+            false
+            (<span style="color: #b6a0ff;">let</span> ((rest (rest-conjuncts exp)))
+              (<span style="color: #b6a0ff;">if</span> (null? rest)
+                  1st-evaluated-conjunct
+                  (eval-and (cons 'and rest) env)))))))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-or</span> exp env)
+  (<span style="color: #b6a0ff;">if</span> (null? (disjuncts exp))
+      false
+      (<span style="color: #b6a0ff;">let</span> ((1st-evaluated-disjunct
+             (eval (1st-disjunct exp) env)))
+        (<span style="color: #b6a0ff;">if</span> (true? 1st-evaluated-disjunct)
+            1st-evaluated-disjunct
+            (eval-or (cons 'or (rest-disjuncts exp)) env)))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org13bca92" class="outline-4">
+<h4 id="org13bca92">Exercise 4.5</h4>
+<div class="outline-text-4" id="text-org13bca92">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Scheme allows an additional syntax for <code>cond</code> clauses, <code>(&lt;TEST&gt; =&gt;
+&lt;RECIPIENT&gt;)</code>.  If &lt;TEST&gt; evaluates to a true value, then &lt;RECIPIENT&gt;
+is evaluated.  Its value must be a procedure of one argument; this
+procedure is then invoked on the value of the &lt;TEST&gt;, and the result
+is returned as the value of the `cond' expression.  For example
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">cond</span> ((assoc 'b '((a 1) (b 2))) =&gt; cadr)
+(<span style="color: #b6a0ff;">else</span> false))
+</pre>
+</div>
+
+<p>
+returns 2.  Modify the handling of <code>cond</code> so that it supports this
+extended syntax.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">#lang sicp
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
+  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin?</span> exp) (tagged-list? exp 'begin))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin-actions</span> exp) (cdr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">last-exp?</span> seq) (null? (cdr seq)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">first-exp</span> seq) (car seq))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">rest-exps</span> seq) (cdr seq))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">sequence-&gt;exp</span> seq)
+  (<span style="color: #b6a0ff;">cond</span> ((null? seq) seq)
+        ((last-exp? seq) (first-exp seq))
+        (<span style="color: #b6a0ff;">else</span> (make-begin seq))))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">sequence-&gt;exp2</span> seq)
+  (<span style="color: #b6a0ff;">cond</span> ((null? seq) seq)
+        ((last-exp? seq) (first-exp seq))
+        (<span style="color: #b6a0ff;">else</span> (make-begin seq))))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-begin</span> seq) (cons 'begin seq))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond?</span> exp) (tagged-list? exp 'cond))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-clauses</span> exp) (cdr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-else-clause?</span> clause)
+  (eq? (cond-predicate clause) 'else))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-predicate</span> clause) (car clause))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-actions</span> clause) (cdr clause))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">alternative-cond-actions</span> clause)
+  (list (caddr clause) (car clause)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-&gt;if</span> exp)
+  (expand-clauses (cond-clauses exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-if</span> predicate consequent alternative)
+  (list 'if predicate consequent alternative))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">alternative-cond?</span> exp)
+  (eq? (cadr exp) '=&gt;))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">expand-clauses</span> clauses)
+  (<span style="color: #b6a0ff;">if</span> (null? clauses)
+      'false                          <span style="color: #989898;">; </span><span style="color: #989898;">no `else' clause</span>
+      (<span style="color: #b6a0ff;">let</span> ((first (car clauses))
+            (rest (cdr clauses)))
+        (<span style="color: #b6a0ff;">if</span> (cond-else-clause? first)
+            (<span style="color: #b6a0ff;">if</span> (null? rest)
+                (<span style="color: #b6a0ff;">if</span> (alternative-cond? first)
+                    (alternative-cond-actions first)
+                    (sequence-&gt;exp (cond-actions first)))
+                (error <span style="color: #79a8ff;">"ELSE clause isn't last -- COND-&gt;IF"</span>
+                       clauses))
+            (make-if (cond-predicate first)
+                     (<span style="color: #b6a0ff;">if</span> (alternative-cond? first)
+                         (alternative-cond-actions first)
+                         (sequence-&gt;exp (cond-actions first)))
+                     (expand-clauses rest))))))
+
+(cond-&gt;if
+ '(<span style="color: #b6a0ff;">cond</span> ((assoc 'b '((a 1) (b 2))) =&gt; cadr)
+        (<span style="color: #b6a0ff;">else</span> false)))
+<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
+<span style="color: #989898;">;;</span><span style="color: #989898;">(if (assoc 'b '((a 1) (b 2)))</span>
+<span style="color: #989898;">;;    </span><span style="color: #989898;">(cadr (assoc 'b '((a 1) (b 2))))</span>
+<span style="color: #989898;">;;    </span><span style="color: #989898;">false)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7af1416" class="outline-4">
+<h4 id="org7af1416">Exercise 4.6</h4>
+<div class="outline-text-4" id="text-org7af1416">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+`Let' expressions are derived expressions, because
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">let</span> ((<span style="color: #6ae4b9;">&lt;VAR_1&gt;</span> <span style="color: #6ae4b9;">&lt;EXP_1&gt;</span>) ... (<span style="color: #6ae4b9;">&lt;VAR_N&gt;</span> <span style="color: #6ae4b9;">&lt;EXP_N&gt;</span>))
+  <span style="color: #6ae4b9;">&lt;BODY&gt;</span>)
+</pre>
+</div>
+
+<p>
+is equivalent to
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #b6a0ff;">lambda</span> (<span style="color: #6ae4b9;">&lt;VAR_1&gt;</span> ... <span style="color: #6ae4b9;">&lt;VAR_N&gt;</span>)
+   <span style="color: #6ae4b9;">&lt;BODY&gt;</span>)
+ <span style="color: #6ae4b9;">&lt;EXP_1&gt;</span>
+ ...
+ <span style="color: #6ae4b9;">&lt;EXP_N&gt;</span>)
+</pre>
+</div>
+
+<p>
+Implement a syntactic transformation <code>let-&gt;combination</code> that reduces
+evaluating <code>let</code> expressions to evaluating combinations of the type
+shown above, and add the appropriate clause to <code>eval</code> to handle <code>let</code>
+expressions.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">#lang sicp
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
+  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let?</span> exp) (tagged-list? exp 'let))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-vars</span> exp)
+  (<span style="color: #b6a0ff;">map</span> car (cadr exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-exps</span> exp)
+  (<span style="color: #b6a0ff;">map</span> cadr (cadr exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-body</span> exp)
+  (cddr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-combination</span> exp)
+  (cons (list 'lambda
+              (let-vars exp)
+              (let-body exp))
+        (let-exps exp)))
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Example:</span>
+(<span style="color: #b6a0ff;">let</span> ((let-exp '(<span style="color: #b6a0ff;">let</span> ((foo (* 2 4))
+                      (bar (* 4 6)))
+                  (display foo)
+                  (display bar))))
+  (let-combination let-exp))
+<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
+<span style="color: #989898;">;;</span><span style="color: #989898;">((lambda (foo bar)</span>
+<span style="color: #989898;">;;   </span><span style="color: #989898;">((display foo)</span>
+<span style="color: #989898;">;;    </span><span style="color: #989898;">(display bar)))</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">(* 2 4) (* 4 6))</span>
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Modifying eval:</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
+  (<span style="color: #b6a0ff;">cond</span> ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp)
+         (make-procedure (lambda-parameters exp)
+                         (lambda-body exp)
+                         env))
+        ((begin? exp)
+         (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval (cond-&gt;if exp) env))
+        ((let? exp) (eval (let-combination) env)) <span style="color: #989898;">;; </span><span style="color: #989898;">&lt;----------------</span>
+        ((application? exp)
+         (apply (eval (operator exp) env)
+                (list-of-values (operands exp) env)))
+        (<span style="color: #b6a0ff;">else</span>
+         (error <span style="color: #79a8ff;">"Unknown expression type -- EVAL"</span> exp))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd4c8e30" class="outline-4">
+<h4 id="orgd4c8e30">Exercise 4.7</h4>
+<div class="outline-text-4" id="text-orgd4c8e30">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+<code>Let*</code> is similar to <code>let</code>, except that the bindings of the <code>let</code>
+variables are performed sequentially from left to right, and each
+binding is made in an environment in which all of the preceding
+bindings are visible.  For example
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">let*</span> ((x 3)
+       (y (+ x 2))
+       (z (+ x y 5)))
+  (* x z))
+</pre>
+</div>
+
+<p>
+returns 39.  Explain how a <code>let*</code> expression can be rewritten as a set
+of nested <code>let</code> expressions, and write a procedure <code>let*-&gt;nested-lets</code>
+that performs this transformation.  If we have already implemented
+<code>let</code> (exercise 4-6) and we want to extend the evaluator to handle
+<code>let*</code>, is it sufficient to add a clause to <code>eval</code> whose action is
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(eval (let*-&gt;nested-lets exp) env)
+</pre>
+</div>
+
+<p>
+or must we explicitly expand <code>let*</code> in terms of non-derived
+expressions?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+This is the way we can translate the example given:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">let</span> (x 3)
+  (<span style="color: #b6a0ff;">let</span> (y (+ x 2))
+    (<span style="color: #b6a0ff;">let</span> (z (+ x y 5))
+      (* x z))))
+</pre>
+</div>
+
+<p>
+Here is <code>let*-&gt;nested-lets</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-bindings</span> exp)
+  (cadr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-first-binding</span> exp)
+  (car (let*-bindings exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-rest-bindings</span> exp)
+  (cdr (let*-bindings exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-body</span> exp)
+  (caddr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-&gt;nested-lets</span> exp)
+  (<span style="color: #b6a0ff;">cond</span> ((null? (let*-bindings exp))
+         (let*-body exp))
+        (<span style="color: #b6a0ff;">else</span> (cons 'let
+                    (list (list (let*-first-binding exp))
+                          (let*-&gt;nested-lets
+                           (cons 'let*
+                                 (list (let*-rest-bindings exp)
+                                       (let*-body exp)))))))))
+
+(let*-&gt;nested-lets '(<span style="color: #b6a0ff;">let*</span> ((x 3)
+                           (y (+ x 2)))
+                      (* x y)))
+<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">(let ((x 3))</span>
+<span style="color: #989898;">;;   </span><span style="color: #989898;">(let ((y (+ x 2)))</span>
+<span style="color: #989898;">;;     </span><span style="color: #989898;">(* x y)))</span>
+
+(let*-&gt;nested-lets '(<span style="color: #b6a0ff;">let*</span> ((x 3)
+                           (y (+ x 2))
+                           (z (+ x y 5)))
+                      (* x z)))
+<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">(let ((x 3))</span>
+<span style="color: #989898;">;;   </span><span style="color: #989898;">(let ((y (+ x 2)))</span>
+<span style="color: #989898;">;;     </span><span style="color: #989898;">(let ((z (+ x y 5)))</span>
+<span style="color: #989898;">;;       </span><span style="color: #989898;">(* x z))))</span>
+</pre>
+</div>
+
+<p>
+Adding <code>(eval (let*-&gt;nested-lets exp) env)</code> to <code>eval</code> should be
+sufficient, in the same way we do for <code>cond</code>. Or am I missing
+something?
+</p>
+</div>
+</div>
+
+<div id="outline-container-org44099ac" class="outline-4">
+<h4 id="org44099ac">Exercise 4.8</h4>
+<div class="outline-text-4" id="text-org44099ac">
+<blockquote>
+<p>
+"Named <code>let</code>" is a variant of <code>let</code> that has the form
+</p>
+
+<p>
+<code>(let &lt;VAR&gt; &lt;BINDINGS&gt; &lt;BODY&gt;)</code>
+</p>
+
+<p>
+The &lt;BINDINGS&gt; and &lt;BODY&gt; are just as in ordinary <code>let</code>, except that
+&lt;VAR&gt; is bound within &lt;BODY&gt; to a procedure whose body is &lt;BODY&gt; and
+whose parameters are the variables in the &lt;BINDINGS&gt;.  Thus, one can
+repeatedly execute the &lt;BODY&gt; by invoking the procedure named &lt;VAR&gt;.
+For example, the iterative Fibonacci procedure (1.2.2) can be
+rewritten using named <code>let</code> as follows:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">fib</span> n)
+  (<span style="color: #b6a0ff;">let</span> <span style="color: #feacd0;">fib-iter</span> ((a 1) (b 0) (count n))
+    (<span style="color: #b6a0ff;">if</span> (= count 0)
+        b
+        (fib-iter (+ a b) a (- count 1)))))
+</pre>
+</div>
+
+<p>
+Modify <code>let-&gt;combination</code> of Exercise 4-6 to also support named <code>let</code>.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Basically, I'm making <code>let-&gt;combination</code> transform the ``named <code>let</code>''
+into the <code>fib-iter</code> definition and call as presented in 1.2.2.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">#lang sicp
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
+  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let?</span> exp) (tagged-list? exp 'let))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-vars</span> exp)
+  (<span style="color: #b6a0ff;">map</span> car (cadr exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-exps</span> exp)
+  (<span style="color: #b6a0ff;">map</span> cadr (cadr exp)))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-body</span> exp)
+  (cddr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">named-let-&gt;combination</span> exp)
+  (<span style="color: #b6a0ff;">let</span> ((nameless (cons (car exp) (cddr exp)))
+        (name (cadr exp)))
+
+    (cons 'begin (list (cons 'define
+                             (cons (cons name (let-vars nameless))
+                                   (let-body nameless)))
+                       (cons name (let-exps nameless))))))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-&gt;combination</span> exp)
+  (<span style="color: #b6a0ff;">if</span> (not (pair? (cadr exp)))
+      (named-let-&gt;combination exp)
+      (cons (list 'lambda
+                  (let-vars exp)
+                  (let-body exp))
+            (let-exps exp))))
+
+(<span style="color: #b6a0ff;">let</span> ((let-exp '(<span style="color: #b6a0ff;">let</span> <span style="color: #feacd0;">fib-iter</span> ((a 1) (b 0) (count n))
+                  (<span style="color: #b6a0ff;">if</span> (= count 0)
+                      b
+                      (fib-iter (+ a b) a (- count 1))))))
+  (let-&gt;combination let-exp))
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">(begin</span>
+<span style="color: #989898;">;;   </span><span style="color: #989898;">(define (fib-iter a b count)</span>
+<span style="color: #989898;">;;     </span><span style="color: #989898;">(if (= count 0) b (fib-iter (+ a b) a (- count 1))))</span>
+<span style="color: #989898;">;;   </span><span style="color: #989898;">(fib-iter 1 0 n))</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfc6955d" class="outline-4">
+<h4 id="orgfc6955d">Exercise 4.9</h4>
+<div class="outline-text-4" id="text-orgfc6955d">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Many languages support a variety of iteration constructs, such as
+`do', `for', `while', and `until'.  In Scheme, iterative processes can
+be expressed in terms of ordinary procedure calls, so special
+iteration constructs provide no essential gain in computational power.
+On the other hand, such constructs are often convenient.  Design some
+iteration constructs, give examples of their use, and show how to
+implement them as derived expressions.Many languages support a variety
+of iteration constructs, such as `do', `for', `while', and `until'.
+In Scheme, iterative processes can be expressed in terms of ordinary
+procedure calls, so special iteration constructs provide no essential
+gain in computational power.  On the other hand, such constructs are
+often convenient.  Design some iteration constructs, give examples of
+their use, and show how to implement them as derived expressions.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+We could design a <code>while</code> construct with this syntax:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(while (<span style="color: #6ae4b9;">&lt;operator&gt;</span> <span style="color: #6ae4b9;">&lt;operand1&gt;</span> <span style="color: #6ae4b9;">&lt;operand2&gt;</span>)
+       <span style="color: #6ae4b9;">&lt;body&gt;</span>)
+</pre>
+</div>
+
+<p>
+Here is an example:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(while (&gt; foo 0)
+       (display foo)
+       (set! foo (- foo 1)))
+</pre>
+</div>
+
+<p>
+We have learnt that we can iterate using procedures. The <code>while</code> loop
+above can be implement in the following way:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">gp-while</span>)
+  (<span style="color: #b6a0ff;">if</span> (&gt; foo 0)
+      (<span style="color: #b6a0ff;">begin</span>
+        (display foo)
+        (set! foo (- foo 1))
+        (gp-while))))
+
+(gp-while)
+</pre>
+</div>
+
+<p>
+<code>While-&gt;combination</code> transforms the new <code>while</code> syntax into procedural
+syntax:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">append</span> l1 l2)
+    (<span style="color: #b6a0ff;">if</span> (null? l1)
+        l2
+        (cons (car l1) (append (cdr l1) l2))))
+
+  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">while-cond</span> exp)
+    (cadr exp))
+
+  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">while-body</span> exp)
+    (cddr exp))
+
+  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">while-&gt;combination</span> exp)
+    (list 'begin
+          (list 'define
+                (list 'gp-while)
+                (list 'if
+                      (while-cond exp)
+                      (cons
+                       'begin
+                       (append
+                        (while-body exp)
+                        (list (list 'gp-while))))))
+          (list 'gp-while)))
+<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">(begin (define (gp-while)</span>
+<span style="color: #989898;">;;        </span><span style="color: #989898;">(if (&gt; foo 0)</span>
+<span style="color: #989898;">;;            </span><span style="color: #989898;">(begin (display foo)</span>
+<span style="color: #989898;">;;                   </span><span style="color: #989898;">(set! foo (- foo 1))</span>
+<span style="color: #989898;">;;                   </span><span style="color: #989898;">(gp-while))))</span>
+<span style="color: #989898;">;;     </span><span style="color: #989898;">(gp-while))</span>
+</pre>
+</div>
+
+<p>
+Now <code>while</code> can be handled as a derived expression by the evaluator:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
+  (<span style="color: #b6a0ff;">cond</span>
+   <span style="color: #989898;">;; </span><span style="color: #989898;">...</span>
+   ((while? exp) (eval (while-&gt;combination exp) env)
+   <span style="color: #989898;">;; </span><span style="color: #989898;">...</span>
+))
+</pre>
+</div>
+
+<p>
+[comment from the future: the begin in <code>gp-while</code> should not be
+necessary. See p. 221 fn. 3]
+</p>
+</div>
+</div>
+<div id="outline-container-orge884c17" class="outline-4">
+<h4 id="orge884c17">Exercise 4.10</h4>
+<div class="outline-text-4" id="text-orge884c17">
+<blockquote>
+<p>
+By using data abstraction, we were able to write an <code>eval</code> procedure
+that is independent of the particular syntax of the language to be
+evaluated.  To illustrate this, design and implement a new syntax for
+Scheme by modifying the procedures in this section, without changing
+<code>eval</code> or <code>apply</code>.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+A couple of examples:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">'quotation instead of 'quote</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">quoted?</span> exp)
+  (tagged-list? exp 'quotation))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">text-of-quotation</span> exp) (cadr exp))
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">(assign! &lt;value&gt; &lt;exp&gt;) instead of (set! &lt;exp&gt; &lt;val&gt;)</span>
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment?</span> exp)
+  (tagged-list? exp 'assing!))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-variable</span> exp) (caddr exp))
+
+(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-value</span> exp) (cadr exp))
+</pre>
+</div>
+
+
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
+</div>
+</body>
+</html>

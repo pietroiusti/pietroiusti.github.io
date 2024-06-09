@@ -1,0 +1,1047 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 4.1.1 and 4.1.2
+#+subtitle: 2024-06-09 Sun
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
+
+* 4 Metalinguistic abstraction
+We have seen several techniques that programmers can use to tame
+complexity. So far we have used the Lisp language. But, as complexity
+grows, it will not be sufficient. To the strategies for controlling
+complexity we must add that of establishing new languages:
+/metalinguistic abstraction/.
+
+#+begin_quote
+Establishing new languages is a powerful strategy for controlling
+complexity in engineering design; we can often enhance our ability to
+deal with a complex problem by adopting a new language that enables us
+to describe (and hence to think about) the problem in a different way,
+using primitives, means of combination, and means of abstraction that
+are particularly well suited to the problem at hand.
+#+end_quote
+
+In computer programming, not only new languages can be formulated;
+they can also be implemented by constructing /evaluators/ (aka
+/interpreters/), that is, procedures that, when applied to an
+expression of the relevant language (the language they are evaluators
+of), perform the actions required to evaluate the expression.
+
+#+begin_quote
+It is no exaggeration to regard this as the most fundamental idea in
+programming:
+
+The evaluator, which determines the meaning of expressions in a
+programming language, is just another program.
+
+To appreciate this point is to change our images of ourselves as
+programmers.  We come to see ourselves as designers of languages,
+rather than only users of languages designed by others.
+
+In fact, we can regard almost any program as the evaluator for some
+language.
+#+end_quote
+
+From a certain perspective,
+#+begin_quote
+the technology for coping with large-scale computer systems merges
+with the technology for building new computer languages, and computer
+science itself becomes no more (and no less) than the discipline of
+constructing appropriate descriptive languages.
+#+end_quote
+
+That's the technology this chapter explores. More precisely: the
+technology by which languages are established in terms of other
+languages. Needless to say, our evaluators will be written in
+Lisp. The first evaluator will be for Lisp itself (a subset of the
+Scheme dialect).
+
+** 4.1 The Metacircular evaluator
+#+begin_quote
+An evaluator that is written in the same language that it evaluates is
+said to be /metacircular/.
+
+The metacircular evaluator is essentially a Scheme formulation of the
+environment model of evaluation described in section 3.2. (362)
+#+end_quote
+
+#+begin_quote
+The evaluation process can be described as the interplay between two
+procedures: `eval' and `apply'.
+
+Recall that the model has two basic parts...
+
+[...]
+
+The implementation of the evaluator will depend upon procedures that
+define the "syntax" of the expressions to be evaluated.
+#+end_quote
+
+*** 4.1.1 The Core of the Evaluator
+``Abstract syntax'':
+#+begin_quote
+Each type of expression has a predicate that tests for it and an
+abstract means for selecting its parts.
+#+end_quote
+
+- Primitive expressions
+- Special forms
+  - quoted expressions
+  - assignments/definitions of a variable
+  - ~if~ expressions
+  - ~lambda~ expressions
+  - ~begin~
+  - ~cond~
+- Combinations
+
+#+begin_src
+*Figure 4.1:* The `eval'-`apply' cycle exposes the essence of a
+computer language.
+
+                                     .,ad88888888baa,
+                            _    ,d8P"""        ""9888ba.      _
+                           /  .a8"          ,ad88888888888a   |\
+                         /   aP'          ,88888888888888888a   \
+                        /  ,8"           ,88888888888888888888,  \
+                       |  ,8'            (888888888888888888888, |
+                      /  ,8'             `8888888888888888888888  \
+                      |  8)               `888888888888888888888, |
+          Procedure,  |  8                  "88888 Apply 8888888) | Expression
+          Arguments   |  8     Eval          `888888888888888888) | Environment
+                      |  8)                    "8888888888888888  |
+                      \  (b                     "88888888888888'  /
+                       | `8,                     8888888888888)  |
+                       \  "8a                   ,888888888888)  /
+                        \   V8,                 d88888888888"  /
+                        _\| `8b,             ,d8888888888P' _/
+                               `V8a,       ,ad8888888888P'
+                                  ""88888888888888888P"
+                                       """"""""""""
+
+[graphic by Normand Veillux, modified]
+[Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
+#+end_src
+
+Here is ~eval~:
+#+begin_src scheme
+  (define (eval exp env)
+    (cond ((self-evaluating? exp) exp)
+          ((variable? exp) (lookup-variable-value exp env))
+          ((quoted? exp) (text-of-quotation exp))
+          ((assignment? exp) (eval-assignment exp env))
+          ((definition? exp) (eval-definition exp env))
+          ((if? exp) (eval-if exp env))
+          ((lambda? exp)
+           (make-procedure (lambda-parameters exp)
+                           (lambda-body exp)
+                           env))
+          ((begin? exp)
+           (eval-sequence (begin-actions exp) env))
+          ((cond? exp) (eval (cond->if exp) env))
+          ((application? exp)
+           (apply (eval (operator exp) env)
+                  (list-of-values (operands exp) env)))
+          (else
+           (error "Unknown expression type -- EVAL" exp))))
+#+end_src
+
+Here is ~apply~:
+#+begin_src scheme
+  (define (apply procedure arguments)
+    (cond ((primitive-procedure? procedure)
+           (apply-primitive-procedure procedure arguments))
+          ((compound-procedure? procedure)
+           (eval-sequence
+            (procedure-body procedure)
+            (extend-environment
+             (procedure-parameters procedure)
+             arguments
+             (procedure-environment procedure))))
+          (else
+           (error
+            "Unknown procedure type -- APPLY" procedure))))
+#+end_src
+
+The rest:
+#+begin_src scheme
+  (define (list-of-values exps env)
+    (if (no-operands? exps)
+        '()
+        (cons (eval (first-operand exps) env)
+              (list-of-values (rest-operands exps) env))))
+
+  (define (eval-if exp env)
+    (if (true? (eval (if-predicate exp) env))
+        (eval (if-consequent exp) env)
+        (eval (if-alternative exp) env)))
+
+  (define (eval-sequence exps env)
+    (cond ((last-exp? exps) (eval (first-exp exps) env))
+          (else (eval (first-exp exps) env)
+                (eval-sequence (rest-exps exps) env))))
+
+  (define (eval-assignment exp env)
+    (set-variable-value! (assignment-variable exp)
+                         (eval (assignment-value exp) env)
+                         env)
+    'ok)
+
+  (define (eval-definition exp env)
+    (define-variable! (definition-variable exp)
+      (eval (definition-value exp) env)
+      env)
+    'ok)
+#+end_src
+
+*** Exercise 4.1
+*Exercise*:
+#+begin_quote
+Notice that we cannot tell whether the metacircular evaluator
+evaluates operands from left to right or from right to left.  Its
+evaluation order is inherited from the underlying Lisp: If the
+arguments to ~cons~ in ~list-of-values~ are evaluated from left to
+right, then ~list-of-values~ will evaluate operands from left to
+right; and if the arguments to ~cons~ are evaluated from right to
+left, then ~list-of-values~ will evaluate operands from right to left.
+
+Write a version of ~list-of-values~ that evaluates operands from left
+to right regardless of the order of evaluation in the underlying Lisp.
+Also write a version of ~list-of-values~ that evaluates operands from
+right to left.
+#+end_quote
+
+*Answer*:
+
+Looking at the solutions published online, this is the widespread
+approach:
+#+begin_src scheme
+  ;; left to right
+  (define (list-of-values exps env)
+    (if (no-operands? exps)
+        '()
+        (let ((fst (eval (first-operand exps) env)))
+          (cons fst
+                (list-of-values (rest-operands exps) env)))))
+  ;; see, for example: https://youtu.be/eoNyHC_cM7w?list=PLVFrD1dmDdvdvWFK8brOVNL7bKHpE-9w0
+#+end_src
+
+Analogously, but without using ~let~ (which is just syntactic sugar):
+#+begin_src scheme
+  (define (list-of-values-left exp env)
+    (if (no-operands? exp)
+        '()
+        ((lambda (first-value)
+           (cons first-value (list-of-values-left (rest-operands-exps) env)))
+         (eval (first-operand exps) env))))
+  ;; found here: https://github.com/cmccloud/SICP/blob/master/exercise-4.1.scm
+#+end_src
+
+My solution was a bit more... complex. But it should count as valid,
+shouldn't it?
+#+begin_src scheme
+  (define (list-of-values exps env)
+    ;; return exps as they are except for the nth exp which is evaluated
+    ;; as an operand
+    (define (eval-nth-operand exps env n)
+      (cond ((no-operands? exps)
+             '())
+            ((= n 0)
+             (cons (eval (first-operand exps) env)
+                   (cdr exps)))
+            (else (cons (car exps)
+                        (eval-nth-operand (cdr exps) env (- n 1))))))
+
+    ;; iteratively call eval-nth-operand for each exp
+    (define (iter exps env count)
+      (if (= count (length exps))
+          exps
+          (iter (eval-nth-operand exps env count)
+                env
+                (+ count 1))))
+
+    (iter exps env 0))
+#+end_src
+
+*** 4.1.2 Representing Expressions
+Authors presents the ``specification of the syntax'' of the language:
+
+#+begin_src scheme
+  (define (self-evaluating? exp)
+    (cond ((number? exp) true)
+          ((string? exp) true)
+          (else false)))
+
+  (define (variable? exp) (symbol? exp))
+
+  (define (quoted? exp)
+    (tagged-list? exp 'quote))
+
+  (define (text-of-quotation exp) (cadr exp))
+
+  (define (tagged-list? exp tag)
+    (if (pair? exp)
+        (eq? (car exp) tag)
+        false))
+
+  (define (assignment? exp)
+    (tagged-list? exp 'set!))
+
+  (define (assignment-variable exp) (cadr exp))
+
+  (define (assignment-value exp) (caddr exp))
+
+  (define (definition? exp)
+    (tagged-list? exp 'define))
+
+  (define (definition-variable exp)
+    (if (symbol? (cadr exp))
+        (cadr exp)
+        (caadr exp)))
+
+  (define (definition-value exp)
+    (if (symbol? (cadr exp))
+        (caddr exp)
+        (make-lambda (cdadr exp)   ; formal parameters
+                     (cddr exp)))) ; body
+
+  (define (lambda? exp) (tagged-list? exp 'lambda))
+
+  (define (lambda-parameters exp) (cadr exp))
+
+  (define (lambda-body exp) (cddr exp))
+
+  (define (lambda? exp) (tagged-list? exp 'lambda))
+
+  (define (lambda-parameters exp) (cadr exp))
+
+  (define (lambda-body exp) (cddr exp))
+
+  ;; Authors provide a constructor as well:
+  (define (make-lambda parameters body)
+    (cons 'lambda (cons parameters body)))
+
+  (define (if? exp) (tagged-list? exp 'if))
+
+  (define (if-predicate exp) (cadr exp))
+
+  (define (if-consequent exp) (caddr exp))
+
+  (define (if-alternative exp)
+    (if (not (null? (cdddr exp)))
+        (cadddr exp)
+        'false))
+
+  ;; Authors provide a constructor as well:
+  (define (make-if predicate consequent alternative)
+    (list 'if predicate consequent alternative))
+
+  (define (begin? exp) (tagged-list? exp 'begin))
+
+  (define (begin-actions exp) (cdr exp))
+
+  (define (last-exp? seq) (null? (cdr seq)))
+
+  (define (first-exp seq) (car seq))
+
+  (define (rest-exps seq) (cdr seq))
+
+  (define (sequence->exp seq)
+    (cond ((null? seq) seq)
+          ((last-exp? seq) (first-exp seq))
+          (else (make-begin seq))))
+
+  (define (make-begin seq) (cons 'begin seq))
+
+  (define (application? exp) (pair? exp))
+
+  (define (operator exp) (car exp))
+
+  (define (operands exp) (cdr exp))
+
+  (define (no-operands? ops) (null? ops))
+
+  (define (first-operand ops) (car ops))
+
+  (define (rest-operands ops) (cdr ops))
+#+end_src
+
+Certain expression are ``derived''. ~Cond~ is one of them, since it
+can be transformed into an ~if~ expression.
+#+begin_src scheme
+  (define (cond? exp) (tagged-list? exp 'cond))
+
+  (define (cond-clauses exp) (cdr exp))
+
+  (define (cond-else-clause? clause)
+    (eq? (cond-predicate clause) 'else))
+
+  (define (cond-predicate clause) (car clause))
+
+  (define (cond-actions clause) (cdr clause))
+
+  (define (cond->if exp)
+    (expand-clauses (cond-clauses exp)))
+
+  (define (expand-clauses clauses)
+    (if (null? clauses)
+        'false                          ; no `else' clause
+        (let ((first (car clauses))
+              (rest (cdr clauses)))
+          (if (cond-else-clause? first)
+              (if (null? rest)
+                  (sequence->exp (cond-actions first))
+                  (error "ELSE clause isn't last -- COND->IF"
+                         clauses))
+              (make-if (cond-predicate first)
+                       (sequence->exp (cond-actions first))
+                       (expand-clauses rest))))))
+#+end_src
+
+*** Exercise 4.2:
+*Exercise*:
+
+#+begin_quote
+Louis Reasoner plans to reorder the ~cond~ clauses in ~eval~ so that
+the clause for procedure applications appears before the clause for
+assignments.  He argues that this will make the interpreter more
+efficient: Since programs usually contain more applications than
+assignments, definitions, and so on, his modified ~eval~ will usually
+check fewer clauses than the original ~eval~ before identifying the
+type of an expression.
+
+a. What is wrong with Louis's plan?  (Hint: What will Louis's
+evaluator do with the expression ~(define x 3)~?)
+
+b. Louis is upset that his plan didn't work.  He is willing to go to
+any lengths to make his evaluator recognize procedure applications
+before it checks for most other kinds of expressions.  Help him by
+changing the syntax of the evaluated language so that procedure
+applications start with ~call~.  For example, instead of ~(factorial
+3)~ we will now have to write ~(call factorial 3)~ and instead of ~(+
+1 2)~ we will have to write ~(call + 1 2)~.
+#+end_quote
+
+*Answer*:
+
+- *a)* If we do as Louis say, then, the evaluator will think that
+  ~(define x 3)~ is an application, because ~(application? exp)~ will
+  return true. Given so, the evaluator will evaluate the expression
+  #+begin_src scheme
+    (apply (eval (operator exp) env) (list-of-values (operands exp) env))
+  #+end_src
+
+  ~(operator exp)~ evaluates to ~x~, and ~(operands exp)~ evaluates to
+  the list ~(3)~.
+
+  So we have
+  #+begin_src scheme
+    (apply (eval x env) (list-of-values (3) env))
+  #+end_src
+   
+  The problem is that ~x~ in ~(eval x env)~ will be taken as a
+  variable and, therefore, we will try to evaluate
+  ~(lookup-variable-value x env)~.
+  
+  We haven't looked at ~lookup-variable-value~ yet, but, regardless,
+  given that ~x~ hasn't been defined, we shouldn't be looking it up.
+
+- *b)* This should be enough as far as I can see:
+  #+begin_src scheme
+    (define (application? exp)
+      (tagged-list exp 'call))
+
+    (define (operator exp)
+      (cadr exp))
+
+    (define (operands exp)
+      (cddr exp))
+  #+end_src
+
+*** Exercise 4.3
+*Exercise*:
+#+begin_quote
+Rewrite ~eval~ so that the dispatch is done in data-directed style.
+Compare this with the data-directed differentiation procedure of
+Exercise 2-73.  (You may use the ~car~ of a compound expression as the
+type of the expression, as is appropriate for the syntax implemented
+in this section.)
+#+end_quote
+
+*Answer*:
+
+I think the code would look like something like this:
+
+#+begin_src scheme
+  (define (type-tag datum) ;; p. 176
+    (if (pair? datum)
+        (car datum)
+        (error "Bad tagged datum -- TYPE-TAG" datum)))
+
+  (define (contents datum) ;; p. 176
+    (if (pair? datum)
+        (cdr datum)
+        (error "Bad tagged datum -- CONTENTS" datum)))
+
+  (define (eval exp env)
+    (let ((tag (type-tag exp)))
+      (let ((proc (get 'eval tag))
+            (if proc
+                (apply proc (list contents env))
+                (error "no proc found"))))))
+
+  (put 'eval
+       'self-evaluating
+       (lambda (exp env) exp))
+
+  (put 'eval
+       'variable
+       lookup-variable-value))
+  ;; etc.
+#+end_src
+
+*** Exercise 4.4
+*Exercise*:
+#+begin_quote
+Recall the definitions of the special forms ~and~ and ~or~ from
+Chapter 1:
+
+ ~and~: The expressions are evaluated from left to right.  If any
+expression evaluates to false, false is returned; any remaining
+expressions are not evaluated.  If all the expressions evaluate to
+true values, the value of the last expression is returned.  If there
+are no expressions then true is returned.
+
+ ~or~: The expressions are evaluated from left to right.  If any
+expression evaluates to a true value, that value is returned; any
+remaining expressions are not evaluated.  If all expressions evaluate
+to false, or if there are no expressions, then false is returned.
+
+Install ~and~ and ~or~ as new special forms for the evaluator by
+defining appropriate syntax procedures and evaluation procedures
+~eval-and~ and ~eval-or~.  Alternatively, show how to implement ~and~
+and ~or~ as derived expressions.
+#+end_quote
+
+*Answer*:
+#+begin_src scheme
+  ;; syntax procedures
+  (define (and? exp)
+    (tagged-list exp 'and))
+
+  (define (or? exp)
+    (tagged-list exp 'and))
+
+  ;; evaluation procedures
+  (define (eval-and exp env)
+    (if (null? (conjuncts exp))
+        true
+        (let ((1st-evaluated-conjunct
+               (eval (1st-conjunct exp) env)))
+          (if (false? 1st-evaluated-conjunct)
+              false
+              (let ((rest (rest-conjuncts exp)))
+                (if (null? rest)
+                    1st-evaluated-conjunct
+                    (eval-and (cons 'and rest) env)))))))
+
+  (define (eval-or exp env)
+    (if (null? (disjuncts exp))
+        false
+        (let ((1st-evaluated-disjunct
+               (eval (1st-disjunct exp) env)))
+          (if (true? 1st-evaluated-disjunct)
+              1st-evaluated-disjunct
+              (eval-or (cons 'or (rest-disjuncts exp)) env)))))
+#+end_src
+
+*** Exercise 4.5
+*Exercise*:
+#+begin_quote
+Scheme allows an additional syntax for ~cond~ clauses, ~(<TEST> =>
+<RECIPIENT>)~.  If <TEST> evaluates to a true value, then <RECIPIENT>
+is evaluated.  Its value must be a procedure of one argument; this
+procedure is then invoked on the value of the <TEST>, and the result
+is returned as the value of the `cond' expression.  For example
+
+#+begin_src scheme
+  (cond ((assoc 'b '((a 1) (b 2))) => cadr)
+  (else false))
+#+end_src
+
+returns 2.  Modify the handling of ~cond~ so that it supports this
+extended syntax.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  #lang sicp
+  (define (tagged-list? exp tag)
+    (if (pair? exp)
+        (eq? (car exp) tag)
+        false))
+
+  (define (begin? exp) (tagged-list? exp 'begin))
+
+  (define (begin-actions exp) (cdr exp))
+
+  (define (last-exp? seq) (null? (cdr seq)))
+
+  (define (first-exp seq) (car seq))
+
+  (define (rest-exps seq) (cdr seq))
+
+  (define (sequence->exp seq)
+    (cond ((null? seq) seq)
+          ((last-exp? seq) (first-exp seq))
+          (else (make-begin seq))))
+
+  (define (sequence->exp2 seq)
+    (cond ((null? seq) seq)
+          ((last-exp? seq) (first-exp seq))
+          (else (make-begin seq))))
+
+  (define (make-begin seq) (cons 'begin seq))
+
+  (define (cond? exp) (tagged-list? exp 'cond))
+
+  (define (cond-clauses exp) (cdr exp))
+
+  (define (cond-else-clause? clause)
+    (eq? (cond-predicate clause) 'else))
+
+  (define (cond-predicate clause) (car clause))
+
+  (define (cond-actions clause) (cdr clause))
+
+  (define (alternative-cond-actions clause)
+    (list (caddr clause) (car clause)))
+
+  (define (cond->if exp)
+    (expand-clauses (cond-clauses exp)))
+
+  (define (make-if predicate consequent alternative)
+    (list 'if predicate consequent alternative))
+
+  (define (alternative-cond? exp)
+    (eq? (cadr exp) '=>))
+
+  (define (expand-clauses clauses)
+    (if (null? clauses)
+        'false                          ; no `else' clause
+        (let ((first (car clauses))
+              (rest (cdr clauses)))
+          (if (cond-else-clause? first)
+              (if (null? rest)
+                  (if (alternative-cond? first)
+                      (alternative-cond-actions first)
+                      (sequence->exp (cond-actions first)))
+                  (error "ELSE clause isn't last -- COND->IF"
+                         clauses))
+              (make-if (cond-predicate first)
+                       (if (alternative-cond? first)
+                           (alternative-cond-actions first)
+                           (sequence->exp (cond-actions first)))
+                       (expand-clauses rest))))))
+
+  (cond->if
+   '(cond ((assoc 'b '((a 1) (b 2))) => cadr)
+          (else false)))
+  ;; =>
+  ;;(if (assoc 'b '((a 1) (b 2)))
+  ;;    (cadr (assoc 'b '((a 1) (b 2))))
+  ;;    false)
+#+end_src
+
+*** Exercise 4.6
+*Exercise*:
+#+begin_quote
+`Let' expressions are derived expressions, because
+
+#+begin_src scheme
+  (let ((<VAR_1> <EXP_1>) ... (<VAR_N> <EXP_N>))
+    <BODY>)
+#+end_src
+
+is equivalent to
+
+#+begin_src scheme
+  ((lambda (<VAR_1> ... <VAR_N>)
+     <BODY>)
+   <EXP_1>
+   ...
+   <EXP_N>)
+#+end_src
+
+Implement a syntactic transformation ~let->combination~ that reduces
+evaluating ~let~ expressions to evaluating combinations of the type
+shown above, and add the appropriate clause to ~eval~ to handle ~let~
+expressions.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  #lang sicp
+  (define (tagged-list? exp tag)
+    (if (pair? exp)
+        (eq? (car exp) tag)
+        false))
+
+  (define (let? exp) (tagged-list? exp 'let))
+
+  (define (let-vars exp)
+    (map car (cadr exp)))
+
+  (define (let-exps exp)
+    (map cadr (cadr exp)))
+
+  (define (let-body exp)
+    (cddr exp))
+
+  (define (let-combination exp)
+    (cons (list 'lambda
+                (let-vars exp)
+                (let-body exp))
+          (let-exps exp)))
+
+  ;; Example:
+  (let ((let-exp '(let ((foo (* 2 4))
+                        (bar (* 4 6)))
+                    (display foo)
+                    (display bar))))
+    (let-combination let-exp))
+  ;; =>
+  ;;((lambda (foo bar)
+  ;;   ((display foo)
+  ;;    (display bar)))
+  ;; (* 2 4) (* 4 6))
+
+  ;; Modifying eval:
+  (define (eval exp env)
+    (cond ((self-evaluating? exp) exp)
+          ((variable? exp) (lookup-variable-value exp env))
+          ((quoted? exp) (text-of-quotation exp))
+          ((assignment? exp) (eval-assignment exp env))
+          ((definition? exp) (eval-definition exp env))
+          ((if? exp) (eval-if exp env))
+          ((lambda? exp)
+           (make-procedure (lambda-parameters exp)
+                           (lambda-body exp)
+                           env))
+          ((begin? exp)
+           (eval-sequence (begin-actions exp) env))
+          ((cond? exp) (eval (cond->if exp) env))
+          ((let? exp) (eval (let-combination) env)) ;; <----------------
+          ((application? exp)
+           (apply (eval (operator exp) env)
+                  (list-of-values (operands exp) env)))
+          (else
+           (error "Unknown expression type -- EVAL" exp))))
+#+end_src
+
+*** Exercise 4.7
+*Exercise*:
+#+begin_quote
+~Let*~ is similar to ~let~, except that the bindings of the ~let~
+variables are performed sequentially from left to right, and each
+binding is made in an environment in which all of the preceding
+bindings are visible.  For example
+
+#+begin_src scheme
+  (let* ((x 3)
+         (y (+ x 2))
+         (z (+ x y 5)))
+    (* x z))
+#+end_src
+
+returns 39.  Explain how a ~let*~ expression can be rewritten as a set
+of nested ~let~ expressions, and write a procedure ~let*->nested-lets~
+that performs this transformation.  If we have already implemented
+~let~ (exercise 4-6) and we want to extend the evaluator to handle
+~let*~, is it sufficient to add a clause to ~eval~ whose action is
+
+#+begin_src scheme
+  (eval (let*->nested-lets exp) env)
+#+end_src
+
+or must we explicitly expand ~let*~ in terms of non-derived
+expressions?
+#+end_quote
+
+*Answer*:
+
+This is the way we can translate the example given:
+
+#+begin_src scheme
+  (let (x 3)
+    (let (y (+ x 2))
+      (let (z (+ x y 5))
+        (* x z))))
+#+end_src
+
+Here is ~let*->nested-lets~:
+
+#+begin_src scheme
+  (define (let*-bindings exp)
+    (cadr exp))
+
+  (define (let*-first-binding exp)
+    (car (let*-bindings exp)))
+
+  (define (let*-rest-bindings exp)
+    (cdr (let*-bindings exp)))
+
+  (define (let*-body exp)
+    (caddr exp))
+
+  (define (let*->nested-lets exp)
+    (cond ((null? (let*-bindings exp))
+           (let*-body exp))
+          (else (cons 'let
+                      (list (list (let*-first-binding exp))
+                            (let*->nested-lets
+                             (cons 'let*
+                                   (list (let*-rest-bindings exp)
+                                         (let*-body exp)))))))))
+
+  (let*->nested-lets '(let* ((x 3)
+                             (y (+ x 2)))
+                        (* x y)))
+  ;; =>
+  ;; (let ((x 3))
+  ;;   (let ((y (+ x 2)))
+  ;;     (* x y)))
+
+  (let*->nested-lets '(let* ((x 3)
+                             (y (+ x 2))
+                             (z (+ x y 5)))
+                        (* x z)))
+  ;; =>
+  ;; (let ((x 3))
+  ;;   (let ((y (+ x 2)))
+  ;;     (let ((z (+ x y 5)))
+  ;;       (* x z))))
+#+end_src
+
+Adding ~(eval (let*->nested-lets exp) env)~ to ~eval~ should be
+sufficient, in the same way we do for ~cond~. Or am I missing
+something?
+
+*** Exercise 4.8
+#+begin_quote
+"Named ~let~" is a variant of ~let~ that has the form
+
+~(let <VAR> <BINDINGS> <BODY>)~
+
+The <BINDINGS> and <BODY> are just as in ordinary ~let~, except that
+<VAR> is bound within <BODY> to a procedure whose body is <BODY> and
+whose parameters are the variables in the <BINDINGS>.  Thus, one can
+repeatedly execute the <BODY> by invoking the procedure named <VAR>.
+For example, the iterative Fibonacci procedure (1.2.2) can be
+rewritten using named ~let~ as follows:
+
+#+begin_src scheme
+  (define (fib n)
+    (let fib-iter ((a 1) (b 0) (count n))
+      (if (= count 0)
+          b
+          (fib-iter (+ a b) a (- count 1)))))
+#+end_src
+
+Modify ~let->combination~ of Exercise 4-6 to also support named ~let~.
+#+end_quote
+
+*Answer*:
+
+Basically, I'm making ~let->combination~ transform the ``named ~let~''
+into the ~fib-iter~ definition and call as presented in 1.2.2.
+
+#+begin_src scheme
+  #lang sicp
+  (define (tagged-list? exp tag)
+    (if (pair? exp)
+        (eq? (car exp) tag)
+        false))
+
+  (define (let? exp) (tagged-list? exp 'let))
+
+  (define (let-vars exp)
+    (map car (cadr exp)))
+
+  (define (let-exps exp)
+    (map cadr (cadr exp)))
+
+  (define (let-body exp)
+    (cddr exp))
+
+  (define (named-let->combination exp)
+    (let ((nameless (cons (car exp) (cddr exp)))
+          (name (cadr exp)))
+
+      (cons 'begin (list (cons 'define
+                               (cons (cons name (let-vars nameless))
+                                     (let-body nameless)))
+                         (cons name (let-exps nameless))))))
+
+  (define (let->combination exp)
+    (if (not (pair? (cadr exp)))
+        (named-let->combination exp)
+        (cons (list 'lambda
+                    (let-vars exp)
+                    (let-body exp))
+              (let-exps exp))))
+
+  (let ((let-exp '(let fib-iter ((a 1) (b 0) (count n))
+                    (if (= count 0)
+                        b
+                        (fib-iter (+ a b) a (- count 1))))))
+    (let->combination let-exp))
+
+  ;; =>
+  ;; (begin
+  ;;   (define (fib-iter a b count)
+  ;;     (if (= count 0) b (fib-iter (+ a b) a (- count 1))))
+  ;;   (fib-iter 1 0 n))
+#+end_src
+
+*** Exercise 4.9
+*Exercise*:
+#+begin_quote
+Many languages support a variety of iteration constructs, such as
+`do', `for', `while', and `until'.  In Scheme, iterative processes can
+be expressed in terms of ordinary procedure calls, so special
+iteration constructs provide no essential gain in computational power.
+On the other hand, such constructs are often convenient.  Design some
+iteration constructs, give examples of their use, and show how to
+implement them as derived expressions.Many languages support a variety
+of iteration constructs, such as `do', `for', `while', and `until'.
+In Scheme, iterative processes can be expressed in terms of ordinary
+procedure calls, so special iteration constructs provide no essential
+gain in computational power.  On the other hand, such constructs are
+often convenient.  Design some iteration constructs, give examples of
+their use, and show how to implement them as derived expressions.
+#+end_quote
+
+*Answer*:
+
+We could design a ~while~ construct with this syntax:
+
+#+begin_src scheme
+  (while (<operator> <operand1> <operand2>)
+         <body>)
+#+end_src
+
+Here is an example:
+#+begin_src scheme
+  (while (> foo 0)
+         (display foo)
+         (set! foo (- foo 1)))
+#+end_src
+
+We have learnt that we can iterate using procedures. The ~while~ loop
+above can be implement in the following way:
+#+begin_src scheme
+  (define (gp-while)
+    (if (> foo 0)
+        (begin
+          (display foo)
+          (set! foo (- foo 1))
+          (gp-while))))
+
+  (gp-while)
+#+end_src
+
+~While->combination~ transforms the new ~while~ syntax into procedural
+syntax:
+#+begin_src scheme
+  (define (append l1 l2)
+      (if (null? l1)
+          l2
+          (cons (car l1) (append (cdr l1) l2))))
+
+    (define (while-cond exp)
+      (cadr exp))
+
+    (define (while-body exp)
+      (cddr exp))
+
+    (define (while->combination exp)
+      (list 'begin
+            (list 'define
+                  (list 'gp-while)
+                  (list 'if
+                        (while-cond exp)
+                        (cons
+                         'begin
+                         (append
+                          (while-body exp)
+                          (list (list 'gp-while))))))
+            (list 'gp-while)))
+  ;; =>
+  ;; (begin (define (gp-while)
+  ;;        (if (> foo 0)
+  ;;            (begin (display foo)
+  ;;                   (set! foo (- foo 1))
+  ;;                   (gp-while))))
+  ;;     (gp-while))
+#+end_src
+
+Now ~while~ can be handled as a derived expression by the evaluator:
+
+#+begin_src scheme
+  (define (eval exp env)
+    (cond
+     ;; ...
+     ((while? exp) (eval (while->combination exp) env)
+     ;; ...
+  ))
+#+end_src
+
+[comment from the future: the begin in ~gp-while~ should not be
+necessary. See p. 221 fn. 3]
+*** Exercise 4.10
+#+begin_quote
+By using data abstraction, we were able to write an ~eval~ procedure
+that is independent of the particular syntax of the language to be
+evaluated.  To illustrate this, design and implement a new syntax for
+Scheme by modifying the procedures in this section, without changing
+~eval~ or ~apply~.
+#+end_quote
+
+*Answer*:
+A couple of examples:
+#+begin_src scheme
+  ;; 'quotation instead of 'quote
+  (define (quoted? exp)
+    (tagged-list? exp 'quotation))
+
+  (define (text-of-quotation exp) (cadr exp))
+
+  ;; (assign! <value> <exp>) instead of (set! <exp> <val>)
+  (define (assignment? exp)
+    (tagged-list? exp 'assing!))
+
+  (define (assignment-variable exp) (caddr exp))
+
+  (define (assignment-value exp) (cadr exp))
+#+end_src
+
+
+#+begin_export html
+<div style="text-align: center;">
+<a href="./posts.html">←</a>
+</div>
+#+end_export
