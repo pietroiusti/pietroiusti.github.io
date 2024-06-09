@@ -30,7 +30,7 @@ complexity in engineering design; we can often enhance our ability to
 deal with a complex problem by adopting a new language that enables us
 to describe (and hence to think about) the problem in a different way,
 using primitives, means of combination, and means of abstraction that
-are particularly well suited to the problem at hand.
+are particularly well suited to the problem at hand. (359)
 #+end_quote
 
 In computer programming, not only new languages can be formulated;
@@ -51,7 +51,7 @@ programmers.  We come to see ourselves as designers of languages,
 rather than only users of languages designed by others.
 
 In fact, we can regard almost any program as the evaluator for some
-language.
+language. (360)
 #+end_quote
 
 From a certain perspective,
@@ -59,7 +59,7 @@ From a certain perspective,
 the technology for coping with large-scale computer systems merges
 with the technology for building new computer languages, and computer
 science itself becomes no more (and no less) than the discipline of
-constructing appropriate descriptive languages.
+constructing appropriate descriptive languages. (361)
 #+end_quote
 
 That's the technology this chapter explores. More precisely: the
@@ -86,14 +86,14 @@ Recall that the model has two basic parts...
 [...]
 
 The implementation of the evaluator will depend upon procedures that
-define the "syntax" of the expressions to be evaluated.
+define the "syntax" of the expressions to be evaluated. (363)
 #+end_quote
 
 *** 4.1.1 The Core of the Evaluator
 ``Abstract syntax'':
 #+begin_quote
 Each type of expression has a predicate that tests for it and an
-abstract means for selecting its parts.
+abstract means for selecting its parts. (364)
 #+end_quote
 
 - Primitive expressions

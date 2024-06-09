@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-06-09 Sun 23:30 -->
+<!-- 2024-06-09 Sun 23:56 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 4.1.1 and 4.1.2</title>
@@ -201,9 +201,9 @@
 <span class="subtitle">2024-06-09 Sun</span>
 </h1>
 
-<div id="outline-container-orgdd4a854" class="outline-2">
-<h2 id="orgdd4a854">4 Metalinguistic abstraction</h2>
-<div class="outline-text-2" id="text-orgdd4a854">
+<div id="outline-container-org7371d54" class="outline-2">
+<h2 id="org7371d54">4 Metalinguistic abstraction</h2>
+<div class="outline-text-2" id="text-org7371d54">
 <p>
 We have seen several techniques that programmers can use to tame
 complexity. So far we have used the Lisp language. But, as complexity
@@ -219,7 +219,7 @@ complexity in engineering design; we can often enhance our ability to
 deal with a complex problem by adopting a new language that enables us
 to describe (and hence to think about) the problem in a different way,
 using primitives, means of combination, and means of abstraction that
-are particularly well suited to the problem at hand.
+are particularly well suited to the problem at hand. (359)
 </p>
 </blockquote>
 
@@ -250,7 +250,7 @@ rather than only users of languages designed by others.
 
 <p>
 In fact, we can regard almost any program as the evaluator for some
-language.
+language. (360)
 </p>
 </blockquote>
 
@@ -262,7 +262,7 @@ From a certain perspective,
 the technology for coping with large-scale computer systems merges
 with the technology for building new computer languages, and computer
 science itself becomes no more (and no less) than the discipline of
-constructing appropriate descriptive languages.
+constructing appropriate descriptive languages. (361)
 </p>
 </blockquote>
 
@@ -275,9 +275,9 @@ Scheme dialect).
 </p>
 </div>
 
-<div id="outline-container-orga5a7a6c" class="outline-3">
-<h3 id="orga5a7a6c">4.1 The Metacircular evaluator</h3>
-<div class="outline-text-3" id="text-orga5a7a6c">
+<div id="outline-container-org4ff6a8b" class="outline-3">
+<h3 id="org4ff6a8b">4.1 The Metacircular evaluator</h3>
+<div class="outline-text-3" id="text-org4ff6a8b">
 <blockquote>
 <p>
 An evaluator that is written in the same language that it evaluates is
@@ -306,21 +306,21 @@ Recall that the model has two basic parts&#x2026;
 
 <p>
 The implementation of the evaluator will depend upon procedures that
-define the "syntax" of the expressions to be evaluated.
+define the "syntax" of the expressions to be evaluated. (363)
 </p>
 </blockquote>
 </div>
 
-<div id="outline-container-orgba024b9" class="outline-4">
-<h4 id="orgba024b9">4.1.1 The Core of the Evaluator</h4>
-<div class="outline-text-4" id="text-orgba024b9">
+<div id="outline-container-org5942821" class="outline-4">
+<h4 id="org5942821">4.1.1 The Core of the Evaluator</h4>
+<div class="outline-text-4" id="text-org5942821">
 <p>
 ``Abstract syntax'':
 </p>
 <blockquote>
 <p>
 Each type of expression has a predicate that tests for it and an
-abstract means for selecting its parts.
+abstract means for selecting its parts. (364)
 </p>
 </blockquote>
 
@@ -448,9 +448,9 @@ The rest:
 </div>
 </div>
 
-<div id="outline-container-orge8367a1" class="outline-4">
-<h4 id="orge8367a1">Exercise 4.1</h4>
-<div class="outline-text-4" id="text-orge8367a1">
+<div id="outline-container-org6c0529f" class="outline-4">
+<h4 id="org6c0529f">Exercise 4.1</h4>
+<div class="outline-text-4" id="text-org6c0529f">
 <p>
 <b>Exercise</b>:
 </p>
@@ -538,9 +538,9 @@ shouldn't it?
 </div>
 </div>
 
-<div id="outline-container-org42735e9" class="outline-4">
-<h4 id="org42735e9">4.1.2 Representing Expressions</h4>
-<div class="outline-text-4" id="text-org42735e9">
+<div id="outline-container-orgffeacb1" class="outline-4">
+<h4 id="orgffeacb1">4.1.2 Representing Expressions</h4>
+<div class="outline-text-4" id="text-orgffeacb1">
 <p>
 Authors presents the ``specification of the syntax'' of the language:
 </p>
@@ -683,9 +683,9 @@ can be transformed into an <code>if</code> expression.
 </div>
 </div>
 
-<div id="outline-container-org1b5a940" class="outline-4">
-<h4 id="org1b5a940">Exercise 4.2:</h4>
-<div class="outline-text-4" id="text-org1b5a940">
+<div id="outline-container-orgbccd9e0" class="outline-4">
+<h4 id="orgbccd9e0">Exercise 4.2:</h4>
+<div class="outline-text-4" id="text-orgbccd9e0">
 <p>
 <b>Exercise</b>:
 </p>
@@ -774,9 +774,9 @@ given that <code>x</code> hasn't been defined, we shouldn't be looking it up.
 </div>
 </div>
 
-<div id="outline-container-org6abda7e" class="outline-4">
-<h4 id="org6abda7e">Exercise 4.3</h4>
-<div class="outline-text-4" id="text-org6abda7e">
+<div id="outline-container-orgeb8f26e" class="outline-4">
+<h4 id="orgeb8f26e">Exercise 4.3</h4>
+<div class="outline-text-4" id="text-orgeb8f26e">
 <p>
 <b>Exercise</b>:
 </p>
@@ -829,9 +829,9 @@ I think the code would look like something like this:
 </div>
 </div>
 
-<div id="outline-container-org172eec6" class="outline-4">
-<h4 id="org172eec6">Exercise 4.4</h4>
-<div class="outline-text-4" id="text-org172eec6">
+<div id="outline-container-orgcee5890" class="outline-4">
+<h4 id="orgcee5890">Exercise 4.4</h4>
+<div class="outline-text-4" id="text-orgcee5890">
 <p>
 <b>Exercise</b>:
 </p>
@@ -901,9 +901,9 @@ and <code>or</code> as derived expressions.
 </div>
 </div>
 
-<div id="outline-container-org13bca92" class="outline-4">
-<h4 id="org13bca92">Exercise 4.5</h4>
-<div class="outline-text-4" id="text-org13bca92">
+<div id="outline-container-org069da7a" class="outline-4">
+<h4 id="org069da7a">Exercise 4.5</h4>
+<div class="outline-text-4" id="text-org069da7a">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1014,9 +1014,9 @@ extended syntax.
 </div>
 </div>
 
-<div id="outline-container-org7af1416" class="outline-4">
-<h4 id="org7af1416">Exercise 4.6</h4>
-<div class="outline-text-4" id="text-org7af1416">
+<div id="outline-container-orgb9d0cfc" class="outline-4">
+<h4 id="orgb9d0cfc">Exercise 4.6</h4>
+<div class="outline-text-4" id="text-orgb9d0cfc">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1118,9 +1118,9 @@ expressions.
 </div>
 </div>
 
-<div id="outline-container-orgd4c8e30" class="outline-4">
-<h4 id="orgd4c8e30">Exercise 4.7</h4>
-<div class="outline-text-4" id="text-orgd4c8e30">
+<div id="outline-container-org6faf2b0" class="outline-4">
+<h4 id="org6faf2b0">Exercise 4.7</h4>
+<div class="outline-text-4" id="text-org6faf2b0">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1230,9 +1230,9 @@ something?
 </div>
 </div>
 
-<div id="outline-container-org44099ac" class="outline-4">
-<h4 id="org44099ac">Exercise 4.8</h4>
-<div class="outline-text-4" id="text-org44099ac">
+<div id="outline-container-org293ae53" class="outline-4">
+<h4 id="org293ae53">Exercise 4.8</h4>
+<div class="outline-text-4" id="text-org293ae53">
 <blockquote>
 <p>
 "Named <code>let</code>" is a variant of <code>let</code> that has the form
@@ -1325,9 +1325,9 @@ into the <code>fib-iter</code> definition and call as presented in 1.2.2.
 </div>
 </div>
 
-<div id="outline-container-orgfc6955d" class="outline-4">
-<h4 id="orgfc6955d">Exercise 4.9</h4>
-<div class="outline-text-4" id="text-orgfc6955d">
+<div id="outline-container-org215b2a8" class="outline-4">
+<h4 id="org215b2a8">Exercise 4.9</h4>
+<div class="outline-text-4" id="text-org215b2a8">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1447,9 +1447,9 @@ necessary. See p. 221 fn. 3]
 </p>
 </div>
 </div>
-<div id="outline-container-orge884c17" class="outline-4">
-<h4 id="orge884c17">Exercise 4.10</h4>
-<div class="outline-text-4" id="text-orge884c17">
+<div id="outline-container-org6f77757" class="outline-4">
+<h4 id="org6f77757">Exercise 4.10</h4>
+<div class="outline-text-4" id="text-org6f77757">
 <blockquote>
 <p>
 By using data abstraction, we were able to write an <code>eval</code> procedure
