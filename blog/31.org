@@ -841,6 +841,7 @@ sufficient, in the same way we do for ~cond~. Or am I missing
 something?
 
 *** Exercise 4.8
+*Exercise*:
 #+begin_quote
 "Named ~let~" is a variant of ~let~ that has the form
 
@@ -1013,6 +1014,7 @@ Now ~while~ can be handled as a derived expression by the evaluator:
 [comment from the future: the begin in ~gp-while~ should not be
 necessary. See p. 221 fn. 3]
 *** Exercise 4.10
+*Exercise*:
 #+begin_quote
 By using data abstraction, we were able to write an ~eval~ procedure
 that is independent of the particular syntax of the language to be
