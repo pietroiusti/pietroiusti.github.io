@@ -1040,10 +1040,3 @@ A couple of examples:
 
   (define (assignment-value exp) (cadr exp))
 #+end_src
-
-
-#+begin_export html
-<div style="text-align: center;">
-<a href="./posts.html">←</a>
-</div>
-#+end_export

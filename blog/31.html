@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-06-09 Sun 23:59 -->
+<!-- 2024-06-16 Sun 23:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 4.1.1 and 4.1.2</title>
@@ -201,9 +201,9 @@
 <span class="subtitle">2024-06-09 Sun</span>
 </h1>
 
-<div id="outline-container-org264002e" class="outline-2">
-<h2 id="org264002e">4 Metalinguistic abstraction</h2>
-<div class="outline-text-2" id="text-org264002e">
+<div id="outline-container-orgff2e482" class="outline-2">
+<h2 id="orgff2e482">4 Metalinguistic abstraction</h2>
+<div class="outline-text-2" id="text-orgff2e482">
 <p>
 We have seen several techniques that programmers can use to tame
 complexity. So far we have used the Lisp language. But, as complexity
@@ -275,9 +275,9 @@ Scheme dialect).
 </p>
 </div>
 
-<div id="outline-container-org4735d37" class="outline-3">
-<h3 id="org4735d37">4.1 The Metacircular evaluator</h3>
-<div class="outline-text-3" id="text-org4735d37">
+<div id="outline-container-orgf5ff1ab" class="outline-3">
+<h3 id="orgf5ff1ab">4.1 The Metacircular evaluator</h3>
+<div class="outline-text-3" id="text-orgf5ff1ab">
 <blockquote>
 <p>
 An evaluator that is written in the same language that it evaluates is
@@ -311,9 +311,9 @@ define the "syntax" of the expressions to be evaluated. (363)
 </blockquote>
 </div>
 
-<div id="outline-container-org21e127e" class="outline-4">
-<h4 id="org21e127e">4.1.1 The Core of the Evaluator</h4>
-<div class="outline-text-4" id="text-org21e127e">
+<div id="outline-container-orgfb31030" class="outline-4">
+<h4 id="orgfb31030">4.1.1 The Core of the Evaluator</h4>
+<div class="outline-text-4" id="text-orgfb31030">
 <p>
 ``Abstract syntax'':
 </p>
@@ -370,8 +370,8 @@ computer language.
 Here is <code>eval</code>:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
-  (<span style="color: #b6a0ff;">cond</span> ((self-evaluating? exp) exp)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval</span> exp env)
+  (<span style="color: #531ab6;">cond</span> ((self-evaluating? exp) exp)
         ((variable? exp) (lookup-variable-value exp env))
         ((quoted? exp) (text-of-quotation exp))
         ((assignment? exp) (eval-assignment exp env))
@@ -387,8 +387,8 @@ Here is <code>eval</code>:
         ((application? exp)
          (apply (eval (operator exp) env)
                 (list-of-values (operands exp) env)))
-        (<span style="color: #b6a0ff;">else</span>
-         (error <span style="color: #79a8ff;">"Unknown expression type -- EVAL"</span> exp))))
+        (<span style="color: #531ab6;">else</span>
+         (error <span style="color: #3548cf;">"Unknown expression type -- EVAL"</span> exp))))
 </pre>
 </div>
 
@@ -396,8 +396,8 @@ Here is <code>eval</code>:
 Here is <code>apply</code>:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">apply</span> procedure arguments)
-  (<span style="color: #b6a0ff;">cond</span> ((primitive-procedure? procedure)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply</span> procedure arguments)
+  (<span style="color: #531ab6;">cond</span> ((primitive-procedure? procedure)
          (apply-primitive-procedure procedure arguments))
         ((compound-procedure? procedure)
          (eval-sequence
@@ -406,9 +406,9 @@ Here is <code>apply</code>:
            (procedure-parameters procedure)
            arguments
            (procedure-environment procedure))))
-        (<span style="color: #b6a0ff;">else</span>
+        (<span style="color: #531ab6;">else</span>
          (error
-          <span style="color: #79a8ff;">"Unknown procedure type -- APPLY"</span> procedure))))
+          <span style="color: #3548cf;">"Unknown procedure type -- APPLY"</span> procedure))))
 </pre>
 </div>
 
@@ -416,29 +416,29 @@ Here is <code>apply</code>:
 The rest:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values</span> exps env)
-  (<span style="color: #b6a0ff;">if</span> (no-operands? exps)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-values</span> exps env)
+  (<span style="color: #531ab6;">if</span> (no-operands? exps)
       '()
       (cons (eval (first-operand exps) env)
             (list-of-values (rest-operands exps) env))))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-if</span> exp env)
-  (<span style="color: #b6a0ff;">if</span> (true? (eval (if-predicate exp) env))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-if</span> exp env)
+  (<span style="color: #531ab6;">if</span> (true? (eval (if-predicate exp) env))
       (eval (if-consequent exp) env)
       (eval (if-alternative exp) env)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-sequence</span> exps env)
-  (<span style="color: #b6a0ff;">cond</span> ((last-exp? exps) (eval (first-exp exps) env))
-        (<span style="color: #b6a0ff;">else</span> (eval (first-exp exps) env)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-sequence</span> exps env)
+  (<span style="color: #531ab6;">cond</span> ((last-exp? exps) (eval (first-exp exps) env))
+        (<span style="color: #531ab6;">else</span> (eval (first-exp exps) env)
               (eval-sequence (rest-exps exps) env))))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-assignment</span> exp env)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-assignment</span> exp env)
   (set-variable-value! (assignment-variable exp)
                        (eval (assignment-value exp) env)
                        env)
   'ok)
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-definition</span> exp env)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-definition</span> exp env)
   (define-variable! (definition-variable exp)
     (eval (definition-value exp) env)
     env)
@@ -448,9 +448,9 @@ The rest:
 </div>
 </div>
 
-<div id="outline-container-org3b597e8" class="outline-4">
-<h4 id="org3b597e8">Exercise 4.1</h4>
-<div class="outline-text-4" id="text-org3b597e8">
+<div id="outline-container-org3c75410" class="outline-4">
+<h4 id="org3c75410">Exercise 4.1</h4>
+<div class="outline-text-4" id="text-org3c75410">
 <p>
 <b>Exercise</b>:
 </p>
@@ -482,14 +482,14 @@ Looking at the solutions published online, this is the widespread
 approach:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">left to right</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values</span> exps env)
-  (<span style="color: #b6a0ff;">if</span> (no-operands? exps)
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">left to right</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-values</span> exps env)
+  (<span style="color: #531ab6;">if</span> (no-operands? exps)
       '()
-      (<span style="color: #b6a0ff;">let</span> ((fst (eval (first-operand exps) env)))
+      (<span style="color: #531ab6;">let</span> ((fst (eval (first-operand exps) env)))
         (cons fst
               (list-of-values (rest-operands exps) env)))))
-<span style="color: #989898;">;; </span><span style="color: #989898;">see, for example: https://youtu.be/eoNyHC_cM7w?list=PLVFrD1dmDdvdvWFK8brOVNL7bKHpE-9w0</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">see, for example: https://youtu.be/eoNyHC_cM7w?list=PLVFrD1dmDdvdvWFK8brOVNL7bKHpE-9w0</span>
 </pre>
 </div>
 
@@ -497,13 +497,13 @@ approach:
 Analogously, but without using <code>let</code> (which is just syntactic sugar):
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values-left</span> exp env)
-  (<span style="color: #b6a0ff;">if</span> (no-operands? exp)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-values-left</span> exp env)
+  (<span style="color: #531ab6;">if</span> (no-operands? exp)
       '()
-      ((<span style="color: #b6a0ff;">lambda</span> (first-value)
+      ((<span style="color: #531ab6;">lambda</span> (first-value)
          (cons first-value (list-of-values-left (rest-operands-exps) env)))
        (eval (first-operand exps) env))))
-<span style="color: #989898;">;; </span><span style="color: #989898;">found here: https://github.com/cmccloud/SICP/blob/master/exercise-4.1.scm</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">found here: https://github.com/cmccloud/SICP/blob/master/exercise-4.1.scm</span>
 </pre>
 </div>
 
@@ -512,21 +512,21 @@ My solution was a bit more&#x2026; complex. But it should count as valid,
 shouldn't it?
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">list-of-values</span> exps env)
-  <span style="color: #989898;">;; </span><span style="color: #989898;">return exps as they are except for the nth exp which is evaluated</span>
-  <span style="color: #989898;">;; </span><span style="color: #989898;">as an operand</span>
-  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-nth-operand</span> exps env n)
-    (<span style="color: #b6a0ff;">cond</span> ((no-operands? exps)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-values</span> exps env)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">return exps as they are except for the nth exp which is evaluated</span>
+  <span style="color: #595959;">;; </span><span style="color: #595959;">as an operand</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-nth-operand</span> exps env n)
+    (<span style="color: #531ab6;">cond</span> ((no-operands? exps)
            '())
           ((= n 0)
            (cons (eval (first-operand exps) env)
                  (cdr exps)))
-          (<span style="color: #b6a0ff;">else</span> (cons (car exps)
+          (<span style="color: #531ab6;">else</span> (cons (car exps)
                       (eval-nth-operand (cdr exps) env (- n 1))))))
 
-  <span style="color: #989898;">;; </span><span style="color: #989898;">iteratively call eval-nth-operand for each exp</span>
-  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">iter</span> exps env count)
-    (<span style="color: #b6a0ff;">if</span> (= count (length exps))
+  <span style="color: #595959;">;; </span><span style="color: #595959;">iteratively call eval-nth-operand for each exp</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">iter</span> exps env count)
+    (<span style="color: #531ab6;">if</span> (= count (length exps))
         exps
         (iter (eval-nth-operand exps env count)
               env
@@ -538,111 +538,111 @@ shouldn't it?
 </div>
 </div>
 
-<div id="outline-container-org1ac18a9" class="outline-4">
-<h4 id="org1ac18a9">4.1.2 Representing Expressions</h4>
-<div class="outline-text-4" id="text-org1ac18a9">
+<div id="outline-container-orgf94614e" class="outline-4">
+<h4 id="orgf94614e">4.1.2 Representing Expressions</h4>
+<div class="outline-text-4" id="text-orgf94614e">
 <p>
 Authors presents the ``specification of the syntax'' of the language:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">self-evaluating?</span> exp)
-  (<span style="color: #b6a0ff;">cond</span> ((number? exp) true)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">self-evaluating?</span> exp)
+  (<span style="color: #531ab6;">cond</span> ((number? exp) true)
         ((string? exp) true)
-        (<span style="color: #b6a0ff;">else</span> false)))
+        (<span style="color: #531ab6;">else</span> false)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">variable?</span> exp) (symbol? exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">variable?</span> exp) (symbol? exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">quoted?</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">quoted?</span> exp)
   (tagged-list? exp 'quote))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">text-of-quotation</span> exp) (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">text-of-quotation</span> exp) (cadr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
-  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tagged-list?</span> exp tag)
+  (<span style="color: #531ab6;">if</span> (pair? exp)
       (eq? (car exp) tag)
       false))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment?</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment?</span> exp)
   (tagged-list? exp 'set!))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-variable</span> exp) (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment-variable</span> exp) (cadr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-value</span> exp) (caddr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment-value</span> exp) (caddr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">definition?</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">definition?</span> exp)
   (tagged-list? exp 'define))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">definition-variable</span> exp)
-  (<span style="color: #b6a0ff;">if</span> (symbol? (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">definition-variable</span> exp)
+  (<span style="color: #531ab6;">if</span> (symbol? (cadr exp))
       (cadr exp)
       (caadr exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">definition-value</span> exp)
-  (<span style="color: #b6a0ff;">if</span> (symbol? (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">definition-value</span> exp)
+  (<span style="color: #531ab6;">if</span> (symbol? (cadr exp))
       (caddr exp)
-      (make-lambda (cdadr exp)   <span style="color: #989898;">; </span><span style="color: #989898;">formal parameters</span>
-                   (cddr exp)))) <span style="color: #989898;">; </span><span style="color: #989898;">body</span>
+      (make-lambda (cdadr exp)   <span style="color: #595959;">; </span><span style="color: #595959;">formal parameters</span>
+                   (cddr exp)))) <span style="color: #595959;">; </span><span style="color: #595959;">body</span>
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda?</span> exp) (tagged-list? exp 'lambda))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda?</span> exp) (tagged-list? exp 'lambda))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-parameters</span> exp) (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda-parameters</span> exp) (cadr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-body</span> exp) (cddr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda-body</span> exp) (cddr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda?</span> exp) (tagged-list? exp 'lambda))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda?</span> exp) (tagged-list? exp 'lambda))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-parameters</span> exp) (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda-parameters</span> exp) (cadr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">lambda-body</span> exp) (cddr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda-body</span> exp) (cddr exp))
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">Authors provide a constructor as well:</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-lambda</span> parameters body)
+<span style="color: #595959;">;; </span><span style="color: #595959;">Authors provide a constructor as well:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-lambda</span> parameters body)
   (cons 'lambda (cons parameters body)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if?</span> exp) (tagged-list? exp 'if))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if?</span> exp) (tagged-list? exp 'if))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if-predicate</span> exp) (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if-predicate</span> exp) (cadr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if-consequent</span> exp) (caddr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if-consequent</span> exp) (caddr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">if-alternative</span> exp)
-  (<span style="color: #b6a0ff;">if</span> (not (null? (cdddr exp)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if-alternative</span> exp)
+  (<span style="color: #531ab6;">if</span> (not (null? (cdddr exp)))
       (cadddr exp)
       'false))
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">Authors provide a constructor as well:</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-if</span> predicate consequent alternative)
+<span style="color: #595959;">;; </span><span style="color: #595959;">Authors provide a constructor as well:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-if</span> predicate consequent alternative)
   (list 'if predicate consequent alternative))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin?</span> exp) (tagged-list? exp 'begin))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">begin?</span> exp) (tagged-list? exp 'begin))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin-actions</span> exp) (cdr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">begin-actions</span> exp) (cdr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">last-exp?</span> seq) (null? (cdr seq)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">last-exp?</span> seq) (null? (cdr seq)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">first-exp</span> seq) (car seq))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-exp</span> seq) (car seq))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">rest-exps</span> seq) (cdr seq))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rest-exps</span> seq) (cdr seq))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">sequence-&gt;exp</span> seq)
-  (<span style="color: #b6a0ff;">cond</span> ((null? seq) seq)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">sequence-&gt;exp</span> seq)
+  (<span style="color: #531ab6;">cond</span> ((null? seq) seq)
         ((last-exp? seq) (first-exp seq))
-        (<span style="color: #b6a0ff;">else</span> (make-begin seq))))
+        (<span style="color: #531ab6;">else</span> (make-begin seq))))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-begin</span> seq) (cons 'begin seq))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-begin</span> seq) (cons 'begin seq))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">application?</span> exp) (pair? exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">application?</span> exp) (pair? exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operator</span> exp) (car exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operator</span> exp) (car exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operands</span> exp) (cdr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operands</span> exp) (cdr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">no-operands?</span> ops) (null? ops))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">no-operands?</span> ops) (null? ops))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">first-operand</span> ops) (car ops))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-operand</span> ops) (car ops))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">rest-operands</span> ops) (cdr ops))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rest-operands</span> ops) (cdr ops))
 </pre>
 </div>
 
@@ -651,29 +651,29 @@ Certain expression are ``derived''. <code>Cond</code> is one of them, since it
 can be transformed into an <code>if</code> expression.
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond?</span> exp) (tagged-list? exp 'cond))
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond?</span> exp) (tagged-list? exp 'cond))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-clauses</span> exp) (cdr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-clauses</span> exp) (cdr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-else-clause?</span> clause)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-else-clause?</span> clause)
   (eq? (cond-predicate clause) 'else))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-predicate</span> clause) (car clause))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-predicate</span> clause) (car clause))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-actions</span> clause) (cdr clause))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-actions</span> clause) (cdr clause))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-&gt;if</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-&gt;if</span> exp)
   (expand-clauses (cond-clauses exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">expand-clauses</span> clauses)
-  (<span style="color: #b6a0ff;">if</span> (null? clauses)
-      'false                          <span style="color: #989898;">; </span><span style="color: #989898;">no `else' clause</span>
-      (<span style="color: #b6a0ff;">let</span> ((first (car clauses))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">expand-clauses</span> clauses)
+  (<span style="color: #531ab6;">if</span> (null? clauses)
+      'false                          <span style="color: #595959;">; </span><span style="color: #595959;">no `else' clause</span>
+      (<span style="color: #531ab6;">let</span> ((first (car clauses))
             (rest (cdr clauses)))
-        (<span style="color: #b6a0ff;">if</span> (cond-else-clause? first)
-            (<span style="color: #b6a0ff;">if</span> (null? rest)
+        (<span style="color: #531ab6;">if</span> (cond-else-clause? first)
+            (<span style="color: #531ab6;">if</span> (null? rest)
                 (sequence-&gt;exp (cond-actions first))
-                (error <span style="color: #79a8ff;">"ELSE clause isn't last -- COND-&gt;IF"</span>
+                (error <span style="color: #3548cf;">"ELSE clause isn't last -- COND-&gt;IF"</span>
                        clauses))
             (make-if (cond-predicate first)
                      (sequence-&gt;exp (cond-actions first))
@@ -683,9 +683,9 @@ can be transformed into an <code>if</code> expression.
 </div>
 </div>
 
-<div id="outline-container-org07c5f71" class="outline-4">
-<h4 id="org07c5f71">Exercise 4.2:</h4>
-<div class="outline-text-4" id="text-org07c5f71">
+<div id="outline-container-org22f6324" class="outline-4">
+<h4 id="org22f6324">Exercise 4.2:</h4>
+<div class="outline-text-4" id="text-org22f6324">
 <p>
 <b>Exercise</b>:
 </p>
@@ -760,13 +760,13 @@ given that <code>x</code> hasn't been defined, we shouldn't be looking it up.
 <b>b)</b> This should be enough as far as I can see:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">application?</span> exp)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">application?</span> exp)
   (tagged-list exp 'call))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operator</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operator</span> exp)
   (cadr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">operands</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operands</span> exp)
   (cddr exp))
 </pre>
 </div></li>
@@ -774,9 +774,9 @@ given that <code>x</code> hasn't been defined, we shouldn't be looking it up.
 </div>
 </div>
 
-<div id="outline-container-orga1cae97" class="outline-4">
-<h4 id="orga1cae97">Exercise 4.3</h4>
-<div class="outline-text-4" id="text-orga1cae97">
+<div id="outline-container-org83d4296" class="outline-4">
+<h4 id="org83d4296">Exercise 4.3</h4>
+<div class="outline-text-4" id="text-org83d4296">
 <p>
 <b>Exercise</b>:
 </p>
@@ -799,39 +799,39 @@ I think the code would look like something like this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">type-tag</span> datum) <span style="color: #989898;">;; </span><span style="color: #989898;">p. 176</span>
-  (<span style="color: #b6a0ff;">if</span> (pair? datum)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">type-tag</span> datum) <span style="color: #595959;">;; </span><span style="color: #595959;">p. 176</span>
+  (<span style="color: #531ab6;">if</span> (pair? datum)
       (car datum)
-      (error <span style="color: #79a8ff;">"Bad tagged datum -- TYPE-TAG"</span> datum)))
+      (error <span style="color: #3548cf;">"Bad tagged datum -- TYPE-TAG"</span> datum)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">contents</span> datum) <span style="color: #989898;">;; </span><span style="color: #989898;">p. 176</span>
-  (<span style="color: #b6a0ff;">if</span> (pair? datum)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">contents</span> datum) <span style="color: #595959;">;; </span><span style="color: #595959;">p. 176</span>
+  (<span style="color: #531ab6;">if</span> (pair? datum)
       (cdr datum)
-      (error <span style="color: #79a8ff;">"Bad tagged datum -- CONTENTS"</span> datum)))
+      (error <span style="color: #3548cf;">"Bad tagged datum -- CONTENTS"</span> datum)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
-  (<span style="color: #b6a0ff;">let</span> ((tag (type-tag exp)))
-    (<span style="color: #b6a0ff;">let</span> ((proc (get 'eval tag))
-          (<span style="color: #b6a0ff;">if</span> proc
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval</span> exp env)
+  (<span style="color: #531ab6;">let</span> ((tag (type-tag exp)))
+    (<span style="color: #531ab6;">let</span> ((proc (get 'eval tag))
+          (<span style="color: #531ab6;">if</span> proc
               (apply proc (list contents env))
-              (error <span style="color: #79a8ff;">"no proc found"</span>))))))
+              (error <span style="color: #3548cf;">"no proc found"</span>))))))
 
 (put 'eval
      'self-evaluating
-     (<span style="color: #b6a0ff;">lambda</span> (exp env) exp))
+     (<span style="color: #531ab6;">lambda</span> (exp env) exp))
 
 (put 'eval
      'variable
      lookup-variable-value))
-<span style="color: #989898;">;; </span><span style="color: #989898;">etc.</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">etc.</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb46cd19" class="outline-4">
-<h4 id="orgb46cd19">Exercise 4.4</h4>
-<div class="outline-text-4" id="text-orgb46cd19">
+<div id="outline-container-orgaee23d0" class="outline-4">
+<h4 id="orgaee23d0">Exercise 4.4</h4>
+<div class="outline-text-4" id="text-orgaee23d0">
 <p>
 <b>Exercise</b>:
 </p>
@@ -868,32 +868,32 @@ and <code>or</code> as derived expressions.
 <b>Answer</b>:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">syntax procedures</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">and?</span> exp)
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">syntax procedures</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">and?</span> exp)
   (tagged-list exp 'and))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">or?</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">or?</span> exp)
   (tagged-list exp 'and))
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">evaluation procedures</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-and</span> exp env)
-  (<span style="color: #b6a0ff;">if</span> (null? (conjuncts exp))
+<span style="color: #595959;">;; </span><span style="color: #595959;">evaluation procedures</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-and</span> exp env)
+  (<span style="color: #531ab6;">if</span> (null? (conjuncts exp))
       true
-      (<span style="color: #b6a0ff;">let</span> ((1st-evaluated-conjunct
+      (<span style="color: #531ab6;">let</span> ((1st-evaluated-conjunct
              (eval (1st-conjunct exp) env)))
-        (<span style="color: #b6a0ff;">if</span> (false? 1st-evaluated-conjunct)
+        (<span style="color: #531ab6;">if</span> (false? 1st-evaluated-conjunct)
             false
-            (<span style="color: #b6a0ff;">let</span> ((rest (rest-conjuncts exp)))
-              (<span style="color: #b6a0ff;">if</span> (null? rest)
+            (<span style="color: #531ab6;">let</span> ((rest (rest-conjuncts exp)))
+              (<span style="color: #531ab6;">if</span> (null? rest)
                   1st-evaluated-conjunct
                   (eval-and (cons 'and rest) env)))))))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval-or</span> exp env)
-  (<span style="color: #b6a0ff;">if</span> (null? (disjuncts exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-or</span> exp env)
+  (<span style="color: #531ab6;">if</span> (null? (disjuncts exp))
       false
-      (<span style="color: #b6a0ff;">let</span> ((1st-evaluated-disjunct
+      (<span style="color: #531ab6;">let</span> ((1st-evaluated-disjunct
              (eval (1st-disjunct exp) env)))
-        (<span style="color: #b6a0ff;">if</span> (true? 1st-evaluated-disjunct)
+        (<span style="color: #531ab6;">if</span> (true? 1st-evaluated-disjunct)
             1st-evaluated-disjunct
             (eval-or (cons 'or (rest-disjuncts exp)) env)))))
 </pre>
@@ -901,9 +901,9 @@ and <code>or</code> as derived expressions.
 </div>
 </div>
 
-<div id="outline-container-org1041c24" class="outline-4">
-<h4 id="org1041c24">Exercise 4.5</h4>
-<div class="outline-text-4" id="text-org1041c24">
+<div id="outline-container-org1b8c51c" class="outline-4">
+<h4 id="org1b8c51c">Exercise 4.5</h4>
+<div class="outline-text-4" id="text-org1b8c51c">
 <p>
 <b>Exercise</b>:
 </p>
@@ -917,8 +917,8 @@ is returned as the value of the `cond' expression.  For example
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">cond</span> ((assoc 'b '((a 1) (b 2))) =&gt; cadr)
-(<span style="color: #b6a0ff;">else</span> false))
+<pre class="src src-scheme">(<span style="color: #531ab6;">cond</span> ((assoc 'b '((a 1) (b 2))) =&gt; cadr)
+(<span style="color: #531ab6;">else</span> false))
 </pre>
 </div>
 
@@ -934,89 +934,89 @@ extended syntax.
 
 <div class="org-src-container">
 <pre class="src src-scheme">#lang sicp
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
-  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tagged-list?</span> exp tag)
+  (<span style="color: #531ab6;">if</span> (pair? exp)
       (eq? (car exp) tag)
       false))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin?</span> exp) (tagged-list? exp 'begin))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">begin?</span> exp) (tagged-list? exp 'begin))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">begin-actions</span> exp) (cdr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">begin-actions</span> exp) (cdr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">last-exp?</span> seq) (null? (cdr seq)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">last-exp?</span> seq) (null? (cdr seq)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">first-exp</span> seq) (car seq))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-exp</span> seq) (car seq))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">rest-exps</span> seq) (cdr seq))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rest-exps</span> seq) (cdr seq))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">sequence-&gt;exp</span> seq)
-  (<span style="color: #b6a0ff;">cond</span> ((null? seq) seq)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">sequence-&gt;exp</span> seq)
+  (<span style="color: #531ab6;">cond</span> ((null? seq) seq)
         ((last-exp? seq) (first-exp seq))
-        (<span style="color: #b6a0ff;">else</span> (make-begin seq))))
+        (<span style="color: #531ab6;">else</span> (make-begin seq))))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">sequence-&gt;exp2</span> seq)
-  (<span style="color: #b6a0ff;">cond</span> ((null? seq) seq)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">sequence-&gt;exp2</span> seq)
+  (<span style="color: #531ab6;">cond</span> ((null? seq) seq)
         ((last-exp? seq) (first-exp seq))
-        (<span style="color: #b6a0ff;">else</span> (make-begin seq))))
+        (<span style="color: #531ab6;">else</span> (make-begin seq))))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-begin</span> seq) (cons 'begin seq))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-begin</span> seq) (cons 'begin seq))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond?</span> exp) (tagged-list? exp 'cond))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond?</span> exp) (tagged-list? exp 'cond))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-clauses</span> exp) (cdr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-clauses</span> exp) (cdr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-else-clause?</span> clause)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-else-clause?</span> clause)
   (eq? (cond-predicate clause) 'else))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-predicate</span> clause) (car clause))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-predicate</span> clause) (car clause))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-actions</span> clause) (cdr clause))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-actions</span> clause) (cdr clause))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">alternative-cond-actions</span> clause)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">alternative-cond-actions</span> clause)
   (list (caddr clause) (car clause)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">cond-&gt;if</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-&gt;if</span> exp)
   (expand-clauses (cond-clauses exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">make-if</span> predicate consequent alternative)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-if</span> predicate consequent alternative)
   (list 'if predicate consequent alternative))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">alternative-cond?</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">alternative-cond?</span> exp)
   (eq? (cadr exp) '=&gt;))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">expand-clauses</span> clauses)
-  (<span style="color: #b6a0ff;">if</span> (null? clauses)
-      'false                          <span style="color: #989898;">; </span><span style="color: #989898;">no `else' clause</span>
-      (<span style="color: #b6a0ff;">let</span> ((first (car clauses))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">expand-clauses</span> clauses)
+  (<span style="color: #531ab6;">if</span> (null? clauses)
+      'false                          <span style="color: #595959;">; </span><span style="color: #595959;">no `else' clause</span>
+      (<span style="color: #531ab6;">let</span> ((first (car clauses))
             (rest (cdr clauses)))
-        (<span style="color: #b6a0ff;">if</span> (cond-else-clause? first)
-            (<span style="color: #b6a0ff;">if</span> (null? rest)
-                (<span style="color: #b6a0ff;">if</span> (alternative-cond? first)
+        (<span style="color: #531ab6;">if</span> (cond-else-clause? first)
+            (<span style="color: #531ab6;">if</span> (null? rest)
+                (<span style="color: #531ab6;">if</span> (alternative-cond? first)
                     (alternative-cond-actions first)
                     (sequence-&gt;exp (cond-actions first)))
-                (error <span style="color: #79a8ff;">"ELSE clause isn't last -- COND-&gt;IF"</span>
+                (error <span style="color: #3548cf;">"ELSE clause isn't last -- COND-&gt;IF"</span>
                        clauses))
             (make-if (cond-predicate first)
-                     (<span style="color: #b6a0ff;">if</span> (alternative-cond? first)
+                     (<span style="color: #531ab6;">if</span> (alternative-cond? first)
                          (alternative-cond-actions first)
                          (sequence-&gt;exp (cond-actions first)))
                      (expand-clauses rest))))))
 
 (cond-&gt;if
- '(<span style="color: #b6a0ff;">cond</span> ((assoc 'b '((a 1) (b 2))) =&gt; cadr)
-        (<span style="color: #b6a0ff;">else</span> false)))
-<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
-<span style="color: #989898;">;;</span><span style="color: #989898;">(if (assoc 'b '((a 1) (b 2)))</span>
-<span style="color: #989898;">;;    </span><span style="color: #989898;">(cadr (assoc 'b '((a 1) (b 2))))</span>
-<span style="color: #989898;">;;    </span><span style="color: #989898;">false)</span>
+ '(<span style="color: #531ab6;">cond</span> ((assoc 'b '((a 1) (b 2))) =&gt; cadr)
+        (<span style="color: #531ab6;">else</span> false)))
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;;</span><span style="color: #595959;">(if (assoc 'b '((a 1) (b 2)))</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">(cadr (assoc 'b '((a 1) (b 2))))</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">false)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orga9500e0" class="outline-4">
-<h4 id="orga9500e0">Exercise 4.6</h4>
-<div class="outline-text-4" id="text-orga9500e0">
+<div id="outline-container-org642cd9a" class="outline-4">
+<h4 id="org642cd9a">Exercise 4.6</h4>
+<div class="outline-text-4" id="text-org642cd9a">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1026,8 +1026,8 @@ extended syntax.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">let</span> ((<span style="color: #6ae4b9;">&lt;VAR_1&gt;</span> <span style="color: #6ae4b9;">&lt;EXP_1&gt;</span>) ... (<span style="color: #6ae4b9;">&lt;VAR_N&gt;</span> <span style="color: #6ae4b9;">&lt;EXP_N&gt;</span>))
-  <span style="color: #6ae4b9;">&lt;BODY&gt;</span>)
+<pre class="src src-scheme">(<span style="color: #531ab6;">let</span> ((<span style="color: #005f5f;">&lt;VAR_1&gt;</span> <span style="color: #005f5f;">&lt;EXP_1&gt;</span>) ... (<span style="color: #005f5f;">&lt;VAR_N&gt;</span> <span style="color: #005f5f;">&lt;EXP_N&gt;</span>))
+  <span style="color: #005f5f;">&lt;BODY&gt;</span>)
 </pre>
 </div>
 
@@ -1036,11 +1036,11 @@ is equivalent to
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">((<span style="color: #b6a0ff;">lambda</span> (<span style="color: #6ae4b9;">&lt;VAR_1&gt;</span> ... <span style="color: #6ae4b9;">&lt;VAR_N&gt;</span>)
-   <span style="color: #6ae4b9;">&lt;BODY&gt;</span>)
- <span style="color: #6ae4b9;">&lt;EXP_1&gt;</span>
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (<span style="color: #005f5f;">&lt;VAR_1&gt;</span> ... <span style="color: #005f5f;">&lt;VAR_N&gt;</span>)
+   <span style="color: #005f5f;">&lt;BODY&gt;</span>)
+ <span style="color: #005f5f;">&lt;EXP_1&gt;</span>
  ...
- <span style="color: #6ae4b9;">&lt;EXP_N&gt;</span>)
+ <span style="color: #005f5f;">&lt;EXP_N&gt;</span>)
 </pre>
 </div>
 
@@ -1058,43 +1058,43 @@ expressions.
 
 <div class="org-src-container">
 <pre class="src src-scheme">#lang sicp
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
-  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tagged-list?</span> exp tag)
+  (<span style="color: #531ab6;">if</span> (pair? exp)
       (eq? (car exp) tag)
       false))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let?</span> exp) (tagged-list? exp 'let))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let?</span> exp) (tagged-list? exp 'let))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-vars</span> exp)
-  (<span style="color: #b6a0ff;">map</span> car (cadr exp)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-vars</span> exp)
+  (<span style="color: #531ab6;">map</span> car (cadr exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-exps</span> exp)
-  (<span style="color: #b6a0ff;">map</span> cadr (cadr exp)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-exps</span> exp)
+  (<span style="color: #531ab6;">map</span> cadr (cadr exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-body</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-body</span> exp)
   (cddr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-combination</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-combination</span> exp)
   (cons (list 'lambda
               (let-vars exp)
               (let-body exp))
         (let-exps exp)))
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">Example:</span>
-(<span style="color: #b6a0ff;">let</span> ((let-exp '(<span style="color: #b6a0ff;">let</span> ((foo (* 2 4))
+<span style="color: #595959;">;; </span><span style="color: #595959;">Example:</span>
+(<span style="color: #531ab6;">let</span> ((let-exp '(<span style="color: #531ab6;">let</span> ((foo (* 2 4))
                       (bar (* 4 6)))
                   (display foo)
                   (display bar))))
   (let-combination let-exp))
-<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
-<span style="color: #989898;">;;</span><span style="color: #989898;">((lambda (foo bar)</span>
-<span style="color: #989898;">;;   </span><span style="color: #989898;">((display foo)</span>
-<span style="color: #989898;">;;    </span><span style="color: #989898;">(display bar)))</span>
-<span style="color: #989898;">;; </span><span style="color: #989898;">(* 2 4) (* 4 6))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;;</span><span style="color: #595959;">((lambda (foo bar)</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">((display foo)</span>
+<span style="color: #595959;">;;    </span><span style="color: #595959;">(display bar)))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(* 2 4) (* 4 6))</span>
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">Modifying eval:</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
-  (<span style="color: #b6a0ff;">cond</span> ((self-evaluating? exp) exp)
+<span style="color: #595959;">;; </span><span style="color: #595959;">Modifying eval:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval</span> exp env)
+  (<span style="color: #531ab6;">cond</span> ((self-evaluating? exp) exp)
         ((variable? exp) (lookup-variable-value exp env))
         ((quoted? exp) (text-of-quotation exp))
         ((assignment? exp) (eval-assignment exp env))
@@ -1107,20 +1107,20 @@ expressions.
         ((begin? exp)
          (eval-sequence (begin-actions exp) env))
         ((cond? exp) (eval (cond-&gt;if exp) env))
-        ((let? exp) (eval (let-combination) env)) <span style="color: #989898;">;; </span><span style="color: #989898;">&lt;----------------</span>
+        ((let? exp) (eval (let-combination) env)) <span style="color: #595959;">;; </span><span style="color: #595959;">&lt;----------------</span>
         ((application? exp)
          (apply (eval (operator exp) env)
                 (list-of-values (operands exp) env)))
-        (<span style="color: #b6a0ff;">else</span>
-         (error <span style="color: #79a8ff;">"Unknown expression type -- EVAL"</span> exp))))
+        (<span style="color: #531ab6;">else</span>
+         (error <span style="color: #3548cf;">"Unknown expression type -- EVAL"</span> exp))))
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgdd39809" class="outline-4">
-<h4 id="orgdd39809">Exercise 4.7</h4>
-<div class="outline-text-4" id="text-orgdd39809">
+<div id="outline-container-orgf533380" class="outline-4">
+<h4 id="orgf533380">Exercise 4.7</h4>
+<div class="outline-text-4" id="text-orgf533380">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1133,7 +1133,7 @@ bindings are visible.  For example
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">let*</span> ((x 3)
+<pre class="src src-scheme">(<span style="color: #531ab6;">let*</span> ((x 3)
        (y (+ x 2))
        (z (+ x y 5)))
   (* x z))
@@ -1168,9 +1168,9 @@ This is the way we can translate the example given:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">let</span> (x 3)
-  (<span style="color: #b6a0ff;">let</span> (y (+ x 2))
-    (<span style="color: #b6a0ff;">let</span> (z (+ x y 5))
+<pre class="src src-scheme">(<span style="color: #531ab6;">let</span> (x 3)
+  (<span style="color: #531ab6;">let</span> (y (+ x 2))
+    (<span style="color: #531ab6;">let</span> (z (+ x y 5))
       (* x z))))
 </pre>
 </div>
@@ -1180,45 +1180,45 @@ Here is <code>let*-&gt;nested-lets</code>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-bindings</span> exp)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let*-bindings</span> exp)
   (cadr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-first-binding</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let*-first-binding</span> exp)
   (car (let*-bindings exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-rest-bindings</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let*-rest-bindings</span> exp)
   (cdr (let*-bindings exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-body</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let*-body</span> exp)
   (caddr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let*-&gt;nested-lets</span> exp)
-  (<span style="color: #b6a0ff;">cond</span> ((null? (let*-bindings exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let*-&gt;nested-lets</span> exp)
+  (<span style="color: #531ab6;">cond</span> ((null? (let*-bindings exp))
          (let*-body exp))
-        (<span style="color: #b6a0ff;">else</span> (cons 'let
+        (<span style="color: #531ab6;">else</span> (cons 'let
                     (list (list (let*-first-binding exp))
                           (let*-&gt;nested-lets
                            (cons 'let*
                                  (list (let*-rest-bindings exp)
                                        (let*-body exp)))))))))
 
-(let*-&gt;nested-lets '(<span style="color: #b6a0ff;">let*</span> ((x 3)
+(let*-&gt;nested-lets '(<span style="color: #531ab6;">let*</span> ((x 3)
                            (y (+ x 2)))
                       (* x y)))
-<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
-<span style="color: #989898;">;; </span><span style="color: #989898;">(let ((x 3))</span>
-<span style="color: #989898;">;;   </span><span style="color: #989898;">(let ((y (+ x 2)))</span>
-<span style="color: #989898;">;;     </span><span style="color: #989898;">(* x y)))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(let ((x 3))</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(let ((y (+ x 2)))</span>
+<span style="color: #595959;">;;     </span><span style="color: #595959;">(* x y)))</span>
 
-(let*-&gt;nested-lets '(<span style="color: #b6a0ff;">let*</span> ((x 3)
+(let*-&gt;nested-lets '(<span style="color: #531ab6;">let*</span> ((x 3)
                            (y (+ x 2))
                            (z (+ x y 5)))
                       (* x z)))
-<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
-<span style="color: #989898;">;; </span><span style="color: #989898;">(let ((x 3))</span>
-<span style="color: #989898;">;;   </span><span style="color: #989898;">(let ((y (+ x 2)))</span>
-<span style="color: #989898;">;;     </span><span style="color: #989898;">(let ((z (+ x y 5)))</span>
-<span style="color: #989898;">;;       </span><span style="color: #989898;">(* x z))))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(let ((x 3))</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(let ((y (+ x 2)))</span>
+<span style="color: #595959;">;;     </span><span style="color: #595959;">(let ((z (+ x y 5)))</span>
+<span style="color: #595959;">;;       </span><span style="color: #595959;">(* x z))))</span>
 </pre>
 </div>
 
@@ -1230,9 +1230,9 @@ something?
 </div>
 </div>
 
-<div id="outline-container-org949b8e5" class="outline-4">
-<h4 id="org949b8e5">Exercise 4.8</h4>
-<div class="outline-text-4" id="text-org949b8e5">
+<div id="outline-container-org8f89bf2" class="outline-4">
+<h4 id="org8f89bf2">Exercise 4.8</h4>
+<div class="outline-text-4" id="text-org8f89bf2">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1255,9 +1255,9 @@ rewritten using named <code>let</code> as follows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">fib</span> n)
-  (<span style="color: #b6a0ff;">let</span> <span style="color: #feacd0;">fib-iter</span> ((a 1) (b 0) (count n))
-    (<span style="color: #b6a0ff;">if</span> (= count 0)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">fib</span> n)
+  (<span style="color: #531ab6;">let</span> <span style="color: #721045;">fib-iter</span> ((a 1) (b 0) (count n))
+    (<span style="color: #531ab6;">if</span> (= count 0)
         b
         (fib-iter (+ a b) a (- count 1)))))
 </pre>
@@ -1279,24 +1279,24 @@ into the <code>fib-iter</code> definition and call as presented in 1.2.2.
 
 <div class="org-src-container">
 <pre class="src src-scheme">#lang sicp
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">tagged-list?</span> exp tag)
-  (<span style="color: #b6a0ff;">if</span> (pair? exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tagged-list?</span> exp tag)
+  (<span style="color: #531ab6;">if</span> (pair? exp)
       (eq? (car exp) tag)
       false))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let?</span> exp) (tagged-list? exp 'let))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let?</span> exp) (tagged-list? exp 'let))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-vars</span> exp)
-  (<span style="color: #b6a0ff;">map</span> car (cadr exp)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-vars</span> exp)
+  (<span style="color: #531ab6;">map</span> car (cadr exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-exps</span> exp)
-  (<span style="color: #b6a0ff;">map</span> cadr (cadr exp)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-exps</span> exp)
+  (<span style="color: #531ab6;">map</span> cadr (cadr exp)))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-body</span> exp)
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-body</span> exp)
   (cddr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">named-let-&gt;combination</span> exp)
-  (<span style="color: #b6a0ff;">let</span> ((nameless (cons (car exp) (cddr exp)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">named-let-&gt;combination</span> exp)
+  (<span style="color: #531ab6;">let</span> ((nameless (cons (car exp) (cddr exp)))
         (name (cadr exp)))
 
     (cons 'begin (list (cons 'define
@@ -1304,33 +1304,33 @@ into the <code>fib-iter</code> definition and call as presented in 1.2.2.
                                    (let-body nameless)))
                        (cons name (let-exps nameless))))))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">let-&gt;combination</span> exp)
-  (<span style="color: #b6a0ff;">if</span> (not (pair? (cadr exp)))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">let-&gt;combination</span> exp)
+  (<span style="color: #531ab6;">if</span> (not (pair? (cadr exp)))
       (named-let-&gt;combination exp)
       (cons (list 'lambda
                   (let-vars exp)
                   (let-body exp))
             (let-exps exp))))
 
-(<span style="color: #b6a0ff;">let</span> ((let-exp '(<span style="color: #b6a0ff;">let</span> <span style="color: #feacd0;">fib-iter</span> ((a 1) (b 0) (count n))
-                  (<span style="color: #b6a0ff;">if</span> (= count 0)
+(<span style="color: #531ab6;">let</span> ((let-exp '(<span style="color: #531ab6;">let</span> <span style="color: #721045;">fib-iter</span> ((a 1) (b 0) (count n))
+                  (<span style="color: #531ab6;">if</span> (= count 0)
                       b
                       (fib-iter (+ a b) a (- count 1))))))
   (let-&gt;combination let-exp))
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
-<span style="color: #989898;">;; </span><span style="color: #989898;">(begin</span>
-<span style="color: #989898;">;;   </span><span style="color: #989898;">(define (fib-iter a b count)</span>
-<span style="color: #989898;">;;     </span><span style="color: #989898;">(if (= count 0) b (fib-iter (+ a b) a (- count 1))))</span>
-<span style="color: #989898;">;;   </span><span style="color: #989898;">(fib-iter 1 0 n))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(begin</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(define (fib-iter a b count)</span>
+<span style="color: #595959;">;;     </span><span style="color: #595959;">(if (= count 0) b (fib-iter (+ a b) a (- count 1))))</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(fib-iter 1 0 n))</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org68e90dd" class="outline-4">
-<h4 id="org68e90dd">Exercise 4.9</h4>
-<div class="outline-text-4" id="text-org68e90dd">
+<div id="outline-container-org51ca187" class="outline-4">
+<h4 id="org51ca187">Exercise 4.9</h4>
+<div class="outline-text-4" id="text-org51ca187">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1361,8 +1361,8 @@ We could design a <code>while</code> construct with this syntax:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(while (<span style="color: #6ae4b9;">&lt;operator&gt;</span> <span style="color: #6ae4b9;">&lt;operand1&gt;</span> <span style="color: #6ae4b9;">&lt;operand2&gt;</span>)
-       <span style="color: #6ae4b9;">&lt;body&gt;</span>)
+<pre class="src src-scheme">(while (<span style="color: #005f5f;">&lt;operator&gt;</span> <span style="color: #005f5f;">&lt;operand1&gt;</span> <span style="color: #005f5f;">&lt;operand2&gt;</span>)
+       <span style="color: #005f5f;">&lt;body&gt;</span>)
 </pre>
 </div>
 
@@ -1381,9 +1381,9 @@ We have learnt that we can iterate using procedures. The <code>while</code> loop
 above can be implement in the following way:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">gp-while</span>)
-  (<span style="color: #b6a0ff;">if</span> (&gt; foo 0)
-      (<span style="color: #b6a0ff;">begin</span>
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">gp-while</span>)
+  (<span style="color: #531ab6;">if</span> (&gt; foo 0)
+      (<span style="color: #531ab6;">begin</span>
         (display foo)
         (set! foo (- foo 1))
         (gp-while))))
@@ -1397,18 +1397,18 @@ above can be implement in the following way:
 syntax:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">append</span> l1 l2)
-    (<span style="color: #b6a0ff;">if</span> (null? l1)
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">append</span> l1 l2)
+    (<span style="color: #531ab6;">if</span> (null? l1)
         l2
         (cons (car l1) (append (cdr l1) l2))))
 
-  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">while-cond</span> exp)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">while-cond</span> exp)
     (cadr exp))
 
-  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">while-body</span> exp)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">while-body</span> exp)
     (cddr exp))
 
-  (<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">while-&gt;combination</span> exp)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">while-&gt;combination</span> exp)
     (list 'begin
           (list 'define
                 (list 'gp-while)
@@ -1420,13 +1420,13 @@ syntax:
                         (while-body exp)
                         (list (list 'gp-while))))))
           (list 'gp-while)))
-<span style="color: #989898;">;; </span><span style="color: #989898;">=&gt;</span>
-<span style="color: #989898;">;; </span><span style="color: #989898;">(begin (define (gp-while)</span>
-<span style="color: #989898;">;;        </span><span style="color: #989898;">(if (&gt; foo 0)</span>
-<span style="color: #989898;">;;            </span><span style="color: #989898;">(begin (display foo)</span>
-<span style="color: #989898;">;;                   </span><span style="color: #989898;">(set! foo (- foo 1))</span>
-<span style="color: #989898;">;;                   </span><span style="color: #989898;">(gp-while))))</span>
-<span style="color: #989898;">;;     </span><span style="color: #989898;">(gp-while))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(begin (define (gp-while)</span>
+<span style="color: #595959;">;;        </span><span style="color: #595959;">(if (&gt; foo 0)</span>
+<span style="color: #595959;">;;            </span><span style="color: #595959;">(begin (display foo)</span>
+<span style="color: #595959;">;;                   </span><span style="color: #595959;">(set! foo (- foo 1))</span>
+<span style="color: #595959;">;;                   </span><span style="color: #595959;">(gp-while))))</span>
+<span style="color: #595959;">;;     </span><span style="color: #595959;">(gp-while))</span>
 </pre>
 </div>
 
@@ -1435,11 +1435,11 @@ Now <code>while</code> can be handled as a derived expression by the evaluator:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme">(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">eval</span> exp env)
-  (<span style="color: #b6a0ff;">cond</span>
-   <span style="color: #989898;">;; </span><span style="color: #989898;">...</span>
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval</span> exp env)
+  (<span style="color: #531ab6;">cond</span>
+   <span style="color: #595959;">;; </span><span style="color: #595959;">...</span>
    ((while? exp) (eval (while-&gt;combination exp) env)
-   <span style="color: #989898;">;; </span><span style="color: #989898;">...</span>
+   <span style="color: #595959;">;; </span><span style="color: #595959;">...</span>
 ))
 </pre>
 </div>
@@ -1450,9 +1450,9 @@ necessary. See p. 221 fn. 3]
 </p>
 </div>
 </div>
-<div id="outline-container-org629ee7b" class="outline-4">
-<h4 id="org629ee7b">Exercise 4.10</h4>
-<div class="outline-text-4" id="text-org629ee7b">
+<div id="outline-container-org9e46424" class="outline-4">
+<h4 id="org9e46424">Exercise 4.10</h4>
+<div class="outline-text-4" id="text-org9e46424">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1471,25 +1471,20 @@ Scheme by modifying the procedures in this section, without changing
 A couple of examples:
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">'quotation instead of 'quote</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">quoted?</span> exp)
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">'quotation instead of 'quote</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">quoted?</span> exp)
   (tagged-list? exp 'quotation))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">text-of-quotation</span> exp) (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">text-of-quotation</span> exp) (cadr exp))
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">(assign! &lt;value&gt; &lt;exp&gt;) instead of (set! &lt;exp&gt; &lt;val&gt;)</span>
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment?</span> exp)
+<span style="color: #595959;">;; </span><span style="color: #595959;">(assign! &lt;value&gt; &lt;exp&gt;) instead of (set! &lt;exp&gt; &lt;val&gt;)</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment?</span> exp)
   (tagged-list? exp 'assing!))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-variable</span> exp) (caddr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment-variable</span> exp) (caddr exp))
 
-(<span style="color: #b6a0ff;">define</span> (<span style="color: #feacd0;">assignment-value</span> exp) (cadr exp))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment-value</span> exp) (cadr exp))
 </pre>
-</div>
-
-
-<div style="text-align: center;">
-<a href="./posts.html">←</a>
 </div>
 </div>
 </div>
@@ -1497,7 +1492,7 @@ A couple of examples:
 </div>
 </div>
 <div id="postamble" class="status">
-<p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
 </div>
 </body>
 </html>
