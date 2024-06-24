@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-06-25 Tue 00:49 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 4.1.3 Evaluator Data Structure</title>
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 4.1.3 Evaluator Data Structure
+<br />
+<span class="subtitle">2024-06-25 Tue</span>
+</h1>
+<p>
+Authors presents further elements of the evaluator implementation: the
+data structures internally manipulated by the evaluator. Some are
+needed to represent procedures, environments, the true and the false.
+</p>
+
+<div id="outline-container-orga48cbdb" class="outline-2">
+<h2 id="orga48cbdb">Testing of predicates</h2>
+<div class="outline-text-2" id="text-orga48cbdb">
+<p>
+Only the <code>false</code> object represents falsity.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">true?</span> x)
+  (not (eq? x false)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">false?</span> x)
+  (eq? x false))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org003e6ee" class="outline-2">
+<h2 id="org003e6ee">Representing procedures</h2>
+<div class="outline-text-2" id="text-org003e6ee">
+<p>
+We assume we have the <code>apply-primitive-procedure</code> (which takes a
+primitive procedure and its arguments) and the <code>primitive-procedure</code>
+procedures available. They do what you expect them to do.
+</p>
+
+<p>
+<code>Make-procedure</code> is used to make compound procedures. It is applied to
+some parameters, a body, and an environment.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-procedure</span> parameters body env)
+  (list 'procedure parameters body env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">compound-procedure?</span> p)
+  (tagged-list? p 'procedure))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">procedure-parameters</span> p) (cadr p))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">procedure-body</span> p) (caddr p))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">procedure-environment</span> p) (cadddr p))
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4d80478" class="outline-2">
+<h2 id="org4d80478">Operations on Environments</h2>
+<div class="outline-text-2" id="text-org4d80478">
+<p>
+An environment, as we already know, is a sequence of frames, each of
+which is made of bindings (associations of a variable to a value). To
+manipulate frames we use the <code>lookup-variable-value</code>, the
+<code>extend-environment</code>, the <code>define-variable!</code>, and the
+<code>set-variable-value!</code> procedures.
+</p>
+
+<p>
+Environment are represented as a list of frames. The enclosing
+environment is the <code>cdr</code> of the list. Frames are represented as pair
+of lists, the first one of which is the list of variables, and the
+second one of which is the list of values. Note that such a
+representation of the environments is not a production-quality one.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">enclosing-environment</span> env) (cdr env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-frame</span> env) (car env))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">the-empty-environment</span> '())
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-frame</span> variables values)
+  (cons variables values))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">frame-variables</span> frame) (car frame))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">frame-values</span> frame) (cdr frame))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">add-binding-to-frame!</span> var val frame)
+  (set-car! frame (cons var (car frame)))
+  (set-cdr! frame (cons val (cdr frame))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">extend-environment</span> vars vals base-env)
+  (<span style="color: #531ab6;">if</span> (= (length vars) (length vals))
+      (cons (make-frame vars vals) base-env)
+      (<span style="color: #531ab6;">if</span> (&lt; (length vars) (length vals))
+          (error <span style="color: #3548cf;">"Too many arguments supplied"</span> vars vals)
+          (error <span style="color: #3548cf;">"Too few arguments supplied"</span> vars vals))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup-variable-value</span> var env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (car vars))
+             (car vals))
+            (<span style="color: #531ab6;">else</span> (scan (cdr vars) (cdr vals)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable"</span> var)
+        (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+          (scan (frame-variables frame)
+                (frame-values frame)))))
+  (env-loop env))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">set-variable-value!</span> var val env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (car vars))
+             (set-car! vals val))
+            (<span style="color: #531ab6;">else</span> (scan (cdr vars) (cdr vals)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable -- SET!"</span> var)
+        (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+          (scan (frame-variables frame)
+                (frame-values frame)))))
+  (env-loop env))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">define-variable!</span> var val env)
+  (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (add-binding-to-frame! var val frame))
+            ((eq? var (car vars))
+             (set-car! vals val))
+            (<span style="color: #531ab6;">else</span> (scan (cdr vars) (cdr vals)))))
+    (scan (frame-variables frame)
+          (frame-values frame))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7a4fb59" class="outline-2">
+<h2 id="org7a4fb59">Exercise 4.11</h2>
+<div class="outline-text-2" id="text-org7a4fb59">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Instead of representing a frame as a pair of lists, we can represent a
+frame as a list of bindings, where each binding is a name-value pair.
+Rewrite the environment operations to use this alternative
+representation.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+These are the operations presented by Authors:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(lookup-variable-value <span style="color: #005f5f;">&lt;VAR&gt;</span> <span style="color: #005f5f;">&lt;ENV&gt;</span>)
+(extend-environment <span style="color: #005f5f;">&lt;VARIABLES&gt;</span> <span style="color: #005f5f;">&lt;VALUES&gt;</span> <span style="color: #005f5f;">&lt;BASE-ENV&gt;</span>)
+(define-variable! <span style="color: #005f5f;">&lt;VAR&gt;</span> <span style="color: #005f5f;">&lt;VALUE&gt;</span> <span style="color: #005f5f;">&lt;ENV&gt;</span>)
+(set-variable-value! <span style="color: #005f5f;">&lt;VAR&gt;</span> <span style="color: #005f5f;">&lt;VALUE&gt;</span> <span style="color: #005f5f;">&lt;ENV&gt;</span>)
+</pre>
+</div>
+
+<p>
+<code>Enclosing-environment</code>, <code>first-frame</code>, and <code>the-empty-environment</code>
+can remain the way they are. For an environment remains a list of
+frames.
+</p>
+
+<p>
+<code>Make-frame</code>, instead, has to change:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-frame</span> variable values)
+  (<span style="color: #531ab6;">if</span> (null? variable) <span style="color: #595959;">;; </span><span style="color: #595959;">assumes variable and values have the same length</span>
+      nil
+      (cons (cons (car variable) (car values))
+            (make-frame (cdr variable) (cdr values)))))
+</pre>
+</div>
+
+<p>
+We need a way to add a binding to a frame. Here is one way of doing
+it:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">add-binding-to-frame!</span> var val frame)
+  (set-car! frame (cons var val))
+  (set-cdr! frame (cons (car frame) (cdr frame))))
+</pre>
+</div>
+
+<p>
+<code>Extend-environment</code> can be left the way it is:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">extend-environment</span> vars vals base-env)
+  (<span style="color: #531ab6;">if</span> (= (length vars) (length vals))
+      (cons (make-frame vars vals) base-env)
+      (<span style="color: #531ab6;">if</span> (&lt; (length vars) (length vals))
+          (error <span style="color: #3548cf;">"Too many arguments supplied"</span> vars vals)
+          (error <span style="color: #3548cf;">"Too few arguments supplied"</span> vars vals))))
+</pre>
+</div>
+
+<p>
+Here is <code>lookup-variable-value</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup-variable-value</span> var env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> frame)
+      (<span style="color: #531ab6;">cond</span> ((null? frame)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (caar frame))
+             (cdar frame))
+            (<span style="color: #531ab6;">else</span> (scan (cdr frame)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable"</span> var)
+        (scan (first-frame env))))
+  (env-loop env))
+</pre>
+</div>
+
+<p>
+Example:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">let</span> ((gp-env (list (make-frame '(foo bar baz) '(1 2 3))
+                    (make-frame '(foobaz) '(4))
+                    (make-frame '(x y z) '(5 6 7)))))
+  (lookup-variable-value 'foobaz gp-env))
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; 4</span>
+</pre>
+</div>
+
+<p>
+Here is <code>set-variable-value!</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">set-variable-value!</span> var val env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> frame)
+      (<span style="color: #531ab6;">cond</span> ((null? frame)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (caar frame))
+             (set-cdr! (car frame) val))
+            (<span style="color: #531ab6;">else</span> (scan (cdr frame)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable -- SET!"</span> var)
+        (scan (first-frame env))))
+  (env-loop env))
+</pre>
+</div>
+
+<p>
+Example:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">let</span> ((gp-env (list (make-frame '(foo bar baz) '(1 2 3))
+                    (make-frame '(foobaz) '(4))
+                    (make-frame '(x y z) '(5 6 7)))))
+  (set-variable-value! 'foobaz 'FOOBAZ gp-env)
+  (lookup-variable-value 'foobaz gp-env))
+</pre>
+</div>
+
+<p>
+<code>Define-variable!</code> was a bit more problematic.
+</p>
+
+<p>
+First of all let's notice that Authors' version assumes that the
+enviroment is not empty. We will assume that too.
+</p>
+
+<p>
+The main problem I had was this: if a frame is an empty list (because
+there are no bindings), then <code>add-binding-to-frame!</code> won't work. For
+neither <code>set-car!</code> nor <code>set-cdr!</code> can be applied to an empty list. So,
+my solution assumes that we have established the convention that an
+empty frame is a list with an empty list in it.
+</p>
+
+<p>
+This is an empty frame:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">'(())
+</pre>
+</div>
+
+<p>
+And this is an environment with an empty frame:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">'((()))
+</pre>
+</div>
+
+<p>
+Given this, here is <code>define-variable!</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">define-variable!</span> var val env)
+  (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> frame)
+      (<span style="color: #531ab6;">cond</span> ((null? (car frame))
+             (set-car! frame (cons var val)))
+            ((eq? var (caar frame))
+             (set-car! frame (cons var val)))
+            (<span style="color: #531ab6;">else</span>
+             (<span style="color: #531ab6;">if</span> (null? (cdr frame))
+                 (<span style="color: #531ab6;">begin</span>
+                   (set-car! frame '())
+                   (scan frame))
+                 (scan (cdr frame))))))
+    (scan frame)))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3452f3f" class="outline-2">
+<h2 id="org3452f3f">Exercise 4.12</h2>
+<div class="outline-text-2" id="text-org3452f3f">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+The procedures <code>set-variable-value!</code>, <code>define-variable!</code>, and
+<code>lookup-variable-value</code> can be expressed in terms of more abstract
+procedures for traversing the environment structure.  Define
+abstractions that capture the common patterns and redefine the three
+procedures in terms of these abstractions.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rest-of-vars</span> vars)
+  (cdr vars))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rest-of-vals</span> vals)
+  (cdr vals))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">set-first-value!</span> vals val)
+  (set-car! vals val))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-var</span>  vars)
+  (car vars))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">set-variable-value!</span> var val env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (first-var vars))
+             (set-first-value! vals val))
+            (<span style="color: #531ab6;">else</span> (scan (rest-of-vars vars) (rest-of-vals vals)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable -- SET!"</span> var)
+        (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+          (scan (frame-variables frame)
+                (frame-values frame)))))
+  (env-loop env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup-variable-value</span> var env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (first-var vars))
+             (car vals))
+            (<span style="color: #531ab6;">else</span> (scan (rest-of-vars vars) (rest-of-vals vals)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable"</span> var)
+        (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+          (scan (frame-variables frame)
+                (frame-values frame)))))
+  (env-loop env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">define-variable!</span> var val env)
+  (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (add-binding-to-frame! var val frame))
+            ((eq? var (first-var vars))
+             (set-first-value! vals val))
+            (<span style="color: #531ab6;">else</span> (scan (rest-of-vars vars) (rest-of-vals vals)))))
+    (scan (frame-variables frame)
+          (frame-values frame))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org89f5ab1" class="outline-2">
+<h2 id="org89f5ab1">Exercise 4.13</h2>
+<div class="outline-text-2" id="text-org89f5ab1">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Scheme allows us to create new bindings for variables by means of
+<code>define</code>, but provides no way to get rid of bindings.  Implement for
+the evaluator a special form <code>make-unbound!</code> that removes the binding
+of a given symbol from the environment in which the <code>make-unbound!</code>
+expression is evaluated.  This problem is not completely specified.
+For example, should we remove only the binding in the first frame of
+the environment?  Complete the specification and justify any choices
+you make.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+I think we should remove the binding in the first frame only. If we
+did otherwise, then couldn't we mutate frames other parts of the
+program rely on?
+</p>
+
+<p>
+Given that, as far as I know, we cannot <i>mutate</i> a list with one
+member into an empty list, I'm using an iterative-process-evolving
+<code>filter-frame</code> procedure which <i>construct</i> a new list (well two new
+lists, <code>new-vars</code> and <code>new-vals</code>) and then I set the <code>car</code> of the
+environment to the new relevant list (that is, I replace the first
+frame with a new one). I could have used a recursive-process-evolving
+procedure as opposed to an iterative-process-evolving one (see Chapter
+1 if you forgot the distinction).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">append</span> l1 l2)
+  (<span style="color: #531ab6;">if</span> (null? l1)
+      l2
+      (cons (car l1) (append (cdr l1) l2))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Usage:</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(make-unbound! 'foo)</span>
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">var-to-unbind</span> exp)
+  (cadr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-make-unbound</span> exp env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">filter-frame</span> vars vals var new-vars new-vals)
+    (<span style="color: #531ab6;">cond</span> ((null? vars)
+           (set-car! env (cons new-vars new-vals)))
+          ((eq? (car vars) var)
+           (filter-frame nil
+                         nil
+                         var
+                         (append (cdr vars) new-vars)
+                         (append (cdr vals) new-vals)))
+          (<span style="color: #531ab6;">else</span> (filter-frame (cdr vars)
+                              (cdr vals)
+                              var
+                              (append (list (car vars)) new-vars)
+                              (append (list (car vals)) new-vals)))))
+  (filter-frame (frame-variables (first-frame env))
+                (frame-values (first-frame env))
+                (var-to-unbind exp)
+                nil
+                nil))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">gp-env</span> '(((a b c) 1 2 3) ((d e f) 4 5 6)))
+(eval-make-unbound '(make-unbound b) gp-env)
+gp-env
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; (((c a) 3 1) ((d e f) 4 5 6))</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)</span></p>
+</div>
+</body>
+</html>

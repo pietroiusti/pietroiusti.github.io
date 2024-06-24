@@ -1,0 +1,417 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 4.1.3 Evaluator Data Structure
+#+subtitle: 2024-06-25 Tue
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
+
+Authors presents further elements of the evaluator implementation: the
+data structures internally manipulated by the evaluator. Some are
+needed to represent procedures, environments, the true and the false.
+
+** Testing of predicates
+Only the ~false~ object represents falsity.
+
+#+begin_src scheme
+  (define (true? x)
+    (not (eq? x false)))
+
+  (define (false? x)
+    (eq? x false))
+#+end_src
+
+** Representing procedures
+We assume we have the ~apply-primitive-procedure~ (which takes a
+primitive procedure and its arguments) and the ~primitive-procedure~
+procedures available. They do what you expect them to do.
+
+~Make-procedure~ is used to make compound procedures. It is applied to
+some parameters, a body, and an environment.
+
+#+begin_src scheme
+  (define (make-procedure parameters body env)
+    (list 'procedure parameters body env))
+
+  (define (compound-procedure? p)
+    (tagged-list? p 'procedure))
+
+  (define (procedure-parameters p) (cadr p))
+
+  (define (procedure-body p) (caddr p))
+
+  (define (procedure-environment p) (cadddr p))
+
+#+end_src
+
+** Operations on Environments
+An environment, as we already know, is a sequence of frames, each of
+which is made of bindings (associations of a variable to a value). To
+manipulate frames we use the ~lookup-variable-value~, the
+~extend-environment~, the ~define-variable!~, and the
+~set-variable-value!~ procedures.
+
+Environment are represented as a list of frames. The enclosing
+environment is the ~cdr~ of the list. Frames are represented as pair
+of lists, the first one of which is the list of variables, and the
+second one of which is the list of values. Note that such a
+representation of the environments is not a production-quality one.
+
+#+begin_src scheme
+  (define (enclosing-environment env) (cdr env))
+
+  (define (first-frame env) (car env))
+
+  (define the-empty-environment '())
+#+end_src
+
+#+begin_src scheme
+  (define (make-frame variables values)
+    (cons variables values))
+
+  (define (frame-variables frame) (car frame))
+
+  (define (frame-values frame) (cdr frame))
+
+  (define (add-binding-to-frame! var val frame)
+    (set-car! frame (cons var (car frame)))
+    (set-cdr! frame (cons val (cdr frame))))
+#+end_src
+
+#+begin_src scheme
+  (define (extend-environment vars vals base-env)
+    (if (= (length vars) (length vals))
+        (cons (make-frame vars vals) base-env)
+        (if (< (length vars) (length vals))
+            (error "Too many arguments supplied" vars vals)
+            (error "Too few arguments supplied" vars vals))))
+#+end_src
+
+#+begin_src scheme
+  (define (lookup-variable-value var env)
+    (define (env-loop env)
+      (define (scan vars vals)
+        (cond ((null? vars)
+               (env-loop (enclosing-environment env)))
+              ((eq? var (car vars))
+               (car vals))
+              (else (scan (cdr vars) (cdr vals)))))
+      (if (eq? env the-empty-environment)
+          (error "Unbound variable" var)
+          (let ((frame (first-frame env)))
+            (scan (frame-variables frame)
+                  (frame-values frame)))))
+    (env-loop env))
+#+end_src
+
+#+begin_src scheme
+  (define (set-variable-value! var val env)
+    (define (env-loop env)
+      (define (scan vars vals)
+        (cond ((null? vars)
+               (env-loop (enclosing-environment env)))
+              ((eq? var (car vars))
+               (set-car! vals val))
+              (else (scan (cdr vars) (cdr vals)))))
+      (if (eq? env the-empty-environment)
+          (error "Unbound variable -- SET!" var)
+          (let ((frame (first-frame env)))
+            (scan (frame-variables frame)
+                  (frame-values frame)))))
+    (env-loop env))
+#+end_src
+
+#+begin_src scheme
+  (define (define-variable! var val env)
+    (let ((frame (first-frame env)))
+      (define (scan vars vals)
+        (cond ((null? vars)
+               (add-binding-to-frame! var val frame))
+              ((eq? var (car vars))
+               (set-car! vals val))
+              (else (scan (cdr vars) (cdr vals)))))
+      (scan (frame-variables frame)
+            (frame-values frame))))
+#+end_src
+
+** Exercise 4.11
+*Exercise*:
+
+#+begin_quote
+Instead of representing a frame as a pair of lists, we can represent a
+frame as a list of bindings, where each binding is a name-value pair.
+Rewrite the environment operations to use this alternative
+representation.
+#+end_quote
+
+*Answer*:
+
+These are the operations presented by Authors:
+#+begin_src scheme
+  (lookup-variable-value <VAR> <ENV>)
+  (extend-environment <VARIABLES> <VALUES> <BASE-ENV>)
+  (define-variable! <VAR> <VALUE> <ENV>)
+  (set-variable-value! <VAR> <VALUE> <ENV>)
+#+end_src
+
+~Enclosing-environment~, ~first-frame~, and ~the-empty-environment~
+can remain the way they are. For an environment remains a list of
+frames.
+
+~Make-frame~, instead, has to change:
+#+begin_src scheme
+  (define (make-frame variable values)
+    (if (null? variable) ;; assumes variable and values have the same length
+        nil
+        (cons (cons (car variable) (car values))
+              (make-frame (cdr variable) (cdr values)))))
+#+end_src
+
+We need a way to add a binding to a frame. Here is one way of doing
+it:
+#+begin_src scheme
+  (define (add-binding-to-frame! var val frame)
+    (set-car! frame (cons var val))
+    (set-cdr! frame (cons (car frame) (cdr frame))))
+#+end_src
+
+~Extend-environment~ can be left the way it is:
+#+begin_src scheme
+  (define (extend-environment vars vals base-env)
+    (if (= (length vars) (length vals))
+        (cons (make-frame vars vals) base-env)
+        (if (< (length vars) (length vals))
+            (error "Too many arguments supplied" vars vals)
+            (error "Too few arguments supplied" vars vals))))
+#+end_src
+
+Here is ~lookup-variable-value~:
+#+begin_src scheme
+  (define (lookup-variable-value var env)
+    (define (env-loop env)
+      (define (scan frame)
+        (cond ((null? frame)
+               (env-loop (enclosing-environment env)))
+              ((eq? var (caar frame))
+               (cdar frame))
+              (else (scan (cdr frame)))))
+      (if (eq? env the-empty-environment)
+          (error "Unbound variable" var)
+          (scan (first-frame env))))
+    (env-loop env))
+#+end_src
+
+Example:
+#+begin_src scheme
+  (let ((gp-env (list (make-frame '(foo bar baz) '(1 2 3))
+                      (make-frame '(foobaz) '(4))
+                      (make-frame '(x y z) '(5 6 7)))))
+    (lookup-variable-value 'foobaz gp-env))
+  ;; => 4
+#+end_src
+
+Here is ~set-variable-value!~:
+#+begin_src scheme
+  (define (set-variable-value! var val env)
+    (define (env-loop env)
+      (define (scan frame)
+        (cond ((null? frame)
+               (env-loop (enclosing-environment env)))
+              ((eq? var (caar frame))
+               (set-cdr! (car frame) val))
+              (else (scan (cdr frame)))))
+      (if (eq? env the-empty-environment)
+          (error "Unbound variable -- SET!" var)
+          (scan (first-frame env))))
+    (env-loop env))
+#+end_src
+
+Example:
+#+begin_src scheme
+  (let ((gp-env (list (make-frame '(foo bar baz) '(1 2 3))
+                      (make-frame '(foobaz) '(4))
+                      (make-frame '(x y z) '(5 6 7)))))
+    (set-variable-value! 'foobaz 'FOOBAZ gp-env)
+    (lookup-variable-value 'foobaz gp-env))
+#+end_src
+
+~Define-variable!~ was a bit more problematic.
+
+First of all let's notice that Authors' version assumes that the
+enviroment is not empty. We will assume that too.
+
+The main problem I had was this: if a frame is an empty list (because
+there are no bindings), then ~add-binding-to-frame!~ won't work. For
+neither ~set-car!~ nor ~set-cdr!~ can be applied to an empty list. So,
+my solution assumes that we have established the convention that an
+empty frame is a list with an empty list in it.
+
+This is an empty frame:
+#+begin_src scheme
+'(())
+#+end_src
+
+And this is an environment with an empty frame:
+#+begin_src scheme
+'((()))
+#+end_src
+
+Given this, here is ~define-variable!~:
+#+begin_src scheme
+  (define (define-variable! var val env)
+    (let ((frame (first-frame env)))
+      (define (scan frame)
+        (cond ((null? (car frame))
+               (set-car! frame (cons var val)))
+              ((eq? var (caar frame))
+               (set-car! frame (cons var val)))
+              (else
+               (if (null? (cdr frame))
+                   (begin
+                     (set-car! frame '())
+                     (scan frame))
+                   (scan (cdr frame))))))
+      (scan frame)))
+#+end_src
+
+** Exercise 4.12
+*Exercise*:
+#+begin_quote
+The procedures ~set-variable-value!~, ~define-variable!~, and
+~lookup-variable-value~ can be expressed in terms of more abstract
+procedures for traversing the environment structure.  Define
+abstractions that capture the common patterns and redefine the three
+procedures in terms of these abstractions.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (rest-of-vars vars)
+    (cdr vars))
+  (define (rest-of-vals vals)
+    (cdr vals))
+  (define (set-first-value! vals val)
+    (set-car! vals val))
+  (define (first-var  vars)
+    (car vars))
+
+  (define (set-variable-value! var val env)
+    (define (env-loop env)
+      (define (scan vars vals)
+        (cond ((null? vars)
+               (env-loop (enclosing-environment env)))
+              ((eq? var (first-var vars))
+               (set-first-value! vals val))
+              (else (scan (rest-of-vars vars) (rest-of-vals vals)))))
+      (if (eq? env the-empty-environment)
+          (error "Unbound variable -- SET!" var)
+          (let ((frame (first-frame env)))
+            (scan (frame-variables frame)
+                  (frame-values frame)))))
+    (env-loop env))
+
+  (define (lookup-variable-value var env)
+    (define (env-loop env)
+      (define (scan vars vals)
+        (cond ((null? vars)
+               (env-loop (enclosing-environment env)))
+              ((eq? var (first-var vars))
+               (car vals))
+              (else (scan (rest-of-vars vars) (rest-of-vals vals)))))
+      (if (eq? env the-empty-environment)
+          (error "Unbound variable" var)
+          (let ((frame (first-frame env)))
+            (scan (frame-variables frame)
+                  (frame-values frame)))))
+    (env-loop env))
+
+  (define (define-variable! var val env)
+    (let ((frame (first-frame env)))
+      (define (scan vars vals)
+        (cond ((null? vars)
+               (add-binding-to-frame! var val frame))
+              ((eq? var (first-var vars))
+               (set-first-value! vals val))
+              (else (scan (rest-of-vars vars) (rest-of-vals vals)))))
+      (scan (frame-variables frame)
+            (frame-values frame))))
+#+end_src
+
+** Exercise 4.13
+*Exercise*:
+#+begin_quote
+Scheme allows us to create new bindings for variables by means of
+~define~, but provides no way to get rid of bindings.  Implement for
+the evaluator a special form ~make-unbound!~ that removes the binding
+of a given symbol from the environment in which the ~make-unbound!~
+expression is evaluated.  This problem is not completely specified.
+For example, should we remove only the binding in the first frame of
+the environment?  Complete the specification and justify any choices
+you make.
+#+end_quote
+
+*Answer*:
+
+I think we should remove the binding in the first frame only. If we
+did otherwise, then couldn't we mutate frames other parts of the
+program rely on?
+
+Given that, as far as I know, we cannot /mutate/ a list with one
+member into an empty list, I'm using an iterative-process-evolving
+~filter-frame~ procedure which /construct/ a new list (well two new
+lists, ~new-vars~ and ~new-vals~) and then I set the ~car~ of the
+environment to the new relevant list (that is, I replace the first
+frame with a new one). I could have used a recursive-process-evolving
+procedure as opposed to an iterative-process-evolving one (see Chapter
+1 if you forgot the distinction).
+
+#+begin_src scheme
+  (define (append l1 l2)
+    (if (null? l1)
+        l2
+        (cons (car l1) (append (cdr l1) l2))))
+
+  ;; Usage:
+  ;; (make-unbound! 'foo)
+
+  (define (var-to-unbind exp)
+    (cadr exp))
+
+  (define (eval-make-unbound exp env)
+    (define (filter-frame vars vals var new-vars new-vals)
+      (cond ((null? vars)
+             (set-car! env (cons new-vars new-vals)))
+            ((eq? (car vars) var)
+             (filter-frame nil
+                           nil
+                           var
+                           (append (cdr vars) new-vars)
+                           (append (cdr vals) new-vals)))
+            (else (filter-frame (cdr vars)
+                                (cdr vals)
+                                var
+                                (append (list (car vars)) new-vars)
+                                (append (list (car vals)) new-vals)))))
+    (filter-frame (frame-variables (first-frame env))
+                  (frame-values (first-frame env))
+                  (var-to-unbind exp)
+                  nil
+                  nil))
+
+  (define gp-env '(((a b c) 1 2 3) ((d e f) 4 5 6)))
+  (eval-make-unbound '(make-unbound b) gp-env)
+  gp-env
+  ;; => (((c a) 3 1) ((d e f) 4 5 6))
+#+end_src
