@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-07-02 Tue 01:04 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 4.1.4 Running the Evaluator as a Program</title>
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 4.1.4 Running the Evaluator as a Program
+<br />
+<span class="subtitle">2024-07-02 Tue</span>
+</h1>
+<p>
+The evaluator provides a description of the process to evaluate a Lisp
+expression.  Such a description is in a programming language (Lisp),
+so we can run it.  Given that evaluator ``reduces expressions
+ultimately to the application of primitive procedures'', we need a way
+to use the underlying Lisp system to apply those procedures.  The
+global environment, consequently, shall contain bindings for each
+primitive procedure name.  The global environment shall also contain
+bindings for <code>true</code> and <code>false</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">setup-environment</span>)
+  (<span style="color: #531ab6;">let</span> ((initial-env
+         (extend-environment (primitive-procedure-names)
+                             (primitive-procedure-objects)
+                             the-empty-environment)))
+    (define-variable! 'true true initial-env)
+    (define-variable! 'false false initial-env)
+    initial-env))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">the-global-environment</span> (setup-environment))
+</pre>
+</div>
+
+<p>
+Primitive procedure are represented as tagged lists. This specific
+representation is hidden behind the <code>primitive-procedure?</code> and
+<code>primitive-implementation</code> abstractions so it could be replaced by a
+different one.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-procedure?</span> proc)
+  (tagged-list? proc 'primitive))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-implementation</span> proc) (cadr proc))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">primitive-procedures</span>
+  (list (list 'car car)
+        (list 'cdr cdr)
+        (list 'cons cons)
+        (list 'null? null?)
+        &lt;MORE PRIMITIVES&gt;
+        ))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-procedure-names</span>)
+  (<span style="color: #531ab6;">map</span> car
+       primitive-procedures))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-procedure-objects</span>)
+  (<span style="color: #531ab6;">map</span> (<span style="color: #531ab6;">lambda</span> (proc) (list 'primitive (cadr proc)))
+       primitive-procedures))
+</pre>
+</div>
+
+<p>
+Here is how we apply a primitive
+procedure. <code>Apply-in-underlying-scheme</code> is nothing more than the
+<code>apply</code> procedures from the underlying scheme we have used in the
+previous chapters.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-primitive-procedure</span> proc args)
+  (apply-in-underlying-scheme
+   (primitive-implementation proc) args))
+</pre>
+</div>
+
+<p>
+Authors provide what they call a ``driver loop'' as a convenience for
+running the evaluator, which ``models the read-eval-print loop of the
+underlying Lisp system.''
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">input-prompt</span> <span style="color: #3548cf;">";;; M-Eval input:"</span>)
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">output-prompt</span> <span style="color: #3548cf;">";;; M-Eval value:"</span>)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">driver-loop</span>)
+  (prompt-for-input input-prompt)
+  (<span style="color: #531ab6;">let</span> ((input (read)))
+    (<span style="color: #531ab6;">let</span> ((output (eval input the-global-environment)))
+      (announce-output output-prompt)
+      (user-print output)))
+  (driver-loop))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">prompt-for-input</span> string)
+  (newline) (newline) (display string) (newline))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">announce-output</span> string)
+  (newline) (display string) (newline))
+</pre>
+</div>
+
+<p>
+<code>User-print</code> is used to avoid printing the the environment part of a
+compound procedure:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">user-print</span> object)
+  (<span style="color: #531ab6;">if</span> (compound-procedure? object)
+      (display (list 'compound-procedure
+                     (procedure-parameters object)
+                     (procedure-body object)
+                     '<span style="color: #005f5f;">&lt;procedure-env&gt;</span>))
+      (display object)))
+</pre>
+</div>
+
+<p>
+Finally:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">the-global-environment</span> (setup-environment))
+
+(driver-loop)
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">M-Eval input:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">append</span> x y)
+  (<span style="color: #531ab6;">if</span> (null? x)
+      y
+      (cons (car x)
+            (append (cdr x) y))))
+<span style="color: #595959;">;;; </span><span style="color: #595959;">M-Eval value:</span>
+ok
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">M-Eval input:</span>
+(append '(a b c) '(d e f))
+<span style="color: #595959;">;;; </span><span style="color: #595959;">M-Eval value:</span>
+(a b c d e f)
+</pre>
+</div>
+
+<p>
+What follows is the whole code for the evaluator presented so
+far. I've evaluated it in DrRacket and I can confirm that it works.
+</p>
+
+<p>
+Notice: I've renamed <code>apply</code> into <code>apply-evaluator</code>. Racket would
+otherwise complain about the first definition (<code>(define
+apply-in-underlying-scheme apply)</code>), telling me that I cannot use
+<code>apply</code> before defining it.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">#lang sicp
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">apply-in-underlying-scheme</span> apply)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval</span> exp env)
+  (<span style="color: #531ab6;">cond</span> ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp)
+         (make-procedure (lambda-parameters exp)
+                         (lambda-body exp)
+                         env))
+        ((begin? exp)
+         (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval (cond-&gt;if exp) env))
+        ((application? exp)
+         (apply-evaluator (eval (operator exp) env)
+                          (list-of-values (operands exp) env)))
+        (<span style="color: #531ab6;">else</span>
+         (error <span style="color: #3548cf;">"Unknown expression type -- EVAL"</span> exp))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-evaluator</span> procedure arguments)
+  (<span style="color: #531ab6;">cond</span> ((primitive-procedure? procedure)
+         (apply-primitive-procedure procedure arguments))
+        ((compound-procedure? procedure)
+         (eval-sequence
+          (procedure-body procedure)
+          (extend-environment
+           (procedure-parameters procedure)
+           arguments
+           (procedure-environment procedure))))
+        (<span style="color: #531ab6;">else</span>
+         (error
+          <span style="color: #3548cf;">"Unknown procedure type -- APPLY"</span> procedure))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-values</span> exps env)
+  (<span style="color: #531ab6;">if</span> (no-operands? exps)
+      '()
+      (cons (eval (first-operand exps) env)
+            (list-of-values (rest-operands exps) env))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-if</span> exp env)
+  (<span style="color: #531ab6;">if</span> (true? (eval (if-predicate exp) env))
+      (eval (if-consequent exp) env)
+      (eval (if-alternative exp) env)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-sequence</span> exps env)
+  (<span style="color: #531ab6;">cond</span> ((last-exp? exps) (eval (first-exp exps) env))
+        (<span style="color: #531ab6;">else</span> (eval (first-exp exps) env)
+              (eval-sequence (rest-exps exps) env))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-assignment</span> exp env)
+  (set-variable-value! (assignment-variable exp)
+                       (eval (assignment-value exp) env)
+                       env)
+  'ok)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-definition</span> exp env)
+  (define-variable! (definition-variable exp)
+    (eval (definition-value exp) env)
+    env)
+  'ok)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">self-evaluating?</span> exp)
+  (<span style="color: #531ab6;">cond</span> ((number? exp) true)
+        ((string? exp) true)
+        (<span style="color: #531ab6;">else</span> false)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">variable?</span> exp) (symbol? exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">quoted?</span> exp)
+  (tagged-list? exp 'quote))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">text-of-quotation</span> exp) (cadr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tagged-list?</span> exp tag)
+  (<span style="color: #531ab6;">if</span> (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment?</span> exp)
+  (tagged-list? exp 'set!))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment-variable</span> exp) (cadr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assignment-value</span> exp) (caddr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">definition?</span> exp)
+  (tagged-list? exp 'define))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">definition-variable</span> exp)
+  (<span style="color: #531ab6;">if</span> (symbol? (cadr exp))
+      (cadr exp)
+      (caadr exp)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">definition-value</span> exp)
+  (<span style="color: #531ab6;">if</span> (symbol? (cadr exp))
+      (caddr exp)
+      (make-lambda (cdadr exp)   <span style="color: #595959;">; </span><span style="color: #595959;">formal parameters</span>
+                   (cddr exp)))) <span style="color: #595959;">; </span><span style="color: #595959;">body</span>
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda?</span> exp) (tagged-list? exp 'lambda))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda-parameters</span> exp) (cadr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lambda-body</span> exp) (cddr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-lambda</span> parameters body)
+  (cons 'lambda (cons parameters body)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if?</span> exp) (tagged-list? exp 'if))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if-predicate</span> exp) (cadr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if-consequent</span> exp) (caddr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">if-alternative</span> exp)
+  (<span style="color: #531ab6;">if</span> (not (null? (cdddr exp)))
+      (cadddr exp)
+      'false))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-if</span> predicate consequent alternative)
+  (list 'if predicate consequent alternative))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">begin?</span> exp) (tagged-list? exp 'begin))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">begin-actions</span> exp) (cdr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">last-exp?</span> seq) (null? (cdr seq)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-exp</span> seq) (car seq))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rest-exps</span> seq) (cdr seq))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">sequence-&gt;exp</span> seq)
+  (<span style="color: #531ab6;">cond</span> ((null? seq) seq)
+        ((last-exp? seq) (first-exp seq))
+        (<span style="color: #531ab6;">else</span> (make-begin seq))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-begin</span> seq) (cons 'begin seq))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">application?</span> exp) (pair? exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operator</span> exp) (car exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operands</span> exp) (cdr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">no-operands?</span> ops) (null? ops))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-operand</span> ops) (car ops))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">rest-operands</span> ops) (cdr ops))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond?</span> exp) (tagged-list? exp 'cond))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-clauses</span> exp) (cdr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-else-clause?</span> clause)
+  (eq? (cond-predicate clause) 'else))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-predicate</span> clause) (car clause))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-actions</span> clause) (cdr clause))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">cond-&gt;if</span> exp)
+  (expand-clauses (cond-clauses exp)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">expand-clauses</span> clauses)
+  (<span style="color: #531ab6;">if</span> (null? clauses)
+      'false                          <span style="color: #595959;">; </span><span style="color: #595959;">no `else' clause</span>
+      (<span style="color: #531ab6;">let</span> ((first (car clauses))
+            (rest (cdr clauses)))
+        (<span style="color: #531ab6;">if</span> (cond-else-clause? first)
+            (<span style="color: #531ab6;">if</span> (null? rest)
+                (sequence-&gt;exp (cond-actions first))
+                (error <span style="color: #3548cf;">"ELSE clause isn't last -- COND-&gt;IF"</span>
+                       clauses))
+            (make-if (cond-predicate first)
+                     (sequence-&gt;exp (cond-actions first))
+                     (expand-clauses rest))))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">true?</span> x)
+  (not (eq? x false)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">false?</span> x)
+  (eq? x false))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-procedure</span> parameters body env)
+  (list 'procedure parameters body env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">compound-procedure?</span> p)
+  (tagged-list? p 'procedure))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">procedure-parameters</span> p) (cadr p))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">procedure-body</span> p) (caddr p))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">procedure-environment</span> p) (cadddr p))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">enclosing-environment</span> env) (cdr env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">first-frame</span> env) (car env))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">the-empty-environment</span> '())
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-frame</span> variables values)
+  (cons variables values))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">frame-variables</span> frame) (car frame))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">frame-values</span> frame) (cdr frame))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">add-binding-to-frame!</span> var val frame)
+  (set-car! frame (cons var (car frame)))
+  (set-cdr! frame (cons val (cdr frame))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">extend-environment</span> vars vals base-env)
+  (<span style="color: #531ab6;">if</span> (= (length vars) (length vals))
+      (cons (make-frame vars vals) base-env)
+      (<span style="color: #531ab6;">if</span> (&lt; (length vars) (length vals))
+          (error <span style="color: #3548cf;">"Too many arguments supplied"</span> vars vals)
+          (error <span style="color: #3548cf;">"Too few arguments supplied"</span> vars vals))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup-variable-value</span> var env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (car vars))
+             (car vals))
+            (<span style="color: #531ab6;">else</span> (scan (cdr vars) (cdr vals)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable"</span> var)
+        (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+          (scan (frame-variables frame)
+                (frame-values frame)))))
+  (env-loop env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">set-variable-value!</span> var val env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (car vars))
+             (set-car! vals val))
+            (<span style="color: #531ab6;">else</span> (scan (cdr vars) (cdr vals)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable -- SET!"</span> var)
+        (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+          (scan (frame-variables frame)
+                (frame-values frame)))))
+  (env-loop env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">define-variable!</span> var val env)
+  (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (add-binding-to-frame! var val frame))
+            ((eq? var (car vars))
+             (set-car! vals val))
+            (<span style="color: #531ab6;">else</span> (scan (cdr vars) (cdr vals)))))
+    (scan (frame-variables frame)
+          (frame-values frame))))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">primitive-procedures</span>
+  (list (list 'car car)
+        (list 'cdr cdr)
+        (list 'cons cons)
+        (list 'null? null?)
+        (list '+ +)
+        (list '- -)
+        (list '* *)
+        (list '/ /)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-procedure-names</span>)
+  (<span style="color: #531ab6;">map</span> car
+       primitive-procedures))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-procedure-objects</span>)
+  (<span style="color: #531ab6;">map</span> (<span style="color: #531ab6;">lambda</span> (proc) (list 'primitive (cadr proc)))
+       primitive-procedures))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">setup-environment</span>)
+  (<span style="color: #531ab6;">let</span> ((initial-env
+         (extend-environment (primitive-procedure-names)
+                             (primitive-procedure-objects)
+                             the-empty-environment)))
+    (define-variable! 'true true initial-env)
+    (define-variable! 'false false initial-env)
+    initial-env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-procedure?</span> proc)
+  (tagged-list? proc 'primitive))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">primitive-implementation</span> proc) (cadr proc))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-primitive-procedure</span> proc args)
+  (apply-in-underlying-scheme
+   (primitive-implementation proc) args))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">input-prompt</span> <span style="color: #3548cf;">";;; M-Eval input:"</span>)
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">output-prompt</span> <span style="color: #3548cf;">";;; M-Eval value:"</span>)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">driver-loop</span>)
+  (prompt-for-input input-prompt)
+  (<span style="color: #531ab6;">let</span> ((input (read)))
+    (<span style="color: #531ab6;">let</span> ((output (eval input the-global-environment)))
+      (announce-output output-prompt)
+      (user-print output)))
+  (driver-loop))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">prompt-for-input</span> string)
+  (newline) (newline) (display string) (newline))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">announce-output</span> string)
+  (newline) (display string) (newline))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">user-print</span> object)
+  (<span style="color: #531ab6;">if</span> (compound-procedure? object)
+      (display (list 'compound-procedure
+                     (procedure-parameters object)
+                     (procedure-body object)
+                     '<span style="color: #005f5f;">&lt;procedure-env&gt;</span>))
+      (display object)))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">the-global-environment</span> (setup-environment))
+
+(driver-loop)
+</pre>
+</div>
+<div id="outline-container-org6cc4ec8" class="outline-2">
+<h2 id="org6cc4ec8">Exercise 4.14</h2>
+<div class="outline-text-2" id="text-org6cc4ec8">
+<p>
+<b>Exercise</b>:
+</p>
+<blockquote>
+<p>
+Eva Lu Ator and Louis Reasoner are each experimenting with the
+metacircular evaluator.  Eva types in the definition of <code>map</code>, and
+runs some test programs that use it.  They work fine.  Louis, in
+contrast, has installed the system version of <code>map</code> as a primitive for
+the metacircular evaluator.  When he tries it, things go terribly
+wrong.  Explain why Louis's <code>map</code> fails even though Eva's works.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+<code>Apply</code> is called in both scenarios. The <code>arguments</code> that <code>apply</code>
+receives are the already-evaluated operands of the combination
+(evaluated by <code>list-of-values</code>). I think that the problem with using
+the primitive <code>map</code> is that one the arguments received by <code>apply</code> is
+an entity representing a procedure <i>using our implementation</i> (our
+implementation is a list whose <code>car</code> is the tag <code>'procedure</code>, among
+other aspects). But the primitive <code>car</code> expects a different kind of
+procedure object (whatever Scheme natively uses).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.5)</span></p>
+</div>
+</body>
+</html>
