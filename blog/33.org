@@ -19,7 +19,7 @@
 
 The evaluator provides a description of the process to evaluate a Lisp
 expression.  Such a description is in a programming language (Lisp),
-so we can run it.  Given that evaluator ``reduces expressions
+so we can run it.  Given that the evaluator ``reduces expressions
 ultimately to the application of primitive procedures'', we need a way
 to use the underlying Lisp system to apply those procedures.  The
 global environment, consequently, shall contain bindings for each
