@@ -1,0 +1,1124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-07-17 Wed 23:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 4.1.5 and 4.1.6</title>
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 4.1.5 and 4.1.6
+<br />
+<span class="subtitle">2024-07-17 Wed</span>
+</h1>
+<div id="outline-container-orgd8dce31" class="outline-2">
+<h2 id="orgd8dce31">Data as Programs</h2>
+<div class="outline-text-2" id="text-orgd8dce31">
+<ul class="org-ul">
+<li>One operational view of the meaning of a program: a program is a
+description of an abstract machine (Cf. the lecture).</li>
+<li>Example: <code>factorial</code>.</li>
+<li>The evaluator can be thought of as a special machine that takes as
+input a description of a machine and emulates the machine whose
+description it takes.</li>
+<li>The evaluator could, for example, take <code>factorial</code> and be able to
+compute factorials.</li>
+<li>The evaluator can, therefore, be seen as a <i>universal machine</i>.</li>
+<li>``This is striking'' (386)</li>
+<li>``Another striking aspect of the evaluator is that it acts as a
+bridge between the data objects that are manipulated by our
+programming language and the programming language itself''. (386)</li>
+<li>``That the user's program are the evaluator's data need not be a
+source of confusion.'' (386)</li>
+</ul>
+</div>
+<div id="outline-container-org99f1e85" class="outline-3">
+<h3 id="org99f1e85">Exercise 4.15</h3>
+<div class="outline-text-3" id="text-org99f1e85">
+<p>
+<b>Exercise</b>:
+</p>
+
+<p>
+Given a one-argument procedure <code>p</code> and an object <code>a</code>, <code>p</code> is said to
+"halt" on <code>a</code> if evaluating the expression <code>(p a)</code> returns a value (as
+opposed to terminating with an error message or running forever).
+Show that it is impossible to write a procedure <code>halts?</code> that
+correctly determines whether <code>p</code> halts on <code>a</code> for any procedure <code>p</code>
+and object <code>a</code>.  Use the following reasoning: If you had such a
+procedure <code>halts?</code>, you could implement the following program:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">run-forever</span>) (run-forever))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">try</span> p)
+  (<span style="color: #531ab6;">if</span> (halts? p p)
+      (run-forever)
+      'halted))
+</pre>
+</div>
+
+<p>
+Now consider evaluating the expression <code>(try try)</code> and show that any
+possible outcome (either halting or running forever) violates the
+intended behavior of <code>halts?</code>.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+</p>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Suppose that applying <code>try</code> to <code>try</code> halts. If so, then, when calling
+<code>(try try)</code>, we will call <code>(run-forever)</code> and, indeed, run forever.
+</p>
+
+<p>
+Suppose that applying <code>try</code> to <code>try</code> does not halt. If so, then, when
+calling <code>(try try)</code>, we would return <code>halted</code>.
+</p>
+
+<p>
+So, this is the way I would put it: we have got a paradox. On the one
+hand, if <code>(try try)</code> halts, then it doesn't halt. On the other hand,
+if <code>(try try)</code> does not halt, then it halts.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orge7472b9" class="outline-2">
+<h2 id="orge7472b9">Internal Definitions</h2>
+<div class="outline-text-2" id="text-orge7472b9">
+<ul class="org-ul">
+<li>Environment model of evaluation &amp; metacircular evaluator: definition
+are executed ``in sequence, extending the environment frame one
+definition at a time.''</li>
+
+<li>``This is particularly convenient for interactive program
+development&#x2026;''</li>
+
+<li>``However, if we think carefully about the internal definitions used
+to implement block structure [&#x2026;] we will find that name-by-name
+extension of the environment may not be the best way to define local
+variables.''</li>
+
+<li><p>
+Example:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">f</span> x)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">even?</span> n)
+    (<span style="color: #531ab6;">if</span> (= n 0)
+        true
+        (odd? (- n 1))))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">odd?</span> n)
+    (<span style="color: #531ab6;">if</span> (= n 0)
+        false
+        (even? (- n 1))))
+  &lt;REST OF BODY OF `F'&gt;)
+</pre>
+</div></li>
+
+<li>``the only satisfactory interpretation of the two <code>define</code>'s is to
+regard them as if the name <code>even?</code> and <code>odd?</code> were being added to
+the environment simultaneously.''</li>
+
+<li>``More generally, in block structure, the scope of a local name is
+the entire procedure body in which the <code>define</code> is evaluated.''</li>
+
+<li>``&#x2026;our interpreter will evaluate calls to <code>f</code> correctly, but for
+an "accidental" reason&#x2026;''</li>
+
+<li>There is ``a simple way to treat definitions so that internally
+defined names have truly simultaneous scope''&#x2026;</li>
+
+<li><p>
+The procedure
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">lambda</span> <span style="color: #005f5f;">&lt;VARS&gt;</span>
+  (<span style="color: #531ab6;">define</span> <span style="color: #721045;">u</span> <span style="color: #005f5f;">&lt;E1&gt;</span>)
+  (<span style="color: #531ab6;">define</span> <span style="color: #721045;">v</span> <span style="color: #005f5f;">&lt;E2&gt;</span>)
+  <span style="color: #005f5f;">&lt;E3&gt;</span>)
+</pre>
+</div>
+
+<p>
+can be transformed into
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">lambda</span> <span style="color: #005f5f;">&lt;VARS&gt;</span>
+  (<span style="color: #531ab6;">let</span> ((u '*unassigned*)
+        (v '*unassigned*))
+    (set! u <span style="color: #005f5f;">&lt;E1&gt;</span>)
+    (set! v <span style="color: #005f5f;">&lt;E2&gt;</span>)
+    <span style="color: #005f5f;">&lt;E3&gt;</span>))
+</pre>
+</div>
+
+<p>
+``where `*unassigned*' is a special symbol that causes looking up a
+variable to signal an error if an attempt is made to use the value
+of the not-yet-assigned variable.''
+</p></li>
+</ul>
+</div>
+<div id="outline-container-org0202925" class="outline-3">
+<h3 id="org0202925">Exercise 4.16</h3>
+<div class="outline-text-3" id="text-org0202925">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+In this exercise we implement the method just described for
+interpreting internal definitions.  We assume that the evaluator
+supports <code>let</code> (See Exercise 4.6).
+</p>
+
+<p>
+a. Change <code>lookup-variable-value</code> (Section 4.1.3) to signal an error
+if the value it finds is the symbol <code>*unassigned*</code>.
+</p>
+
+<p>
+b. Write a procedure <code>scan-out-defines</code> that takes a procedure body
+and returns an equivalent one that has no internal definitions, by
+making the transformation described above.
+</p>
+
+<p>
+c. Install <code>scan-out-defines</code> in the interpreter, either in
+<code>make-procedure</code> or in <code>procedure-body</code> (section 4-1-3).  Which place
+is better?  Why?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li><p>
+a:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup-variable-value</span> var env)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">env-loop</span> env)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan</span> vars vals)
+      (<span style="color: #531ab6;">cond</span> ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (car vars))
+             (<span style="color: #531ab6;">if</span> (eq? (car vals) '*unassigned*)
+                 (error <span style="color: #3548cf;">"not-yet-assigned variable"</span> var)
+                 (car vals)))
+            (<span style="color: #531ab6;">else</span> (scan (cdr vars) (cdr vals)))))
+    (<span style="color: #531ab6;">if</span> (eq? env the-empty-environment)
+        (error <span style="color: #3548cf;">"Unbound variable"</span> var)
+        (<span style="color: #531ab6;">let</span> ((frame (first-frame env)))
+          (scan (frame-variables frame)
+                (frame-values frame)))))
+  (env-loop env))
+</pre>
+</div></li>
+
+<li><p>
+b:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">filter</span> pred seq)
+  (<span style="color: #531ab6;">cond</span> ((null? seq)
+         nil)
+        ((pred (car seq))
+         (cons (car seq)
+               (filter pred (cdr seq))))
+        (<span style="color: #531ab6;">else</span> (filter pred (cdr seq)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">append</span> l1 l2)
+  (<span style="color: #531ab6;">if</span> (null? l1)
+      l2
+      (cons (car l1) (append (cdr l1) l2))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">example of a procedure body</span>
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">body-example</span>
+  '((<span style="color: #531ab6;">define</span> <span style="color: #721045;">even?</span>
+      (<span style="color: #531ab6;">lambda</span> (n)
+        (<span style="color: #531ab6;">if</span> (= n 0)
+            true
+            (odd? (- n 1)))))
+    (<span style="color: #531ab6;">define</span> <span style="color: #721045;">odd?</span>
+      (<span style="color: #531ab6;">lambda</span> (n)
+        (<span style="color: #531ab6;">if</span> (= n 0)
+            false
+            (even? (- n 1)))))
+    (message <span style="color: #3548cf;">"hello world"</span>)
+    (progn (* 3 3)
+           (message <span style="color: #3548cf;">"foobar"</span>))
+    (<span style="color: #531ab6;">define</span> <span style="color: #721045;">another-var</span>
+      (* 3 2))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">return a list with:</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">car   (1st el): body without definitions</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">cadr  (2nd el): a list of the variables</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">caddr (3rd el): a list of the values for the variables</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">gp-build-lists</span> body body-no-defs vars vals)
+  (<span style="color: #531ab6;">cond</span> ((null? body)
+         (list body-no-defs vars vals)) <span style="color: #595959;">;; </span><span style="color: #595959;">we finished scanning, return results</span>
+        ((eq? (caar body) 'define)
+         (gp-build-lists (cdr body) <span style="color: #595959;">;; </span><span style="color: #595959;">filter definition out</span>
+                         body-no-defs <span style="color: #595959;">;; </span><span style="color: #595959;">nothing to be addedd to new-body (we</span>
+                         <span style="color: #595959;">;; </span><span style="color: #595959;">want the define to be gone)</span>
+                         (cons (cadar body) vars) <span style="color: #595959;">;; </span><span style="color: #595959;">add var</span>
+                         (cons (caddar body) vals))) <span style="color: #595959;">;; </span><span style="color: #595959;">add val</span>
+        (<span style="color: #531ab6;">else</span> (gp-build-lists (cdr body)
+                              (append body-no-defs (list (car body)))
+                              vars
+                              vals))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">map vars to lists whose car is the var and show cadr is the symbol</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">'*unassigned*</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">build-unassigned-vars</span> vars)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">we could use map, but I'm doing it manually</span>
+  (<span style="color: #531ab6;">if</span> (null? vars)
+      nil
+      (cons (list (car vars) '*unassigned*) (build-unassigned-vars (cdr vars)))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">maps vars to lists whose car is the var and whose cadr is the</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">associated val</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">build-sets</span> vars vals)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">we could use map, but I'm doing it manually</span>
+  (<span style="color: #531ab6;">if</span> (null? vars)
+      nil
+      (cons (list 'set! (car vars) (car vals))
+            (build-sets (cdr vars) (cdr vals)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">scan-out-defines</span> body)
+  (<span style="color: #531ab6;">let</span> ((lists (gp-build-lists body nil nil nil)))
+    (<span style="color: #531ab6;">let</span> ((body-no-defs (car lists))
+          (vars (cadr lists))
+          (vals (caddr lists)))
+      (append (append
+               (cons 'let (list (build-unassigned-vars vars)))
+               (build-sets vars vals))
+              body-no-defs))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">example:</span>
+(scan-out-defines body-example)
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(let ((another-var *unassigned*) (odd? *unassigned*) (even? *unassigned*))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(set! another-var (* 3 2))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(set! odd? (lambda (n) (if (= n 0) false (even? (- n 1)))))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(set! even? (lambda (n) (if (= n 0) true (odd? (- n 1)))))</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(message "hello world")</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(progn (* 3 3) (message "foobar")))</span>
+</pre>
+</div></li>
+
+<li><p>
+c:
+</p>
+
+<p>
+<code>Make-procedure</code> is used in <code>eval</code> to construct procedures.
+<code>Procedure-body</code> is used in <code>apply</code> to select the bodies of
+procedures.
+</p>
+
+<p>
+I think it would be better to install <code>scan-out-defines</code> in
+<code>make-procedure</code>, rather than in <code>procedure-body</code>, because we would
+avoid calling <code>scan-out-defines</code> more than once for the same
+procedure (<code>scan-out-defines</code> would be called for each application).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-procedure</span> parameters body env)
+  (list 'procedure parameters (scan-out-defines body) env))
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgcc67426" class="outline-3">
+<h3 id="orgcc67426">Exercise 4.17</h3>
+<div class="outline-text-3" id="text-orgcc67426">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Draw diagrams of the environment in effect when evaluating the
+expression &lt;e3&gt; in the procedure in the text, comparing how this will
+be structured when definitions are interpreted sequentially with how
+it will be structured if definitions are scanned out as described.
+Why is there an extra frame in the transformed program?  Explain why
+this difference in environment structure can never make a difference
+in the behavior of a correct program.  Design a way to make the
+interpreter implement the "simultaneous" scope rule for internal
+definitions without constructing the extra frame.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+The following is the environment structure when definition are
+interpreted sequentially; &lt;e3&gt; is evaluated in E1.
+</p>
+<div class="org-src-container">
+<pre class="src src-nil"> global env
+      |
+      V
++-------------+
+| ...         |
+|             |
++-------------+
+       ^    ^        E1
+       |    |         |
+       |    |         V
+ +---+-+-+  |    +-------------+
+ | . | . |  +----+  u: e1      |
+ +-+-+---+       |  v: e2      |
+   |             +-------------+
+   |
+   V
+ params: vars
+ body: (define u &lt;E1&gt;)
+       (define v &lt;E2&gt;)
+       &lt;E3&gt;
+</pre>
+</div>
+
+<p>
+The following is the environment structure when definition are scanned
+out; &lt;e3&gt; is evaluated in E2.
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">   global env
+      |
+      V
++-------------+
+| ...         |
+|             |
++-------------+
+       ^    ^                 E1
+       |    |                  |
+       |    |                  V
+ +---+-+-+  |             +-------------+
+ | . | . |  +-------------+ vars        |
+ +-+-+---+                |             |
+   |                      +-------------+          E2
+   |                                  ^             |
+   V                                  |             V
+ params: vars                         |  +-------------+
+ body: (let ((u '*unassigned*)        +--+ u: e1       |
+            (v '*unassigned*))           | v: e2       |
+         (set! u &lt;E1&gt;)                   +-------------+
+         (set! v &lt;E2&gt;)
+         &lt;E3&gt;)
+</pre>
+</div>
+
+<p>
+In the second structure there is an extra frame because a <code>let</code> is
+equivalent to the application of a lambda, and the application of a
+lambda involves the creation of a new frame.
+</p>
+
+<p>
+As long as <code>&lt;e3&gt;</code> is evaluated after <code>u</code> is set to <code>e1</code> and <code>v</code> to
+<code>e2</code> there won't be any difference between the behaviuor in the two
+environments, because there is no difference with respect to the
+values of the bindings in the environment.
+</p>
+
+<p>
+Simultaneous scope without an extra frame could be achieved by
+transforming the body of the lambda so that all its internal
+definitions come before all the rest (cf. the ``accidental reason'',
+Authors mention, because calls to the example procedure <code>f</code> work).
+</p>
+</div>
+</div>
+<div id="outline-container-orgeb6277a" class="outline-3">
+<h3 id="orgeb6277a">Exercise 4.19</h3>
+<div class="outline-text-3" id="text-orgeb6277a">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle, Alyssa P. Hacker, and Eva Lu Ator are arguing about the
+desired result of evaluating the expression
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">let</span> ((a 1))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">f</span> x)
+    (<span style="color: #531ab6;">define</span> <span style="color: #721045;">b</span> (+ a x))
+    (<span style="color: #531ab6;">define</span> <span style="color: #721045;">a</span> 5)
+    (+ a b))
+  (f 10))
+</pre>
+</div>
+
+<p>
+Ben asserts that the result should be obtained using the sequential
+rule for <code>define</code>: <code>b</code> is defined to be 11, then <code>a</code> is defined to be
+5, so the result is 16.  Alyssa objects that mutual recursion requires
+the simultaneous scope rule for internal procedure definitions, and
+that it is unreasonable to treat procedure names differently from
+other names. Thus, she argues for the mechanism implemented Exercise
+4.16.  This would lead to <code>a</code> being unassigned at the time that the
+value for <code>b</code> is to be computed.  Hence, in Alyssa's view the
+procedure should produce an error.  Eva has a third opinion.  She says
+that if the definitions of <code>a</code> and <code>b</code> are truly meant to be
+simultaneous, then the value 5 for <code>a</code> should be used in evaluating
+<code>b</code>.  Hence, in Eva's view <code>a</code> should be 5, <code>b</code> should be 15, and the
+result should be 20.  Which (if any) of these viewpoints do you
+support?  Can you devise a way to implement internal definitions so
+that they behave as Eva prefers?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Both Ben's approach and Alyssa's approach seem okay to me.  As far as
+I can see, a serious obstacle for Eva's approach is represented by
+what we might call ``interdependent definitions''. For example, what
+would we be supposed to do if the definitions of <code>b</code> and <code>a</code> were the
+following?
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">b</span> (+ a x))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">a</span> (b + 5))
+</pre>
+</div>
+<p>
+I cannot see a way to follow Eva's approach, given the possibility of
+this kind of situations, can I?
+</p>
+
+<p>
+(
+</p>
+
+<p>
+Authors say that MIT Scheme generates an error.  Javascript raises an
+error too, when evaluating equivalent code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">((a) =&gt; {
+  <span style="color: #531ab6;">function</span> <span style="color: #721045;">f</span>(<span style="color: #005e8b;">x</span>) {
+    <span style="color: #531ab6;">let</span> <span style="color: #005e8b;">b</span> = a + x;
+    <span style="color: #531ab6;">let</span> <span style="color: #005e8b;">a</span> = 5;
+    <span style="color: #531ab6;">return</span> a + b;
+  }
+  f(10);
+})(1)
+<span style="color: #595959;">/*</span>
+<span style="color: #595959;">  Uncaught ReferenceError: Cannot access 'a' before initialization</span>
+<span style="color: #595959;">  at f (REPL11:4:15)</span>
+<span style="color: #595959;">  at REPL11:9:5</span>
+<span style="color: #595959;">*/</span>
+</pre>
+</div>
+
+<p>
+)
+</p>
+</div>
+</div>
+<div id="outline-container-orgbbb43a8" class="outline-3">
+<h3 id="orgbbb43a8">Exercise 4.20</h3>
+<div class="outline-text-3" id="text-orgbbb43a8">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Because internal definitions look sequential but are actually
+simultaneous, some people prefer to avoid them entirely, and use the
+special form <code>letrec</code> instead.  <code>Letrec</code> looks like <code>let</code>, so it is
+not surprising that the variables it binds are bound simultaneously
+and have the same scope as each other.  The sample procedure <code>f</code> above
+can be written without internal definitions, but with exactly the same
+meaning, as
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">f</span> x)
+  (<span style="color: #531ab6;">letrec</span> ((even?
+            (<span style="color: #531ab6;">lambda</span> (n)
+              (<span style="color: #531ab6;">if</span> (= n 0)
+                  true
+                  (odd? (- n 1)))))
+           (odd?
+            (<span style="color: #531ab6;">lambda</span> (n)
+              (<span style="color: #531ab6;">if</span> (= n 0)
+                  false
+                  (even? (- n 1))))))
+    &lt;rest of body of f&gt;))
+</pre>
+</div>
+
+<p>
+<code>Letrec</code> expressions, which have the form
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">letrec</span> ((<span style="color: #005f5f;">&lt;var_1&gt;</span> <span style="color: #005f5f;">&lt;exp_1&gt;</span>) ... (<span style="color: #005f5f;">&lt;var_n&gt;</span> <span style="color: #005f5f;">&lt;exp_n&gt;</span>))
+  <span style="color: #005f5f;">&lt;body&gt;</span>)
+</pre>
+</div>
+
+<p>
+are a variation on <code>let</code> in which the expressions &lt;exp<sub>k</sub>&gt; that
+provide the initial values for the variables &lt;var<sub>k</sub>&gt; are evaluated
+in an environment that includes all the <code>letrec</code> bindings.  This
+permits recursion in the bindings, such as the mutual recursion of
+<code>even?</code> and <code>odd?</code> in the example above, or the evaluation of 10
+factorial with
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">letrec</span> ((fact
+          (<span style="color: #531ab6;">lambda</span> (n)
+            (<span style="color: #531ab6;">if</span> (= n 1)
+                1
+                (* n (fact (- n 1)))))))
+  (fact 10))
+</pre>
+</div>
+
+<p>
+a. Implement <code>letrec</code> as a derived expression, by transforming a
+<code>letrec</code> expression into a <code>let</code> expression as shown in the text above
+or in Exercise 4.18. That is, the <code>letrec</code> variables should be created
+with a <code>let</code> and then be assigned their values with <code>set!</code>.
+</p>
+
+<p>
+b. Louis Reasoner is confused by all this fuss about internal
+definitions.  The way he sees it, if you don't like to use <code>define</code>
+inside a procedure, you can just use <code>let</code>.  Illustrate what is loose
+about his reasoning by drawing an environment diagram that shows the
+environment in which the <code>&lt;rest of body of f&gt;</code> is evaluated during
+evaluation of the expression <code>(f 5)</code>, with <code>f</code> defined as in this
+exercise.  Draw an environment diagram for the same evaluation, but
+with <code>let</code> in place of <code>letrec</code> in the definition of <code>f</code>.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+a:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">append</span> l1 l2)
+  (<span style="color: #531ab6;">if</span> (null? l1)
+      l2
+      (cons (car l1) (append (cdr l1) l2))))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">example-letrec</span>
+  '(<span style="color: #531ab6;">letrec</span> ((even?
+             (<span style="color: #531ab6;">lambda</span> (n)
+               (<span style="color: #531ab6;">if</span> (= n 0)
+                   true
+                   (odd? (- n 1)))))
+            (odd?
+             (<span style="color: #531ab6;">lambda</span> (n)
+               (<span style="color: #531ab6;">if</span> (= n 0)
+                   false
+                   (even? (- n 1))))))
+     (message <span style="color: #3548cf;">"ciao"</span>)
+     (message <span style="color: #3548cf;">"hola"</span>)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">letrec-body</span> exp)
+  (cddr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">letrec-bindings</span> exp)
+  (cadr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">letrec-vars</span> bindings)
+  (<span style="color: #531ab6;">if</span> (null? bindings)
+      nil
+      (cons (caar bindings) (letrec-vars (cdr bindings)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">letrec-vals</span> bindings)
+  (<span style="color: #531ab6;">if</span> (null? bindings)
+      nil
+      (cons (cadar bindings) (letrec-vals (cdr bindings)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">letrec-build-unassigned-vars</span> vars)
+  (<span style="color: #531ab6;">if</span> (null? vars)
+      nil
+      (cons (list (car vars) '*unassigned*) (letrec-build-unassigned-vars (cdr vars)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">letrec-build-sets</span> vars vals)
+  (<span style="color: #531ab6;">if</span> (null? vars)
+      nil
+      (cons (list 'set! (car vars) (car vals))
+            (letrec-build-sets (cdr vars) (cdr vals)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">letrec-to-let</span> exp)
+  (append
+   (cons 'let (list (letrec-build-unassigned-vars (letrec-vars (letrec-bindings exp)))))
+   (append (letrec-build-sets (letrec-vars (letrec-bindings exp))
+                              (letrec-vals (letrec-bindings exp)))
+           (letrec-body exp))))
+
+(letrec-to-let example-letrec)
+<span style="color: #595959;">;; </span><span style="color: #595959;">=&gt;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">(let ((even? *unassigned*) (odd? *unassigned*))</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(set! even? (lambda (n) (if (= n 0) true (odd? (- n 1)))))</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(set! odd? (lambda (n) (if (= n 0) false (even? (- n 1)))))</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(message "ciao")</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(message "hola"))</span>
+</pre>
+</div>
+
+<p>
+b:
+</p>
+
+<p>
+I had a bit of trouble doing part b of the exercise. But, after
+looking on the web for what people have said and asking for help&#x2026;,
+the following should be the correct drawings. The key thing to notice,
+assuming this is correct, is that, when using <code>let</code> (which is just a
+lambda; see p. 64), the expressions whose evaluation gives the values
+of the <code>let</code> bindings are not evaluated in the context of the new
+frame created by the <code>let</code>, but they are evaluated in the context of
+the frame to which the new frame created by the <code>let</code> points to (that
+is, its ``enclosing environment''). In a sense, we can say, they are
+evaluated while the new frame is in the process of being created.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">When using letrec, &lt;rest of body of f&gt; is evaluated in the following E2 frame:
+
+      E0
+  +-------------------+
+  |f:--+              |
+  |    |              |
+  |    |              |
+  +----+--------------+
+       |   ^    ^
+       |   |    |
+       V   |    |                 E1
++---+---+  |    |   +--+------+---------+
+| | |  -+--+    +---+x: 5               |
++-+-+---+           +-------------------+
+  |                          ^
+  V                          |
+ ...                         |
+                             |    E2
+                     +-------+------------+
+                     | even?:-------------+---------------+
+                     |                    |               |
+                     |                    |&lt;-----------   |
+                     | odd?:---+          |            \  |
+                     +---------+----------+             \ V
+                               |     ^             +---+-\-+
+                               |     |             | | |   +
+                               |     |             +-+-+---+
+                               V     |               |
+                          +---+---+  |               |
+                          | | |  -+--+               V
+                          +-+-+---+                 ...
+                            |
+                            |
+                            V
+                           ...
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-nil">When using let, &lt;rest of body of f&gt; is evaluated in the following E2 frame:
+
+    E0
+  +-------------------+
+  |f:--+              |
+  |    |              |
+  |    |              |
+  +----+--------------+
+       |   ^    ^
+       |   |    |
+       V   |    |                 E1
++---+---+  |    |   +--+------+---------+ &lt;----------------------------+
+| | |  -+--+    +---+x: 5               | &lt;---------------------+      |
++-+-+---+           +-------------------+                       |      |
+  |                          ^                                  |      |
+  V                          |                                  |      |
+ ...                         |                                  |      |
+                             |    E2                            |      |
+                     +-------+------------+                     |      |
+                     | even?:-------------+---------------+     |      |
+                     |                    |               |     |      |
+                     |                    |               |     |      |
+                     | odd?:---+          |               |     |      |
+                     +---------+----------+               V     |      |
+                               |                   +---+---+    |      |
+                               |                   | | |  -+----+      |
+                               |                   +-+-+---+           |
+                               V                     |                 |
+                          +---+---+                  |                 |
+                          | | |   +---------+        V                 |
+                          +-+-+---+         |       ...                |
+                            |               |                          |
+                            |               |                          |
+                            V               |                          |
+                           ...              |                          |
+                                            |                          |
+                                            +--------------------------+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8656943" class="outline-3">
+<h3 id="org8656943">Exercise 4.21</h3>
+<div class="outline-text-3" id="text-org8656943">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Amazingly, Louis's intuition in Exercise 4.20 is correct.  It is
+indeed possible to specify recursive procedures without using <code>letrec</code>
+(or even <code>define</code>), although the method for accomplishing this is much
+more subtle than Louis imagined.  The following expression computes 10
+factorial by applying a recursive factorial procedure<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (n)
+   ((<span style="color: #531ab6;">lambda</span> (fact)
+      (fact fact n))
+    (<span style="color: #531ab6;">lambda</span> (ft k)
+      (<span style="color: #531ab6;">if</span> (= k 1)
+          1
+          (* k (ft ft (- k 1)))))))
+ 10)
+</pre>
+</div>
+
+<p>
+a. Check (by evaluating the expression) that this really does compute
+factorials.  Devise an analogous expression for computing Fibonacci
+numbers.
+</p>
+
+<p>
+b. Consider the following procedure, which includes mutually recursive
+internal definitions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">f</span> x)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">even?</span> n)
+    (<span style="color: #531ab6;">if</span> (= n 0)
+        true
+        (odd? (- n 1))))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">odd?</span> n)
+    (<span style="color: #531ab6;">if</span> (= n 0)
+        false
+        (even? (- n 1))))
+  (even? x))
+</pre>
+</div>
+
+<p>
+Fill in the missing expressions to complete an alternative definition
+of <code>f</code>, which uses neither internal definitions nor <code>letrec</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">f</span> x)
+  ((<span style="color: #531ab6;">lambda</span> (even? odd?)
+     (even? even? odd? x))
+   (<span style="color: #531ab6;">lambda</span> (ev? od? n)
+     (<span style="color: #531ab6;">if</span> (= n 0) true (od? <span style="color: #005f5f;">&lt;??&gt;</span> <span style="color: #005f5f;">&lt;??&gt;</span> <span style="color: #005f5f;">&lt;??&gt;</span>)))
+   (<span style="color: #531ab6;">lambda</span> (ev? od? n)
+     (<span style="color: #531ab6;">if</span> (= n 0) false (ev? <span style="color: #005f5f;">&lt;??&gt;</span> <span style="color: #005f5f;">&lt;??&gt;</span> <span style="color: #005f5f;">&lt;??&gt;</span>)))))
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+a:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (n)
+   ((<span style="color: #531ab6;">lambda</span> (fib)
+      (fib fib n))
+    (<span style="color: #531ab6;">lambda</span> (ft k)
+      (<span style="color: #531ab6;">cond</span> ((= k 0)
+             0)
+            ((= k 1)
+             1)
+            (<span style="color: #531ab6;">else</span> (+ (ft ft (- k 1))
+                     (ft ft (- k 2))))))))
+ 12) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; 144</span>
+</pre>
+</div>
+
+<p>
+b:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">f</span> x)
+  ((<span style="color: #531ab6;">lambda</span> (even? odd?)
+     (even? even? odd? x))
+   (<span style="color: #531ab6;">lambda</span> (ev? od? n)
+     (<span style="color: #531ab6;">if</span> (= n 0) true (od? ev? od? (- n 1))))
+   (<span style="color: #531ab6;">lambda</span> (ev? od? n)
+     (<span style="color: #531ab6;">if</span> (= n 0) false (ev? ev? od? (- n 1))))))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Although we stipulated that
+`halts?' is given a procedure object, notice that this reasoning still
+applies even if `halts?' can gain access to the procedure's text and
+its environment.  This is Turing's celebrated "Halting Theorem", which
+gave the first clear example of a "non-computable" problem, i.e., a
+well-posed task that cannot be carried out as a computational
+procedure.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This example
+illustrates a programming trick for formulating recursive procedures
+without using <code>define</code>.  The most general trick of this sort is the Y
+"operator", which can be used to give a "pure λ-calculus"
+implementation of recursion.  (See Stoy 1977 for details on the λ
+calculus, and Gabriel 1988 for an exposition of the Y operator in
+Scheme.)</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.5)</span></p>
+</div>
+</body>
+</html>
