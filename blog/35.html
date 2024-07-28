@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-07-28 Sun 22:37 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 4.17</title>
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 4.17
+<br />
+<span class="subtitle">2024-07-28 Sun</span>
+</h1>
+<div id="outline-container-orgef6604e" class="outline-2">
+<h2 id="orgef6604e">Separating Syntactic Analysis from Execution</h2>
+<div class="outline-text-2" id="text-orgef6604e">
+<ul class="org-ul">
+<li>Our evaluator is inefficient in that it interleaves syntactic
+analysis and execution of expressions.</li>
+
+<li>If a program is executed many times, then its syntax is expensively
+and wastefully analyzed each of those times.</li>
+
+<li><p>
+Consider:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">factorial</span> n)
+  (<span style="color: #531ab6;">if</span> (= n 1)
+      1
+      (* (factorial (- n 1)) n)))
+</pre>
+</div>
+
+<p>
+Each time <code>factorial</code> is called the evaluator must determine that
+the body is an <code>if</code> statement and act accordingly. Each time <code>(*
+  (factorial (- n 1)) n)</code>, <code>(factorial (- n 1))</code>, and <code>(- n 1)</code> are
+evaluated, the evaluator must determine that they are applications
+and act accordingly.
+</p></li>
+
+<li>Authors present a way, used by Jonathan Rees in 1982 and
+independently invented by Marc Feeley in 1986, to perform syntactic
+analysis only once.</li>
+
+<li><code>Eval</code> is split into two parts.</li>
+
+<li>``The procedure <code>analyze</code> takes only the expression. It performs the
+syntactic analysis and returns a new procedure, the <i>execution
+procedure</i>, that encapsulates the work to be done in executing the
+analyzed expression. The execution procedure takes an environment as
+its argument and completes the evaluation. This saves work because
+<code>analyze</code> will be called only once on an expression, while the
+execution procedure may be called many times.'' (394)</li>
+</ul>
+
+<p>
+Here is the code:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval</span> exp env)
+  ((analyze exp) env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze</span> exp)
+  (<span style="color: #531ab6;">cond</span> ((self-evaluating? exp)
+         (analyze-self-evaluating exp))
+        ((quoted? exp) (analyze-quoted exp))
+        ((variable? exp) (analyze-variable exp))
+        ((assignment? exp) (analyze-assignment exp))
+        ((definition? exp) (analyze-definition exp))
+        ((if? exp) (analyze-if exp))
+        ((begin? exp) (analyze-sequence (begin-action exp)))
+        ((cond? exp) (analyze (cond-&gt;if exp)))
+        ((application? exp) (analyze-application exp))
+        (<span style="color: #531ab6;">else</span>
+         (error <span style="color: #3548cf;">"Unknown expression type -- ANALYZE"</span> exp))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-self-evaluating</span> exp)
+  (<span style="color: #531ab6;">lambda</span> (env) exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-quoted</span> exp)
+  (<span style="color: #531ab6;">let</span> ((qval (text-of-quotation exp)))
+    (<span style="color: #531ab6;">lambda</span> (env) qval)))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Looking up a variable depends upon knowing the environment, so it</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">must be done at execution time (Sec. 5.5.6 will show, though, how</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">to perform an important part of the variable search as part of the</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">syntactic analysis).</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-variable</span> exp)
+  (<span style="color: #531ab6;">lambda</span> (env) (lookup-variable-value exp env)))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Assignments and definitions, too, can be performed only when the</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">env is known. However, the recursive analysis of `assignment-value`</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">and `definition-value` during syntactic analys is a ``major gain in</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">efficiency''.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-assignment</span> exp)
+  (<span style="color: #531ab6;">let</span> ((var (assignment-variable exp))
+        (vproc (analyze (assignment-value exp))))
+    (<span style="color: #531ab6;">lambda</span> (env)
+      (set-variable-value! var (vproc env) env)
+      'ok)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-definition</span> exp)
+  (<span style="color: #531ab6;">let</span> ((var (definition-variable exp))
+        (vproc (analyze (definition-value exp))))
+    (<span style="color: #531ab6;">lambda</span> (env)
+      (define-variable! var (vproc env) env)
+      'ok)))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">We now analyze predicates, consequents, and alternatives of if</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">statements at analysis time:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-if</span> exp)
+  (<span style="color: #531ab6;">let</span> ((pproc (analyze (if-predicate exp)))
+        (cproc (analyze (if-consequent exp)))
+        (aproc (analyze (if-alternative exp))))
+    (<span style="color: #531ab6;">lambda</span> (env)
+      (<span style="color: #531ab6;">if</span> (true? (pproc env))
+          (cproc env)
+          (aproc env)))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">&#955;:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-lambda</span> exp)
+  (<span style="color: #531ab6;">let</span> ((vars (lambda-parameters exp))
+        (bproc (analyze-sequence (lambda-body exp))))
+    (<span style="color: #531ab6;">lambda</span> (env) (make-procedure vars bproc env))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">The analysis of sequences is ``more involved'': ...</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-sequence</span> exps)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">sequentially</span> proc1 proc2)
+    (<span style="color: #531ab6;">lambda</span> (env) (proc1 env) (proc2 env)))
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">loop</span> first-proc rest-procs)
+    (<span style="color: #531ab6;">if</span> (null? rest-procs)
+        first-proc
+        (loop (sequentially first-proc (car rest-procs))
+              (cdr rest-procs))))
+  (<span style="color: #531ab6;">let</span> ((procs (<span style="color: #531ab6;">map</span> analyze exps)))
+    (<span style="color: #531ab6;">if</span> (null? procs)
+        (error <span style="color: #3548cf;">"Empty sequence -- ANALYZE"</span>))
+    (loop (car procs) (cdr procs))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Finally, to analyze an application...</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-application</span> exp)
+  (<span style="color: #531ab6;">let</span> ((fproc (analyze (operator exp)))
+        (aprocs (<span style="color: #531ab6;">map</span> analyze (operands exp))))
+    (<span style="color: #531ab6;">lambda</span> (env)
+      (execute-application (fproc env)
+                           (<span style="color: #531ab6;">map</span> (<span style="color: #531ab6;">lambda</span> (aproc) (aproc env))
+                                aprocs)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">execute-application</span> proc args)
+  (<span style="color: #531ab6;">cond</span> ((primitive-procedure? proc)
+         (apply-primitive-procedure proc args))
+        ((compound-procedure? proc)
+         ((procedure-body proc)
+          (extend-environment (procedure-parameters proc)
+                              args
+                              (procedure-environment proc))))
+        (<span style="color: #531ab6;">else</span>
+         (error
+          <span style="color: #3548cf;">"Unknown procedure type -- EXECUTE-APPLICATION"</span>
+          proc))))
+</pre>
+</div>
+</div>
+<div id="outline-container-org53a0456" class="outline-3">
+<h3 id="org53a0456">Exercise 4.22</h3>
+<div class="outline-text-3" id="text-org53a0456">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Extend the evaluator in this section to support the special form
+<code>let</code>. (See Exercise 4.6)
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze</span> exp)
+    (<span style="color: #531ab6;">cond</span> ((self-evaluating? exp)
+           (analyze-self-evaluating exp))
+          ((quoted? exp) (analyze-quoted exp))
+          ((variable? exp) (analyze-variable exp))
+          ((assignment? exp) (analyze-assignment exp))
+          ((definition? exp) (analyze-definition exp))
+          ((if? exp) (analyze-if exp))
+          ((lambda? exp) (analyze-lambda exp))
+          ((begin? exp) (analyze-sequence (begin-actions exp)))
+          ((cond? exp) (analyze (cond-&gt;if exp)))
+          ((let? exp) (analyze (let-combination exp)))
+          ((application? exp) (analyze-application exp))
+          (<span style="color: #531ab6;">else</span>
+           (error <span style="color: #3548cf;">"Unknown expression type -- ANALYZE"</span> exp))))
+<span style="color: #595959;">;; </span><span style="color: #595959;">where `let-combination' is the procedure (shown in the answer to</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">Exercise 4.6) that transforms a let expression into (the</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">application of) a lambda expression.</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org76656d4" class="outline-3">
+<h3 id="org76656d4">Exercise 4.23</h3>
+<div class="outline-text-3" id="text-org76656d4">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Alyssa P. Hacker doesn't understand why <code>analyze-sequence</code> needs to be
+so complicated.  All the other analysis procedures are straightforward
+transformations of the corresponding evaluation procedures (or <code>eval</code>
+clauses) in section 4.1.1.  She expected <code>analyze-sequence</code> to look
+like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">analyze-sequence</span> exps)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">execute-sequence</span> procs env)
+    (<span style="color: #531ab6;">cond</span> ((null? (cdr procs)) ((car procs) env))
+          (<span style="color: #531ab6;">else</span> ((car procs) env)
+                (execute-sequence (cdr procs) env))))
+  (<span style="color: #531ab6;">let</span> ((procs (<span style="color: #531ab6;">map</span> analyze exps)))
+    (<span style="color: #531ab6;">if</span> (null? procs)
+        (error <span style="color: #3548cf;">"Empty sequence -- ANALYZE"</span>))
+    (<span style="color: #531ab6;">lambda</span> (env) (execute-sequence procs env))))
+</pre>
+</div>
+
+<p>
+Eva Lu Ator explains to Alyssa that the version in the text does more
+of the work of evaluating a sequence at analysis time.  Alyssa's
+sequence-execution procedure, rather than having the calls to the
+individual execution procedures built in, loops through the procedures
+in order to call them: In effect, although the individual expressions
+in the sequence have been analyzed, the sequence itself has not been.
+</p>
+
+<p>
+Compare the two versions of <code>analyze-sequence</code>.  For example, consider
+the common case (typical of procedure bodies) where the sequence has
+just one expression.  What work will the execution procedure produced
+by Alyssa's program do?  What about the execution procedure produced
+by the program in the text above?  How do the two versions compare for
+a sequence with two expressions?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Let's consider a sequence with one expression, the sequence which
+contains the self-evaluating expression <code>1</code>: <code>(1)</code>.
+</p>
+
+<p>
+This is what happens when the program in the main text is applied to
+that sequence:
+</p>
+<ul class="org-ul">
+<li><p>
+<code>procs</code> is assigned this value:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (env) 1))
+</pre>
+</div></li>
+<li><p>
+<code>loop</code> is called:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(loop (<span style="color: #531ab6;">lambda</span> (env) 1) nil)
+</pre>
+</div></li>
+<li><p>
+final value:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">lambda</span> (env) 1)
+</pre>
+</div></li>
+<li>If we apply this latter value (which is a <code>lambda</code>) to an
+environment, then it evaluates to <code>1</code>.</li>
+</ul>
+
+<p>
+This, instead, is what happens with Alyssa's program:
+</p>
+<ul class="org-ul">
+<li><code>procs</code> are assigned the same value they are assigned by the program
+in the main text;</li>
+<li><p>
+final value:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">lambda</span> (env) (execute-sequence ((<span style="color: #531ab6;">lambda</span> (env) q))
+                                env))
+</pre>
+</div></li>
+<li><p>
+if this latter value is applied to an environment, then it evaluates
+to this call:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (env) 1) env)
+</pre>
+</div>
+<p>
+which evaluates to 1.
+</p></li>
+</ul>
+
+<p>
+Let's now consider the sequence with the self-evaluting expression <code>1</code>
+and the self-evaluting expression <code>2</code>: <code>(1 2)</code>.
+</p>
+
+<p>
+This is what happens when the program in the main text is applied to
+that sequence:
+</p>
+<ul class="org-ul">
+<li><p>
+<code>procs</code> is set to this value:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (env) 1) (<span style="color: #531ab6;">lambda</span> (env) 2))
+</pre>
+</div></li>
+<li><p>
+we perform this application:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(loop (<span style="color: #531ab6;">lambda</span> (env) 1) ((<span style="color: #531ab6;">lambda</span> (env) 2)))
+</pre>
+</div></li>
+<li><p>
+then we perform this application:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(loop (<span style="color: #531ab6;">lambda</span> (env) (<span style="color: #531ab6;">lambda</span> (env) 1) (<span style="color: #531ab6;">lambda</span> (env) 2)) nil)
+</pre>
+</div></li>
+<li><p>
+This is the final value:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">lambda</span> (env) ((<span style="color: #531ab6;">lambda</span> (env) 1 env)) ((<span style="color: #531ab6;">lambda</span> (env) 2) env))
+</pre>
+</div></li>
+</ul>
+
+<p>
+This is what happens with Alyssa's program:
+</p>
+<ul class="org-ul">
+<li><code>procs</code> is set to the same value as above;</li>
+<li><p>
+Final value:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">lambda</span> (env) (execute-sequence ((<span style="color: #531ab6;">lambda</span> (env) 1)
+                                 (<span style="color: #531ab6;">lambda</span> (env) 2))
+                                env))
+</pre>
+</div></li>
+<li><p>
+When we apply this final value (which is a <code>lambda</code>) to an
+environment, we evaluate this application, which evaluates to 1:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (env) 1) env)
+</pre>
+</div>
+<p>
+But also also this one:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(execute-sequence ((<span style="color: #531ab6;">lambda</span> (env) 2)) env)
+</pre>
+</div>
+<p>
+which evaluates to
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #531ab6;">lambda</span> (env) 2 ) env)
+</pre>
+</div>
+<p>
+which evaluates to 2.
+</p>
+
+<p>
+The program in the main text and Alyssa's program give the same
+result. However, Alyssa's program returns a lambda which does more
+work when it is called; it has to construct the final lambda
+calls. The program in the main text returns a lambda whose body
+already contains those final lambda calls.
+</p></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.5)</span></p>
+</div>
+</body>
+</html>
