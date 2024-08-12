@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-06-16 Sun 23:22 -->
+<!-- 2024-08-12 Mon 22:31 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 4.1.1 and 4.1.2</title>
 <meta name="generator" content="Org Mode" />
-<style>
+<style type="text/css">
   #content { max-width: 60em; margin: auto; }
   .title  { text-align: center;
              margin-bottom: .2em; }
@@ -198,12 +198,11 @@
 <div id="content" class="content">
 <h1 class="title">SICP 4.1.1 and 4.1.2
 <br />
-<span class="subtitle">2024-06-09 Sun</span>
+<span class="subtitle">2024-06-09 Sun (updated on 2024-08-12 Mon)</span>
 </h1>
-
-<div id="outline-container-orgff2e482" class="outline-2">
-<h2 id="orgff2e482">4 Metalinguistic abstraction</h2>
-<div class="outline-text-2" id="text-orgff2e482">
+<div id="outline-container-orgbd1db23" class="outline-2">
+<h2 id="orgbd1db23">4 Metalinguistic abstraction</h2>
+<div class="outline-text-2" id="text-orgbd1db23">
 <p>
 We have seen several techniques that programmers can use to tame
 complexity. So far we have used the Lisp language. But, as complexity
@@ -274,10 +273,14 @@ Lisp. The first evaluator will be for Lisp itself (a subset of the
 Scheme dialect).
 </p>
 </div>
+<div id="outline-container-org32bbdfd" class="outline-3">
+<h3 id="org32bbdfd">4.1 The Metacircular evaluator</h3>
+<div class="outline-text-3" id="text-org32bbdfd">
+<p>
+We are going to write in Lisp an evaluator for Lisp. There's nothing
+wrong with that.
+</p>
 
-<div id="outline-container-orgf5ff1ab" class="outline-3">
-<h3 id="orgf5ff1ab">4.1 The Metacircular evaluator</h3>
-<div class="outline-text-3" id="text-orgf5ff1ab">
 <blockquote>
 <p>
 An evaluator that is written in the same language that it evaluates is
@@ -290,30 +293,66 @@ environment model of evaluation described in section 3.2. (362)
 </p>
 </blockquote>
 
+<p>
+The environment model of evaluation has two basic parts:
+</p>
+<blockquote>
+<ol class="org-ol">
+<li>To evaluate a combination (a compound expression other than a
+special form), evaluate the subexpressions and then apply the value
+of the operator subexpression to the values of the operand
+subexpressions.</li>
+
+<li>To apply a compound procedure to a set of arguments, evaluate the
+body of the procedure in a new environment.  To construct this
+environment, extend the environment part of the procedure object by
+a frame in which the formal parameters of the procedure are bound
+to the arguments to which the procedure is applied.</li>
+</ol>
+</blockquote>
+
+<p>
+Authors say that those two rules ``describe the essence of the
+evaluation process.'' Such a process is a cycle in which expressions
+which are to be evaluated in environments are reduced to procedures
+which are to be applied to arguments, which, in turn are reduced to
+other expression which are to evaluated in other environments, and so
+on. The process terminates when the evaluator has either to look up
+the value of a symbol in an environment or to apply a primitive
+procedure (See Figure 4.1).
+</p>
+
+<p>
+I find footnote 2 quite illuminating: given that the primitive
+procedures are not implemented in the evaluator, Authors feel the need
+to note that ``[t]he job of the evaluator is not to specify the
+primitive of the language, but rather to provide the connective tissue
+&#x2014; the means of combination and the means of abstraction &#x2014; that
+binds a collection of primitives to form a language.'' Authors, after
+having said that, are more specific:
+</p>
+<ul class="org-ul">
+<li>The evaluator lets us deal with <b>nested expressions</b>. Consider: <code>(+
+  1 (* 2 3))</code>. The <code>+</code> procedure does not know how to deal with <code>(* 2
+  3)</code> by itself; it expects number.</li>
+<li>The evaluator lets us use <b>variables</b>. Consider: <code>(+ x 1)</code>. The
+primitive procedure <code>+</code> does not know how to deal with <code>x</code>; it
+expects numbers.</li>
+<li>The evaluator lets us define <b>compound procedures</b>.</li>
+<li>The evaluator provides the <b>special forms</b>.</li>
+</ul>
+
 <blockquote>
 <p>
-The evaluation process can be described as the interplay between two
-procedures: `eval' and `apply'.
-</p>
-
-<p>
-Recall that the model has two basic parts&#x2026;
-</p>
-
-<p>
-[&#x2026;]
-</p>
-
-<p>
 The implementation of the evaluator will depend upon procedures that
-define the "syntax" of the expressions to be evaluated. (363)
+define the "syntax" of the expressions to be evaluated.  We will use
+data abstraction&#x2026; (363)
 </p>
 </blockquote>
 </div>
-
-<div id="outline-container-orgfb31030" class="outline-4">
-<h4 id="orgfb31030">4.1.1 The Core of the Evaluator</h4>
-<div class="outline-text-4" id="text-orgfb31030">
+<div id="outline-container-org46b0333" class="outline-4">
+<h4 id="org46b0333">4.1.1 The Core of the Evaluator</h4>
+<div class="outline-text-4" id="text-org46b0333">
 <p>
 ``Abstract syntax'':
 </p>
@@ -338,8 +377,8 @@ abstract means for selecting its parts. (364)
 <li>Combinations</li>
 </ul>
 
-<pre class="example">
-*Figure 4.1:* The `eval'-`apply' cycle exposes the essence of a
+<div class="org-src-container">
+<pre class="src src-nil">*Figure 4.1:* The `eval'-`apply' cycle exposes the essence of a
 computer language.
 
                                      .,ad88888888baa,
@@ -365,6 +404,7 @@ computer language.
 [graphic by Normand Veillux, modified]
 [Figure from SICP Unofficial Texinfo Format version 2.neilvandyke4 (January 10, 2007)]
 </pre>
+</div>
 
 <p>
 Here is <code>eval</code>:
@@ -447,10 +487,9 @@ The rest:
 </div>
 </div>
 </div>
-
-<div id="outline-container-org3c75410" class="outline-4">
-<h4 id="org3c75410">Exercise 4.1</h4>
-<div class="outline-text-4" id="text-org3c75410">
+<div id="outline-container-org8f14358" class="outline-4">
+<h4 id="org8f14358">Exercise 4.1</h4>
+<div class="outline-text-4" id="text-org8f14358">
 <p>
 <b>Exercise</b>:
 </p>
@@ -537,10 +576,9 @@ shouldn't it?
 </div>
 </div>
 </div>
-
-<div id="outline-container-orgf94614e" class="outline-4">
-<h4 id="orgf94614e">4.1.2 Representing Expressions</h4>
-<div class="outline-text-4" id="text-orgf94614e">
+<div id="outline-container-orgcd40915" class="outline-4">
+<h4 id="orgcd40915">4.1.2 Representing Expressions</h4>
+<div class="outline-text-4" id="text-orgcd40915">
 <p>
 Authors presents the ``specification of the syntax'' of the language:
 </p>
@@ -682,10 +720,9 @@ can be transformed into an <code>if</code> expression.
 </div>
 </div>
 </div>
-
-<div id="outline-container-org22f6324" class="outline-4">
-<h4 id="org22f6324">Exercise 4.2:</h4>
-<div class="outline-text-4" id="text-org22f6324">
+<div id="outline-container-orgb972684" class="outline-4">
+<h4 id="orgb972684">Exercise 4.2:</h4>
+<div class="outline-text-4" id="text-orgb972684">
 <p>
 <b>Exercise</b>:
 </p>
@@ -773,10 +810,9 @@ given that <code>x</code> hasn't been defined, we shouldn't be looking it up.
 </ul>
 </div>
 </div>
-
-<div id="outline-container-org83d4296" class="outline-4">
-<h4 id="org83d4296">Exercise 4.3</h4>
-<div class="outline-text-4" id="text-org83d4296">
+<div id="outline-container-org42451a4" class="outline-4">
+<h4 id="org42451a4">Exercise 4.3</h4>
+<div class="outline-text-4" id="text-org42451a4">
 <p>
 <b>Exercise</b>:
 </p>
@@ -828,10 +864,9 @@ I think the code would look like something like this:
 </div>
 </div>
 </div>
-
-<div id="outline-container-orgaee23d0" class="outline-4">
-<h4 id="orgaee23d0">Exercise 4.4</h4>
-<div class="outline-text-4" id="text-orgaee23d0">
+<div id="outline-container-orgd4bdafd" class="outline-4">
+<h4 id="orgd4bdafd">Exercise 4.4</h4>
+<div class="outline-text-4" id="text-orgd4bdafd">
 <p>
 <b>Exercise</b>:
 </p>
@@ -900,10 +935,9 @@ and <code>or</code> as derived expressions.
 </div>
 </div>
 </div>
-
-<div id="outline-container-org1b8c51c" class="outline-4">
-<h4 id="org1b8c51c">Exercise 4.5</h4>
-<div class="outline-text-4" id="text-org1b8c51c">
+<div id="outline-container-org333b53b" class="outline-4">
+<h4 id="org333b53b">Exercise 4.5</h4>
+<div class="outline-text-4" id="text-org333b53b">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1013,10 +1047,9 @@ extended syntax.
 </div>
 </div>
 </div>
-
-<div id="outline-container-org642cd9a" class="outline-4">
-<h4 id="org642cd9a">Exercise 4.6</h4>
-<div class="outline-text-4" id="text-org642cd9a">
+<div id="outline-container-orgef6b969" class="outline-4">
+<h4 id="orgef6b969">Exercise 4.6</h4>
+<div class="outline-text-4" id="text-orgef6b969">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1117,10 +1150,9 @@ expressions.
 </div>
 </div>
 </div>
-
-<div id="outline-container-orgf533380" class="outline-4">
-<h4 id="orgf533380">Exercise 4.7</h4>
-<div class="outline-text-4" id="text-orgf533380">
+<div id="outline-container-org866590d" class="outline-4">
+<h4 id="org866590d">Exercise 4.7</h4>
+<div class="outline-text-4" id="text-org866590d">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1229,10 +1261,9 @@ something?
 </p>
 </div>
 </div>
-
-<div id="outline-container-org8f89bf2" class="outline-4">
-<h4 id="org8f89bf2">Exercise 4.8</h4>
-<div class="outline-text-4" id="text-org8f89bf2">
+<div id="outline-container-orgc30089c" class="outline-4">
+<h4 id="orgc30089c">Exercise 4.8</h4>
+<div class="outline-text-4" id="text-orgc30089c">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1327,10 +1358,9 @@ into the <code>fib-iter</code> definition and call as presented in 1.2.2.
 </div>
 </div>
 </div>
-
-<div id="outline-container-org51ca187" class="outline-4">
-<h4 id="org51ca187">Exercise 4.9</h4>
-<div class="outline-text-4" id="text-org51ca187">
+<div id="outline-container-org0177aa0" class="outline-4">
+<h4 id="org0177aa0">Exercise 4.9</h4>
+<div class="outline-text-4" id="text-org0177aa0">
 <p>
 <b>Exercise</b>:
 </p>
@@ -1450,9 +1480,9 @@ necessary. See p. 221 fn. 3]
 </p>
 </div>
 </div>
-<div id="outline-container-org9e46424" class="outline-4">
-<h4 id="org9e46424">Exercise 4.10</h4>
-<div class="outline-text-4" id="text-org9e46424">
+<div id="outline-container-orge27be0f" class="outline-4">
+<h4 id="orge27be0f">Exercise 4.10</h4>
+<div class="outline-text-4" id="text-orge27be0f">
 <p>
 <b>Exercise</b>:
 </p>
