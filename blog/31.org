@@ -13,7 +13,7 @@
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
 #+title: SICP 4.1.1 and 4.1.2
-#+subtitle: 2024-06-09 Sun (updated on 2024-08-12 Mon)
+#+subtitle: 2024-06-09 Sun (updated on 2024-08-12 Mon; 2024-08-20 Tue)
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.3.50 (<a href="https://orgmode.org">Org</a> mode 9.6.15)
 
@@ -748,9 +748,9 @@ expressions.
     (cddr exp))
 
   (define (let-combination exp)
-    (cons (list 'lambda
-                (let-vars exp)
-                (let-body exp))
+    (cons (cons 'lambda
+                (cons (let-vars exp)
+                      (let-body exp)))
           (let-exps exp)))
 
   ;; Example:
@@ -780,7 +780,7 @@ expressions.
           ((begin? exp)
            (eval-sequence (begin-actions exp) env))
           ((cond? exp) (eval (cond->if exp) env))
-          ((let? exp) (eval (let-combination) env)) ;; <----------------
+          ((let? exp) (eval (let-combination exp) env)) ;; <----------------
           ((application? exp)
            (apply (eval (operator exp) env)
                   (list-of-values (operands exp) env)))
