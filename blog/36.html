@@ -1,0 +1,1209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-09-18 Wed 20:44 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 4.2.1 and 4.2.2</title>
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 4.2.1 and 4.2.2</h1>
+<div id="outline-container-orgadd3c82" class="outline-2">
+<h2 id="orgadd3c82">4.2.1 Normal Order and Applicative Order</h2>
+<div class="outline-text-2" id="text-orgadd3c82">
+<p>
+<i>Lazy evaluation</i> is the technique of delaying the evaluation of
+procedure arguments until their values are needed.  Roughly, languages
+that evaluate lazily are called ``normal-order'' languages and those
+that do not are called ``applicative-order'' languages.
+</p>
+
+<p>
+Since Scheme is an applicative-order language, the following will give
+an error:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">try</span> a b)
+  (<span style="color: #531ab6;">if</span> (= a 0) 1 b))
+
+(try 0 (/ 1 0)) <span style="color: #595959;">;; </span><span style="color: #595959;">=&gt; error, division by 0</span>
+</pre>
+</div>
+
+<p>
+A procedure is said to "strict" in those arguments which are evaluated
+before the body of the procedure is entered, and it is said to be
+"non-strict" in those arguments which are not evaluated before the
+body of the procedure is entered.
+</p>
+</div>
+<div id="outline-container-orged4afdd" class="outline-3">
+<h3 id="orged4afdd">Exercise 4.25</h3>
+<div class="outline-text-3" id="text-orged4afdd">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Suppose that (in ordinary applicative-order Scheme) we define <code>unless</code>
+as shown above and then define <code>factorial</code> in terms of <code>unless</code> as
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">factorial</span> n)
+  (<span style="color: #531ab6;">unless</span> (= n 1)
+    (* n (factorial (- n 1)))
+    1))
+</pre>
+</div>
+
+<p>
+What happens if we attempt to evaluate <code>(factorial 5)</code>? Will our
+definitions work in a normal-order language?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+At some point, the chain of recursive calls ends up calling <code>unless</code>
+where <code>n</code> is bound to 1.
+</p>
+
+<p>
+This means that the second argument passed to <code>unless</code>, if evaluated,
+would entail the application of <code>factorial</code> to <code>0</code>.
+</p>
+
+<p>
+An applicative order evaluation language would evaluate it; so it
+would initiate an infinite chain of applications (because the
+terminating condition will never be satisfied).
+</p>
+
+<p>
+But there should be no problem in a normal-order language.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbbc84bc" class="outline-3">
+<h3 id="orgbbc84bc">Exercise 4.26</h3>
+<div class="outline-text-3" id="text-orgbbc84bc">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle and Alyssa P. Hacker disagree over the importance of
+lazy evaluation for implementing things such as <code>unless</code>.  Ben points
+out that it's possible to implement <code>unless</code> in applicative order as a
+special form.  Alyssa counters that, if one did that, <code>unless</code> would
+be merely syntax, not a procedure that could be used in conjunction
+with higher-order procedures.  Fill in the details on both sides of
+the argument.  Show how to implement <code>unless</code> as a derived expression
+(like <code>cond</code> or <code>let</code>), and give an example of a situation where it
+might be useful to have <code>unless</code> available as a procedure, rather than
+as a special form.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Remember that Authors stated:
+</p>
+<blockquote>
+<p>
+Some special forms in our language can be defined in terms of
+expressions involving other special forms, rather than being
+implemented directly (p. ?) [&#x2026;] Expressions (such as cond) that we
+choose to implement as syntactic transformations are called <i>derived
+expressions</i>.
+</p>
+</blockquote>
+<p>
+That is the way Authors understand <code>unless</code> to be a special form
+(i.e., defined in terms of <code>if</code>).
+</p>
+
+<p>
+We can transform an <code>unless</code> expression into an <code>if</code> expression in the
+following way:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">tagged-list?</span> exp tag)
+  (<span style="color: #531ab6;">if</span> (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">unless?</span> exp)
+  (tagged-list? exp 'unless))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">unless-condition</span> exp)
+  (cadr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">unless-usual-value</span> exp)
+  (caddr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">unless-exceptional-value</span> exp)
+  (cadddr exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">unless-&gt;if</span> exp)
+  (list 'if
+        (unless-condition exp)
+        (unless-exceptional-value exp)
+        (unless-usual-value exp)))
+</pre>
+</div>
+
+<p>
+Ben is right that we can implement <code>unless</code> as a special form. Alyssa
+is right in maintaining that, if implemented that way, it could not be
+passed to higher-order procedures. The reason is that the arguments of
+a procedures are evaluated; the evaluation of a symbol which is bound
+to procedure will return a procedure object, but if we evaluate the
+``name'' of special form, then we try to look it up as if it was a
+variable name; but there is not such a binding in the environment.
+</p>
+
+<p>
+It's kind of hard to think of a case where it would be useful to have
+<code>unless</code> as a procedure. The only thing I can think of is something
+like <code>BOH</code>, that is, a procedure that gives the user the choice of how
+to deal with a certain condition.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">BOH</span>
+  (<span style="color: #531ab6;">lambda</span> (cond-eval-strategy cond alt1 alt2)
+    (cond-eval-strategy cond alt1 alt2)))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org6d93ecc" class="outline-2">
+<h2 id="org6d93ecc">4.2.2 An Interpreter with Lazy Evaluation</h2>
+<div class="outline-text-2" id="text-org6d93ecc">
+<p>
+Authors show the implementation of a (normal-order) Scheme in which
+compounde procedures are non-strict (in each argument) &#x2014; but
+primitive procedures keep being strict.
+</p>
+
+<p>
+When the evaluator applies a compound procedures, instead of
+evaluating the arguments, it turns them into object called
+``thunks''. Thunks contain all the information that is need to
+evaluate the arguments as if it was evaluated at application time. The
+evalution of a thunk is called ``forcing''.
+</p>
+
+<p>
+Thunks are to be forced when:
+</p>
+<ul class="org-ul">
+<li>they are passed to a primitive procedure;</li>
+<li>when they are the predicate of a conditional;</li>
+<li>when they are the operator of an application.</li>
+</ul>
+
+<p>
+The evaluator memoizes the thunk. That is, if a thunk is forced,
+future forcirg can just retrieve their already-computed value.
+</p>
+
+<p>
+Here is the new code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval</span> exp env)
+  ...
+  ((application? exp)
+   (apply (actual-value (operator exp) env)
+          (operands exp)
+          env))
+  ...)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">actual-value</span> exp env)
+  (force-it (eval exp env)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply</span> procedure arguments env)
+  (<span style="color: #531ab6;">cond</span> ((primitive-procedure? procedure)
+         (apply-primitive-procedure
+          procedure
+          (list-of-arg-values arguments env)))  <span style="color: #595959;">; </span><span style="color: #595959;">changed</span>
+        ((compound-procedure? procedure)
+         (eval-sequence
+          (procedure-body procedure)
+          (extend-environment
+           (procedure-parameters procedure)
+           (list-of-delayed-args arguments env) <span style="color: #595959;">; </span><span style="color: #595959;">changed</span>
+           (procedure-environment procedure))))
+        (<span style="color: #531ab6;">else</span>
+         (error
+          <span style="color: #3548cf;">"Unknown procedure type -- APPLY"</span> procedure))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-arg-values</span> exps env)
+  (<span style="color: #531ab6;">if</span> (no-operands? exps)
+      '()
+      (cons (actual-value (first-operand exps) env)
+            (list-of-arg-values (rest-operands exps)
+                                env))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-delayed-args</span> exps env)
+  (<span style="color: #531ab6;">if</span> (no-operands? exps)
+      '()
+      (cons (delay-it (first-operand exps) env)
+            (list-of-delayed-args (rest-operands exps)
+                                  env))))
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-if</span> exp env)
+  (<span style="color: #531ab6;">if</span> (true? (actual-value (if-predicate exp) env))
+      (eval (if-consequent exp) env)
+      (eval (if-alternative exp) env)))
+
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">input-prompt</span> <span style="color: #3548cf;">";;; L-Eval input:"</span>)
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">output-prompt</span> <span style="color: #3548cf;">";;; L-Eval value:"</span>)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">driver-loop</span>)
+  (prompt-for-input input-prompt)
+  (<span style="color: #531ab6;">let</span> ((input (read)))
+    (<span style="color: #531ab6;">let</span> ((output
+           (actual-value input the-global-environment)))
+      (announce-output output-prompt)
+      (user-print output)))
+  (driver-loop))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">delay-it</span> exp env)
+  (list 'thunk exp env))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">thunk?</span> obj)
+  (tagged-list? obj 'thunk))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">thunk-exp</span> thunk) (cadr thunk))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">thunk-env</span> thunk) (caddr thunk))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">evaluated-thunk?</span> obj)
+  (tagged-list? obj 'evaluated-thunk))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">thunk-value</span> evaluated-thunk) (cadr evaluated-thunk))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">force-it</span> obj)
+  (<span style="color: #531ab6;">cond</span> ((thunk? obj)
+         (<span style="color: #531ab6;">let</span> ((result (actual-value
+                        (thunk-exp obj)
+                        (thunk-env obj))))
+           (set-car! obj 'evaluated-thunk)
+           (set-car! (cdr obj) result)  <span style="color: #595959;">; </span><span style="color: #595959;">replace `exp' with its value</span>
+           (set-cdr! (cdr obj) '())     <span style="color: #595959;">; </span><span style="color: #595959;">forget unneeded `env'</span>
+           result))
+        ((evaluated-thunk? obj)
+         (thunk-value obj))
+        (<span style="color: #531ab6;">else</span> obj)))
+</pre>
+</div>
+</div>
+<div id="outline-container-org55ac327" class="outline-3">
+<h3 id="org55ac327">Exercise 4.27</h3>
+<div class="outline-text-3" id="text-org55ac327">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Suppose we type in the following definitions to the lazy evaluator:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">count</span> 0)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">id</span> x)
+  (set! count (+ count 1))
+  x)
+</pre>
+</div>
+
+<p>
+Give the missing values in the following sequence of interactions, and
+explain your answers.(5)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">w</span> (id (id 10)))
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+count
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+<span style="color: #005f5f;">&lt;RESPONSE&gt;</span>
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+w
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+<span style="color: #005f5f;">&lt;RESPONSE&gt;</span>
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+count
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+<span style="color: #005f5f;">&lt;RESPONSE&gt;</span>
+</pre>
+</div>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+The first &lt;RESPONSE&gt; is 1 (I thought it was 0&#x2026;). When we evaluate
+<code>(define w (id (id 10)))</code>, among other things, we apply <code>eval</code> to the
+``definition-value'', that is, to <code>(id (id 10))</code>.
+</p>
+
+<p>
+That's the application of a compound procedure (of the outer
+<code>id</code>). Regardless of lazy evaluation, that means we are going to
+evaluate the expressions of the body of <code>id</code> (in an environment in
+which the parameters are set to delayed values).
+</p>
+
+<p>
+This means, first, that the <code>set!</code> in the body is evaluated, so
+<code>count</code> won't be 1 anymore. And, second, that the value of the final
+expression &#x2014; that value <code>w</code> is set to &#x2014; will be a thunk.
+</p>
+
+<p>
+The second &lt;RESPONSE&gt; is 10: we are trying to print a thunk, so the
+thunk is forced (remember the modification we made to the driver
+loop).
+</p>
+
+<p>
+The third &lt;RESPONSE&gt; is 2. To print the value of <code>w</code> we nee to perform
+the application of the inner <code>id</code> (which entails increasing <code>count</code>
+for the second time).
+</p>
+</div>
+</div>
+<div id="outline-container-org86e6f2c" class="outline-3">
+<h3 id="org86e6f2c">Exercise 4.28</h3>
+<div class="outline-text-3" id="text-org86e6f2c">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+<code>Eval</code> uses <code>actual-value</code> rather than <code>eval</code> to evaluate the operator
+before passing it to <code>apply</code>, in order to force the value of the
+operator. Give an example that demonstrates the need for this forcing.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Example: higher order functions. E.g., <code>map</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">Unmodified evaluator (using `actual-value'):</span>
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">add1</span> x)
+  (+ x 1))
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+ok
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">map</span> proc items)
+  (<span style="color: #531ab6;">if</span> (null? items)
+      '()
+      (cons (proc (car items))
+            (<span style="color: #531ab6;">map</span> proc (cdr items)))))
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+ok
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(<span style="color: #531ab6;">map</span> add1 '(1 2 3))
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+(2 3 4)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">Using `eval' instead of `actual-value':</span>
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">add1</span> x)
+  (+ x 1))
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+ok
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(add1 5)
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+6
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">map</span> proc items)
+  (<span style="color: #531ab6;">if</span> (null? items)
+      '()
+      (cons (proc (car items))
+            (<span style="color: #531ab6;">map</span> proc (cdr items)))))
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+ok
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(<span style="color: #531ab6;">map</span> add1 '(1 2 3))
+. . Unknown procedure type -- APPLY (thunk add1 #0=(((<span style="color: #531ab6;">map</span> add1 try false true car cdr cons null? = + - * /) (procedure (proc items) ((<span style="color: #531ab6;">if</span> (null? items) '() (cons (proc (car items)) (<span style="color: #531ab6;">map</span> proc (cdr items))))) #0#) (procedure (x) ((+ x 1)) #0#) (procedure (a b) ((<span style="color: #531ab6;">if</span> (= a 0) 1 b)) #0#) #...
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0c6cf29" class="outline-3">
+<h3 id="org0c6cf29">Exercise 4.29</h3>
+<div class="outline-text-3" id="text-org0c6cf29">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Exhibit a program that you would expect to run much more slowly
+without memoization than with memoization.  Also, consider the
+following interaction, where the <code>id</code> procedure is defined as in *Note 4.27
+and <code>count</code> starts at 0:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">square</span> x)
+  (* x x))
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(square (id 10))
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+<span style="color: #005f5f;">&lt;RESPONSE&gt;</span>
+
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+count
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+<span style="color: #005f5f;">&lt;RESPONSE&gt;</span>
+</pre>
+</div>
+
+<p>
+Give the responses both when the evaluator memoizes and when it
+does not.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+The argument of <code>(square (id 10))</code> is delayed (turned into a thunk),
+In the body of <code>square</code>, though, we have the application of a
+primitive procedure (<code>(* thunk thunk)</code>) so the thunks must be
+forced. Given that the two thunks are the same thunk, if we memoize,
+then the final &lt;RESPONSE&gt; is 1, otherwise is 2. The first &lt;RESPONSE&gt;
+is 100, regardless of whether we memoize or not.
+</p>
+
+<p>
+Clearly memoization will entail an improvement in performance in those
+cases in which we need the value for the same thunk many times and
+where forcing the thunk requires non-trivial computation.
+</p>
+
+<p>
+The procedures <code>fact</code> and <code>fib</code> are two example where a difference can
+be seen.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(eval '(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">fact</span> n)
+         (<span style="color: #531ab6;">if</span> (= n 1)
+             1
+             (* n (fact (- n 1)))))
+      the-global-environment)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">fib</span> n)
+  (<span style="color: #531ab6;">cond</span> ((= n 0) 0)
+        ((= n 1) 1)
+        (<span style="color: #531ab6;">else</span> (+ (fib (- n 1))
+                 (fib (- n 2))))))
+</pre>
+</div>
+
+<p>
+Let's test <code>fact</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">start</span> (runtime))
+
+(eval '(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">fact</span> n)
+         (<span style="color: #531ab6;">if</span> (= n 1)
+             1
+             (* n (fact (- n 1)))))
+      the-global-environment)
+
+(eval '(fact 140)
+      the-global-environment)
+
+(display (- (runtime) start))
+</pre>
+</div>
+
+<p>
+With memoization:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">ok</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">13462012475717524605876073858941615558355851148193967190051391468057460367090535696797920946629681836680869097041958983702264048370902871114013579941370766400374327741701139895604871545254810788060989321379840000000000000000000000000000000000</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">1556</span>
+</pre>
+</div>
+
+<p>
+Without memoization:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">ok</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">13462012475717524605876073858941615558355851148193967190051391468057460367090535696797920946629681836680869097041958983702264048370902871114013579941370766400374327741701139895604871545254810788060989321379840000000000000000000000000000000000</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">53581</span>
+</pre>
+</div>
+
+<p>
+When calling <code>(fact &lt;EXP&gt;)</code>, <code>&lt;EXP&gt;</code> is turned into a thunk. So the
+body of <code>fact</code> will be evaluated in an environment where <code>n</code> (the
+parameter name to which <code>&lt;EXP&gt;</code> corresponds to) is bound to that
+thunk. Given the body of <code>fact</code> we need the value of <code>n</code> twice (when
+<code>n</code> is not 1). Getting the value of <code>n</code> requires looking up the value
+of the variable in the environment. If we memoize, then we need to do
+that once (the second time we already have the value in the thunk we
+has become an <code>evaluated-thunk</code>). If we don't memoize, then we need to
+do it twice. <i>Mutatis mutandis</i> for <code>fib</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org51eab94" class="outline-3">
+<h3 id="org51eab94">Exercise 4.30</h3>
+<div class="outline-text-3" id="text-org51eab94">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Cy D. Fect, a reformed C programmer, is worried that some side effects
+may never take place, because the lazy evaluator doesn't force the
+expressions in a sequence.  Since the value of an expression in a
+sequence other than the last one is not used (the expression is there
+only for its effect, such as assigning to a variable or printing),
+there can be no subsequent use of this value (e.g., as an argument to
+a primitive procedure) that will cause it to be forced.  Cy thus
+thinks that when evaluating sequences, we must force all expressions
+in the sequence except the final one.  He proposes to modify
+<code>eval-sequence</code> from section 4-1-1 to use <code>actual-value</code> rather than
+<code>eval</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">eval-sequence</span> exps env)
+  (<span style="color: #531ab6;">cond</span> ((last-exp? exps) (eval (first-exp exps) env))
+        (<span style="color: #531ab6;">else</span> (actual-value (first-exp exps) env)
+              (eval-sequence (rest-exps exps) env))))
+</pre>
+</div>
+
+<p>
+a. Ben Bitdiddle thinks Cy is wrong.  He shows Cy the <code>for-each</code>
+procedure described in Exercise 2-23, which gives an important example
+of a sequence with side effects:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">for-each</span> proc items)
+  (<span style="color: #531ab6;">if</span> (null? items)
+      'done
+      (<span style="color: #531ab6;">begin</span> (proc (car items))
+             (<span style="color: #531ab6;">for-each</span> proc (cdr items)))))
+</pre>
+</div>
+
+<p>
+He claims that the evaluator in the text (with the original
+<code>eval-sequence</code>) handles this correctly:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval input:</span>
+(<span style="color: #531ab6;">for-each</span> (<span style="color: #531ab6;">lambda</span> (x) (newline) (display x))
+          (list 57 321 88))
+57
+321
+88
+<span style="color: #595959;">;;; </span><span style="color: #595959;">L-Eval value:</span>
+done
+</pre>
+</div>
+
+<p>
+Explain why Ben is right about the behavior of <code>for-each</code>.
+</p>
+
+<p>
+b. Cy agrees that Ben is right about the <code>for-each</code> example, but says
+that that's not the kind of program he was thinking about when he
+proposed his change to <code>eval-sequence</code>.  He defines the following two
+procedures in the lazy evaluator:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">p1</span> x)
+  (set! x (cons x '(2)))
+  x)
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">p2</span> x)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">p</span> e)
+    e
+    x)
+  (p (set! x (cons x '(2)))))
+</pre>
+</div>
+
+<p>
+What are the values of <code>(p1 1)</code> and <code>(p2 1)</code> with the original
+<code>eval-sequence</code>?  What would the values be with Cy's proposed change
+to <code>eval-sequence</code>?
+</p>
+
+<p>
+c. Cy also points out that changing <code>eval-sequence</code> as he proposes
+   does not affect the behavior of the example in part a.  Explain why
+   this is true.
+</p>
+
+<p>
+d. How do you think sequences ought to be treated in the lazy
+   evaluator?  Do you like Cy's approach, the approach in the text, or
+   some other approach?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+a.
+</p>
+
+<p>
+There is nothing to force in the example. For the expressions in the
+sequences are not thunks.
+</p>
+
+<p>
+When we evaluate something like
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">begin</span>
+  (display <span style="color: #3548cf;">"foo"</span>)
+  ...)
+</pre>
+</div>
+<p>
+we are going to, among other things, apply <code>eval</code> to <code>(display
+"foo")</code>. And that is enough to carry out the complete application of
+<code>display</code> to <code>"foo"</code>.
+</p>
+
+<p>
+b.
+</p>
+
+<p>
+When using the original <code>eval-sequence</code>, the value of <code>(p1 1)</code> is <code>(1
+2)</code>: the evaluation of <code>p1</code>'s definition creates a procedure object
+whose environment is the global environment.  The application of <code>p1</code>
+to <code>1</code>, first, creates a new environment by extending the global
+environment with a frame which binds <code>x</code> to a thunk whose expression
+is 1 and whose environment is the global evironment; and, second,
+evaluates the body of <code>p1</code> within that environment. This latter
+evaluation entails the application of <code>eval</code> to <code>(set! x (cons x
+'(2)))</code> and <code>x</code>.  The evaluation of <code>(set!  x (cons x '(2)))</code> entails
+the forcing of <code>x</code>, because primitive procedures must receive values
+they can understand &#x2014; not thunks. So the value of <code>x</code> is set to <code>(1
+2)</code>.
+</p>
+
+<p>
+When using Cy's <code>eval-sequence</code>, the value of <code>(p1 1)</code> should be <code>(1
+2)</code> as well.
+</p>
+
+<p>
+When using the original <code>eval-sequence</code>, the value of <code>(p2 1)</code> is a
+thunk. The evaluation of <code>p2</code>'s definition creates a procedure object
+whose environment is the global environment. The application of <code>p2</code>
+to <code>1</code>, first, creates a new environment by extending the global
+environment with a frame which binds <code>x</code> to a thunk whose expression
+is 1 and whose environment is the global evironment; and, second,
+evaluates the body of of <code>p2</code> within that environment. This latter
+evaluation entails the evaluation of the definition of <code>p</code> and the
+application of <code>p</code> to <code>(set! x (cons x '(2)))</code>. The evaluation of the
+definition of <code>p</code> creates a procedures object whose environment is the
+environment <code>p2</code> points to. The application of <code>p</code> to <code>(set! x (cons x
+'(2)))</code>, first, creates a new environment by extending the environment
+<code>p</code> points to with a frame which binds <code>e</code> to a thunk whose expression
+is <code>(set! x (cons x '(2)))</code> and whose environemnt is the environment
+<code>p</code> points to. This latter evaluation entails the evaluation of <code>e</code>
+and <code>x</code> (in the environemnt <code>p</code> points to). <code>e</code> evaluates to the thunk
+described above and nothing is done with it. <code>x</code> evaluates to the
+other thunk described above and it is returned (it is the value of the
+<code>p</code>'s application). So the final value is that thunk.
+</p>
+
+<p>
+When using Cy's <code>eval-sequence</code>, the value of <code>(p2 1)</code> should be <code>(1
+2)</code> &#x2014; that's because we are not applying <code>eval</code> to <code>e</code>; we are
+instead applying <code>actual-value</code> to it.
+</p>
+
+<p>
+c.
+</p>
+
+<p>
+The difference between the old <code>eval-sequence</code> and the new one with
+respect to the example in a. is that, when using the old procedure, we
+apply <code>eval</code> to <code>(proc (car items))</code>, whereas, when using the new one,
+we apply <code>actual-value~</code> to it.
+</p>
+
+<p>
+When we apply <code>eval</code> to <code>(proc (car items))</code>, <code>items</code> have already
+been forced, because <code>null?</code> has been applied to them. <code>proc</code> is
+forced, because it is the operator of an application. So the value of
+the application of <code>eval</code> is the expression's actual value.
+</p>
+
+<p>
+When we apply <code>actual-value</code> to <code>(proc (car items))</code>, there is an
+extra step: we passed the evaluated value to <code>force-it</code>. But since the
+value is not a thunk, nothing changes.
+</p>
+
+<p>
+d.
+</p>
+
+<p>
+Cy's seems a better approach, since i) it ensures that side effects
+take place in both a-type cases and b-type cases, and ii) the
+difference with the other approach is minimal when it comes to a-type
+cases.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf2145dc" class="outline-3">
+<h3 id="orgf2145dc">Exercise 4.31</h3>
+<div class="outline-text-3" id="text-orgf2145dc">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The approach taken in this section is somewhat unpleasant, because it
+makes an incompatible change to Scheme.  It might be nicer to
+implement lazy evaluation as an <i>upward-compatible extension</i>, that
+is, so that ordinary Scheme programs will work as before.  We can do
+this by extending the syntax of procedure declarations to let the user
+control whether or not arguments are to be delayed.  While we're at
+it, we may as well also give the user the choice between delaying with
+and without memoization.  For example, the definition
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">f</span> a (b lazy) c (d lazy-memo))
+  ...)
+</pre>
+</div>
+
+<p>
+would define <code>f</code> to be a procedure of four arguments, where the first
+and third arguments are evaluated when the procedure is called, the
+second argument is delayed, and the fourth argument is both delayed
+and memoized.  Thus, ordinary procedure definitions will produce the
+same behavior as ordinary Scheme, while adding the `lazy-memo'
+declaration to each parameter of every compound procedure will produce
+the behavior of the lazy evaluator defined in this section. Design and
+implement the changes required to produce such an extension to Scheme.
+You will have to implement new syntax procedures to handle the new
+syntax for `define'.  You must also arrange for `eval' or `apply' to
+determine when arguments are to be delayed, and to force or delay
+arguments accordingly, and you must arrange for forcing to memoize or
+not, as appropriate.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li>Changes:
+<ul class="org-ul">
+<li><code>apply-evaluator</code>, instead of using <code>list-of-delayed-args</code>, uses
+<code>list-of-args</code> which can decide whether to delay an argument or
+not, since it receives that information which, thanks to the new
+syntax, is possibly included in the parameters (I'm packing that
+information into the arguments that <code>list-of-args</code> receives).</li>
+
+<li>When we delay an argument, we create a thunk which now contains
+information about whether the forcing should use memoization or
+not. More concretely, the second element of a thunk is now either
+the symbol <code>memo</code> or the symbol <code>no-memo</code>.</li>
+</ul></li>
+
+<li><p>
+Here are new methods and modified methods:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">to-delay?</span> arg-with-info)
+  (<span style="color: #531ab6;">cond</span> ((not (pair? arg-with-info))
+         (error <span style="color: #3548cf;">"arg-with-info is expected to be a pair"</span>))
+        (<span style="color: #531ab6;">else</span> (<span style="color: #531ab6;">or</span> (eq? (car arg-with-info) 'lazy)
+                  (eq? (car arg-with-info) 'lazy-memo)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">arg</span> arg-with-info)
+  (cdr arg-with-info))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">apply either `actual-value` or `delay-it` depending on the symbol</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">attached</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">list-of-args</span> exps env)
+  (<span style="color: #531ab6;">if</span> (no-operands? exps)
+      '()
+      (cons (actual-value-or-delay (first-operand exps) env)
+            (list-of-args (rest-operands exps) env))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">actual-value-or-delay</span> operand-with-info env)
+  (<span style="color: #531ab6;">if</span> (to-delay? operand-with-info)
+      (delay-it operand-with-info env)
+      (actual-value (arg operand-with-info) env)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-args-with-info</span> args params-with-info)
+  (<span style="color: #531ab6;">if</span> (null? args)
+      '()
+      (<span style="color: #531ab6;">if</span> (pair? (car params-with-info))
+
+          (cons (cons (memo-info-symbol (car params-with-info))
+                      (car args))
+                (make-args-with-info (cdr args)
+                                     (cdr params-with-info)))
+          (cons (cons 'non-lazy (car args))
+                (make-args-with-info (cdr args)
+                                     (cdr params-with-info))))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">memo-info-symbol</span> param-with-info)
+  (cadr param-with-info))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">force-it</span> obj)
+  (<span style="color: #531ab6;">cond</span> ((thunk? obj)
+         (<span style="color: #531ab6;">if</span> (eq? (cadr obj) 'lazy) <span style="color: #595959;">;; </span><span style="color: #595959;">no memo</span>
+             (actual-value (thunk-exp obj) (thunk-env obj))
+             (<span style="color: #531ab6;">let</span> ((result (actual-value <span style="color: #595959;">;; </span><span style="color: #595959;">memo</span>
+                            (thunk-exp obj)
+                            (thunk-env obj))))
+               (set-car! obj 'evaluated-thunk)
+               (set-car! (cdr obj) result)
+               (set-cdr! (cdr obj) '())
+               result)))
+        ((evaluated-thunk? obj)
+         (thunk-value obj))
+        (<span style="color: #531ab6;">else</span> obj)))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">it expects the exp to be tagged with either 'lazy or 'lazy-memo</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">delay-it</span> exp env)
+  (<span style="color: #531ab6;">if</span> (to-memo? exp)
+      (list 'thunk 'memo (cdr exp) env)
+      (list 'thunk 'no-memo (cdr exp) env)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">to-memo?</span> exp)
+  (eq? (car exp) 'lazy-memo))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">thunk-exp</span> thunk) (caddr thunk))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">thunk-env</span> thunk) (cadddr thunk))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">apply-evaluator</span> procedure arguments env)
+  (<span style="color: #531ab6;">cond</span> ((primitive-procedure? procedure)
+         (apply-primitive-procedure
+          procedure
+          (list-of-arg-values arguments env)))
+        ((compound-procedure? procedure)
+         (eval-sequence
+          (procedure-body procedure)
+          (extend-environment
+           (procedure-parameters-names procedure)
+           (list-of-args (make-args-with-info arguments
+                                              (procedure-parameters procedure))
+                         env)
+           (procedure-environment procedure))))
+        (<span style="color: #531ab6;">else</span>
+         (error
+          <span style="color: #3548cf;">"Unknown procedure type -- APPLY"</span> procedure))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">procedure-parameters-names</span> proc)
+  (param-names (cadr proc)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">param-names</span> params-with-info)
+  (<span style="color: #531ab6;">cond</span> ((null? params-with-info)
+         '())
+        ((pair? (car params-with-info))
+         (cons (car (car params-with-info))
+               (param-names (cdr params-with-info))))
+        (<span style="color: #531ab6;">else</span> (cons (car params-with-info)
+                    (param-names (cdr params-with-info))))))
+</pre>
+</div></li>
+</ul>
+
+
+<p>
+Now, for example, we could define <code>try</code> (See 4.2.1) like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">try</span> a (b lazy-memo))
+  (<span style="color: #531ab6;">if</span> (= a 0) 1 b))
+</pre>
+</div>
+
+<p>
+and evaluating <code>(try 0 (/ 1 0))</code> should return 1 instead of yielding
+an error.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.5)</span></p>
+</div>
+</body>
+</html>
