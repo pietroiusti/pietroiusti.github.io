@@ -1,0 +1,369 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 4.2.3 Streams as Lazy Lists
+#+subtitle: 2024-10-02 Wed
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.9)
+
+Authors show a relatively easy implementation of streams as of lazy
+lists.
+
+Given that our evaluator is now lazy, we can simply reimplement
+~cons~, ~car~, ~cdr~ as compound procedures in this way:
+
+#+begin_src scheme
+  (define (cons x y)
+    (lambda (m) (m x y)))
+
+  (define (car z)
+    (z (lambda (p q) p)))
+
+  (define (cdr z)
+    (z (lambda (p q) q)))
+#+end_src
+
+The streams presented in Chapter 3 were lazy at construction time with
+respect to the ~cdr~ and non-lazy with respect to everything else.
+
+The lazy lists presented in this chapter are lazy at both construction
+time and selection time with respect to both the ~car~ and the
+~cdr~. Delayed values are forced only when they are ``really needed
+--- e.g., for use as the argument of a primitive, or to be printed as
+an answer'' (410).
+
+* Exercise 4.32
+*Exercise*:
+
+#+begin_quote
+Give some examples that illustrate the difference between the streams
+of chapter 3 and the ``lazier'' lazy lists described in this section.
+How can you take advantage of this extra laziness?
+#+end_quote
+
+*Answer*:
+
+First of all, here is a way in which we can add the lazy lists feature
+to the evaluator:
+#+begin_src scheme
+  ;; add replace scheme's cons, car and cdr with our implementations
+  (define primitive-procedures
+    (list (list 'cons (lambda (x y)
+                        (list 'lazy-list (lambda (m) (m x y)))))
+          (list 'car (lambda (z)
+                       ((cadr z) (lambda (p q) p))))
+          (list 'cdr (lambda (z)
+                       ((cadr z) (lambda (p q) q))))
+          (list 'null? null?)
+          (list '= =)
+          (list '+ +)
+          (list '- -)
+          (list '* *)
+          (list '/ /)
+          (list 'newline newline)
+          (list 'display display)))
+#+end_src
+
+Here are a couple of examples.
+
+In normal scheme (I'm using racket), ~cons~ is strict in both
+arguments:
+#+begin_src scheme
+  #lang sicp
+  (define (foo)
+    (display "foo!")
+    (newline)
+    "foo")
+
+  (cons (foo) (foo))
+  ;; foo!
+  ;; foo!
+  ;; ("foo" . "foo")
+#+end_src
+
+The ~cons~ of chapter 3 is strict in the first argument and non-strict
+in the second:
+#+begin_src scheme
+  (define (foo)
+    (display "foo!")
+    (newline)
+    "foo")
+
+  (cons-stream (foo) (foo))
+  ;; foo!
+  ;; ("foo" . #<promise>)
+#+end_src
+
+The ~cons~ of chapter 4 is non-strict on both arguments:
+#+begin_src scheme
+  ;;; L-Eval input:
+  (define (foo)
+    (display "foo!")
+    (newline)
+    "foo")
+
+  ;;; L-Eval value:
+  ok
+
+  ;;; L-Eval input:
+  (cons (foo) (foo))
+
+  ;;; L-Eval value:
+  (compound-procedure (m) ((m x y)) <procedure-env>)
+#+end_src
+
+Here is an example of the extra-lazyness Authors mention:
+
+With the streams of chapter 3, calling ~stream-cdr~ forces the ~cdr~:
+#+begin_src scheme
+  #lang sicp
+  (define (stream-car stream) (car stream))
+  (define (stream-cdr stream) (force (cdr stream)))
+
+  (define (foo)
+    (display "foo!")
+    (newline)
+    "foo")
+
+  (define foovar (cons-stream (foo) (foo)))
+  ;; foo!
+
+  (define foovarcar (stream-car foovar))
+
+  (define foovarcdr (stream-cdr foovar))
+  ;; foo!
+#+end_src
+
+With the lazy lists of chapter 4, neither the application of ~cdr~ nor
+that of ~car~ forces delayed value:
+#+begin_src scheme
+  ;;; L-Eval input:
+  (define (foo) (display "foo!") (newline) "foo")
+
+  ;;; L-Eval value:
+  ok
+
+  ;;; L-Eval input:
+  (define foovar (cons (foo) (foo)))
+
+  ;;; L-Eval value:
+  ok
+
+  ;;; L-Eval input:
+  (define foovarcar (car foovar))
+
+  ;;; L-Eval value:
+  ok
+
+  ;;; L-Eval input:
+  (define foovarcdr (cdr foovar))
+
+  ;;; L-Eval value:
+  ok
+#+end_src
+
+The streams of Chapter 3 are lazy at construction time with respect to
+the ~cdr~. They are non-lazy with respect to everything else.
+
+The lazy lists of Chapter 4 are lazy both at construction time and at
+selection time with respect to both the ~car~ and the ~cdr~. Delayed
+values are forced only when they are ``really needed --- e.g., for use
+as the argument of a primitive, or to be printed as an answer.''
+
+We can take advantage of the fact that the actual value of the ~car~
+is not computed at construction time. If the application of ~foo~
+involves a lot of computations, then ~(cons-stream (foo) nil)~ will
+make them, wheres the lazy ~cons~ of chapter 4 won't.
+
+And we can take advantage of the fact that the selection of the ~cdr~
+does not entail its actual value in situation where its actual value
+is not needed. For example, computing the length of a
+stream/lazy-list:
+
+Streams of chapter 3:
+#+begin_src scheme
+  (define (stream-car stream) (car stream))
+  (define (stream-cdr stream) (force (cdr stream)))
+
+  (define (foo)
+    (display "foo!")
+    (newline)
+    "foo")
+
+  (define foolist
+    (cons-stream (foo)
+                 (cons-stream (foo)
+                              (cons-stream (foo) nil))))
+
+  (define (length stream-items)
+    (if (stream-null? stream-items)
+        0
+        (+ 1 (length (stream-cdr stream-items)))))
+
+  (length foolist)
+
+  ;; foo!
+  ;; foo!
+  ;; foo!
+  ;; 3
+#+end_src
+
+Lazy lists of chapter 4:
+#+begin_src scheme
+  ;;; L-Eval input:
+  (define (length items) (if (null? items) 0 (+ 1 (length (cdr items)))))
+
+  ;;; L-Eval value:
+  ok
+
+  ;;; L-Eval input:
+  (define (foo) (display "foo!") (newline) "foo")
+
+  ;;; L-Eval value:
+  ok
+
+  ;;; L-Eval input:
+  (define foolist (cons (foo) (cons (foo) (cons (foo) '()))))
+
+  ;;; L-Eval value:
+  ok
+
+  ;;; L-Eval input:
+  (length foolist)
+
+  ;;; L-Eval value:
+  3
+#+end_src
+* Exercise 4.33
+*Exercise*:
+
+#+begin_quote
+Ben Bitdiddle tests the lazy list implementation given above by
+evaluating the expression
+
+#+begin_src scheme
+  (car '(a b c))
+#+end_src
+
+To his surprise, this produces an error.  After some thought, he
+realizes that the "lists" obtained by reading in quoted expressions
+are different from the lists manipulated by the new definitions of
+`cons', `car', and `cdr'.  Modify the evaluator's treatment of quoted
+expressions so that quoted lists typed at the driver loop will produce
+true lazy lists.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+(define (is-non-empty-list? exp)
+  (and (quoted? exp)
+       (list? (text-of-quotation exp))
+       (not (null? (text-of-quotation exp)))))
+
+(define (list->cons exp)
+    (if (null? exp)
+        ''()
+        (list
+         'cons
+         (car exp)
+         (list->cons (cdr exp)))))
+
+(define (eval exp env)
+  (cond ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((is-non-empty-list? exp) (eval (list->cons (cadr exp)) env));;<-------------
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp)
+         (make-procedure (lambda-parameters exp)
+                         (lambda-body exp)
+                         env))
+        ((begin? exp)
+         (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval (cond->if exp) env))
+        ((application? exp)
+         (apply-evaluator (actual-value (operator exp) env)
+                          (operands exp)
+                          env))
+        (else
+         (error "Unknown expression type -- EVAL" exp))))
+#+end_src
+
+* Exercise 4.34
+*Exercise*:
+
+#+begin_quote
+Modify the driver loop for the evaluator so that lazy pairs and lists
+will print in some reasonable way.  (What are you going to do about
+infinite lists?)  You may also need to modify the representation of
+lazy pairs so that the evaluator can identify them in order to print
+them.
+#+end_quote
+
+In order to make lazy lists recognizable (to tell them apart from
+other compound procedures), we can change the implementation of ~cons~
+(and, accordingly, that of as ~car~ and that of ~cdr~) by adding a tag
+in front of the lazy lists representation we already have:
+
+#+begin_src scheme
+  (define primitive-procedures
+    (list (list 'cons (lambda (x y)
+                        (list 'lazy-list (lambda (m) (m x y)))))
+          (list 'car (lambda (z)
+                       ((cadr z) (lambda (p q) p))))
+          (list 'cdr (lambda (z)
+                       ((cadr z) (lambda (p q) q))))
+          (list 'null? null?)
+          (list '= =)
+          (list '+ +)
+          (list '- -)
+          (list '* *)
+          (list '/ /)
+          (list 'newline newline)
+          (list 'display display)))
+#+end_src
+
+Now that lazy-list have been made recognizable, we can modify the
+printing rules (~user-print~) so that lazy list are taken into account
+as a special case.
+
+An easy way to deal with printing lazy lists is to display the first
+element only and then some ellipses. What better approaches are there?
+
+#+begin_src scheme
+    (define (lazy-list? exp)
+      (tagged-list? exp 'lazy-list))
+
+  (define (user-print object)
+    (cond ((compound-procedure? object)
+           (display (list 'compound-procedure
+                          (procedure-parameters object)
+                          (procedure-body object)
+                          '<procedure-env>)))
+          ((lazy-list? object)
+           (display (list (lazy-car object) '...)))
+          (else (display object))))
+#+end_src
+
+#+begin_src
+  ;;; L-Eval input:
+  '(1 2 3)
+
+  ;;; L-Eval value:
+  (1 ...)
+#+end_src
+
