@@ -17,7 +17,7 @@
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.9)
 
-Authors show a relatively easy implementation of streams as of lazy
+Authors show a relatively easy implementation of streams as lazy
 lists.
 
 Given that our evaluator is now lazy, we can simply reimplement
