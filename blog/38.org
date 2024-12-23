@@ -1,0 +1,480 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 5.1 Computing with Register Machines: Designing Register Machines
+#+subtitle: 2024-12-24 Tue
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.9)
+
+- The book began talking about ``processes''. [Question as an ex
+  philosophy student: can we say that processes are to procedures what
+  semantic content is to linguistic expressions? If the answer is yes,
+  we might want to avoid saying that procedures /describe/
+  processes...]
+
+- We have described processes in terms of procedures written in Lisp.
+
+- The ``meaning'' of those procedures, Authors say, has been explained
+  by using ``models of evaluations'':
+  - the substitution model (chapter 1);
+  - the environment model (chapter 3);
+  - the metacircular evaluator (chapter 4).
+
+- [Q: doesn't the metacircular evaluator implement an environment
+  model of evaluation?]
+
+- Much mystery has been cleared away, but important questions have
+  been left unanswered.
+  - The mechanisms of control have not been explained.
+    - How are values returned by the evaluation of subexpressions to
+      the expressions that use them?
+    - Why some recursive procedures generate iterative process (that
+      is, processes whose growth complexity in space is constant) and
+      some recursive procedures generate recursive processes?
+
+- The reason such important questions remain unanswered is that the
+  metacircular evaluator is itself a Lisp program so it inherits the
+  control structure of the underlying Lisp system.
+
+- To elucidate the control structure of the Lisp evaluator we shall
+  descend at a more primitive level.
+
+- Chapter 5 describes processes in terms of the operations of a
+  traditional computer, a.k.a. /register machine/.
+
+- A register machine ``sequentially executes /instructions/ that
+  manipulate the contents of a fixed set of storage elements called
+  /registers/'' (491).
+
+- ``[W]e will examine some procedures and design a register machine
+  for each of them. Thus, we will approach our task from the
+  perspective of a hardware architect rather than that of a
+  machine-language computer programmer'' (492).
+
+- To design a register machine, me must design
+  - its /datapaths/;
+  - its /controller/.
+
+- Only one register can be assigned a new value at each step.
+
+- Authors present a way to represents datapaths and controllers with
+  diagrams.
+
+- As an example, they draw the datapaths and controller of a ~GCD~
+  machine.
+
+- Authors present a wawy to describe machines in a textual form and
+  presents a specification of the of the GCD machine.
+
+- Authors introduction the notion of /subroutine/. [What's the def? It
+  wasn't that clear.]
+
+- Authors show that we can use a register to hold a label.
+
+- Authors show how to use a stack to implement recursion
+  - Example: ~factorial~
+  - Example: ~fib~ (double recursion)
+
+*** Exercise 5.1
+*Exercise*:
+
+#+begin_quote
+Design a register machine to compute factorials using the iterative
+algorithm specified by the following procedure.  Draw data-path and
+controller diagrams for this machine.
+
+#+begin_src scheme
+  (define (factorial n)
+    (define (iter product counter)
+      (if (> counter n)
+          product
+          (iter (* counter product)
+                (+ counter 1))))
+    (iter 1 1))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+#+begin_src
+                  Data paths                                                                Controller
+
+       /\--------------------------------+
+      /  \                               |                                                    start
+ +---/ 1  \                             (x) 1->n                                                |
+ |  /      \                   -----     |                                                      |
+ | ----------       --------->(  >  )    |                                                      V
+ |       \         /           -----     |                                                 +-----------+
+ |  1->c (x)      /              ^       |                                                 |  1->c     |
+ |         \     /               |       |                                                 |           |
+ |          V   /                |       V                                                 +-----------+
+ |     +----------+            +-+---------+            +------------+                          |
+ |     | counter  |            |     n     |            | product    |                          |
+ |     |          |            |           |            |            |                          V
+ |     +----------+            +-----------+            +------------+                     +-----------+
+ |      |   \    ^                                       /      ^                          |  1->n     |
+ |      |    \   +------------------------+             /       |                          |           |
+ |      |     \                           |            /        |                          +-----------+
+ |      |      \                          |           /         |                               |
+ |      |       \               +---------+-----------          |                               |
+ |      |        \              |         |                     |                               V
+ |      |         V             V         |                     |                               /\
+ |      |      \-------------------/      |                     |                              /  \
+ |      |       \                 /       |                    (x) *->p                       /    \     yes
+ |      |        \       *       /        |                     |                     +----> /  >   \----------> done
+ |      |         \             /         |                     |                     |      \      /
+ |      |          \           /          |                     |                     |       \    /
+ |      |           -----+-----           |                     |                     |        \  /
+ |      |                |                |                     |                     |         \/
+ |      +------------+   |                |                     |                     |         |
+ |                   |   -----------------+---------------------+                     |         |
+ +---------------+   |                    |                                           |         |no
+                 |   |                    |                                           |         |
+                 V   V                    |                                           |         |
+               \-------------------/      |                                           |         V
+                \                 /       |                                           |    +-----------+
+                 \       +       /        |                                           |    |  *->p     |
+                  \             /        (x) +->c                                     |    |           |
+                   \           /          |                                           |    +-----------+
+                    -----+-----           |                                           |         |
+                         |                |                                           |         |
+                         |                |                                           |         V
+                         +----------------+                                           |    +-----------+
+                                                                                      |    |  +->c     |
+                                                                                      |    |           |
+                                                                                      |    +----+------+
+                                                                                      |         |
+                                                                                      |         |
+                                                                                      +---------+
+       The result is stored in the product register.
+#+end_src
+
+*** Exercise 5.2
+*Exercise*:
+
+#+begin_quote
+Use the register-machine language to describe the iterative factorial
+machine of Exercise 5.1
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (controller
+   (assign counter (const 1))
+   (assign n (const 1))
+  test-counter-n
+   (test (op >) (reg counter) (reg n))
+   (branch (label factorial-done))
+   (assign product (op *) (reg counter) (reg product))
+   (assign counter (op +) (reg counter) (const 1))
+   (goto (label test-counter-n))
+  factorial-done)
+#+end_src
+
+*** Exercise 5.3
+*Exercise*:
+
+#+begin_quote
+Design a machine to compute square roots using Newton's method, as
+described in section 1.1.7.
+
+#+begin_src scheme
+  (define (sqrt x)
+    (define (good-enough? guess)
+      (< (abs (- (square guess) x)) 0.001))
+    (define (improve guess)
+      (average guess (/ x guess)))
+    (define (sqrt-iter guess)
+      (if (good-enough? guess)
+          guess
+          (sqrt-iter (improve guess))))
+    (sqrt-iter 1.0))
+#+end_src
+
+Begin by assuming that ~good-enough?~ and ~improve~ operations are
+available as primitives.  Then show how to expand these in terms of
+arithmetic operations.  Describe each version of the ~sqrt~ machine
+design by drawing a data-path diagram and writing a controller
+definition in the register-machine language.
+#+end_quote
+
+*Answer*:
+
+First version of ~sqrt~ machine:
+
+Data paths:
+#+begin_src
+             /\
+            /  \                                -----------------------
+           /    \                               \                     /
+          /      \                               \      read         /
+         /   1.0  \                               \                 /
+        /          \                               \               /
+       /            \                               ----+---------/
+       ------+-------                                   |
+             |    g<-1                                  |
+             +----(x)-----+                   +----------
+                          |                   |
+                          V                   v
+                 +--------------+       +------+-----+
+                 |              |       |            |
+                 |    guess     |       |      x     |
+                 |              |       |            |
+                 +----------+---+       +------------+
+                    |       | ^
+                    |       | |          g<-i
+                    |       | +-----------(x)--------+
+                    V       |                        |
+                 -------    +--------------+         |
+               -/       \-                 V         |
+              /           \            --------------+---------
+              |good-enough|             \                    /
+              \           /              \    improve       /
+               -\       /-                \                /
+                 -------                   \--------------/
+#+end_src
+
+Controller:
+#+begin_src scheme
+  (controller
+   (assign guess (const 1.0))
+   (assign x (op read))
+  test-ge
+   (test (op good-enough) (reg guess))
+   (branch (label sqr-done))
+   (assign guess (op improve) (reg guess))
+   (goto (label test-ge))
+  sqr-done)
+#+end_src
+
+Second version of the ~sqrt~ machine (without the ~good-enough~ and
+the ~improve~ abstractions):
+
+Data paths:
+#+begin_src
+                /\
+               /  \
+              /    \
+             /      \
+            /  1.0   \
+           /          \
+           -----+------
+                |
+                |
+                |
+                +-----------------------------+
+                                              |
+                                              |
+                                              |
+                                              V
+                                  ----------------------------                                                          |---------------------------|
+                                  |                          |                                                          |                           |
+                                  |                          |                                                          |                           |
+                                  |         guess            |                                                          |             x             |
+                                  |                          |                                                          |                           |
+                                  |                          |                                                          |                           |
+                                  ----------------------------                                                          |                           |
+                                     |                 ^  |                                                             -----------------------------
+                                     |                 |  |                                                                          |             |
+                                     |                 |  +------------------------------------+                                     |             |
+                                     |                 |                                       |                                     |             |
+                                     |                 |                                       |          +--------------------------+             |
+                                     |                 |                                       |          |                                        |
+                                     |                 |                                       |          |                                        |
+                                     |                 |                                       V          V                                        |
+                                     |                 |                               ------------------------                                    |
+                                     V                 |                                \                    /                                     |
+                       |-----------------------------  |                                 \        /         /                                      |
+                       |                            |  |                                  \                /                                       |
+                       |                            |<-+-----------------------------+     \              /     +-----------+                      |
+    -------------------|          tmp               |  |                             |      --------------      |           |                      |
+    |                  |                            |--+---------------------+       |            |    |        |           V                      |
+    |                  |                            |  |                     |       +------------+    +--------+     ------------------------     |
+    |                  |-----------------------------  |                     |                                         \                    /      |
+    |                    ^   |   ^  ^  |   |           |                     |                                          \     average      /       |
+    |          +---------+   |   |  |  |   |           |                     +-----------------------------------------> \                /        |
+    |          |    +--------+   |  |  |   |           |                                                                  ----------------         |
+    |          |    |  +---------+  |  |   |           |                                                                         |                 |
+    |          |    |  |            |  |   |           +-------------------------------------------------------------------------+                 |
+    |          |    |  |  +---------+  |   +----------------------------------------+                                                              |
+    |          |    |  |  |            V                                            |                  +-------------------------------------------+
+    |          |    |  |  | -------------------------------                         V                  V
+    |          |    |  |  | \                            /                 -------------------------------
+    |          |    |  |  |  \                          /                  \                             /
+    |          |    |  |  |   \       square           /                    \                           /
+    |          |    |  |  |    \                      /                      \           -             /
+    |          |    |  |  |     \                    /                        \                       /
+    |          |    |  |  |      --------------------                          \                     /
+    |          |    |  |  |            |                                         -------------------
+    |          |    |  |  |            |                                                  |
+    |          |    |  |  |            |                                                  |
+    |          |    |  |  +------------+                                                  |
+    |          |    |  |                                                                  |
+    |          |    |  |                                                                  |
+    |          |    |  +------------------------------------------------------------------+
+    |          |    |
+    |          |    |
+    |          |    +---------------------------------+
+    |          |                                      |
+    |          |                                      |
+    |          |                                      V
+    |          |                           --------------------------
+    |          |                           |                        |
+    |          |                           |                        |
+    |          |                           |        abs             |
+    |          |                           |                        |
+    |          |                           |                        |
+    |          |                           --------------------------
+    |          |                                       |
+    |          |                                       |
+    |          +---------------------------------------+
+    |
+    |
+    |                                                               /\
+    |                              -------                         /  \
+    |                            -/       \-                      /    \
+    |                           /           \                    /      \
+    |-------------------------> |     <     | <-----------------/        \
+                                \           /                  /  0.001   \
+                                 -\       /-                  /            \
+                                   -------                    --------------
+#+end_src
+
+Controller:
+#+begin_src scheme
+(controller
+  (assign guess (const 1.0))
+test-ge
+  (assign tmp (reg guess))
+  (assign tmp (op square) (reg tmp))
+  (assign tmp (op -) (reg tmp) (reg x))
+  (assing tmp (op abs) (reg tmp))
+  (test (op <) (reg tmp) (const 0.001))
+  (branch (label sqrt-done))
+  (assign tmp (op /) (reg x) (reg guess))
+  (assign guess (op average) (reg guess) (reg tmp))
+sqrt-done)
+#+end_src
+
+*** Exercise 5.4
+*Exercise*:
+
+#+begin_quote
+Specify register machines that implement each of the following
+procedures.  For each machine, write a controller instruction sequence
+and draw a diagram showing the data paths.
+
+a. Recursive exponentiation:
+
+#+begin_src scheme
+  (define (expt b n)
+    (if (= n 0)
+        1
+        (* b (expt b (- n 1)))))
+#+end_src
+
+b. Iterative exponentiation:
+
+#+begin_src scheme
+  (define (expt b n)
+    (define (expt-iter counter product)
+      (if (= counter 0)
+          product
+          (expt-iter (- counter 1) (* b product))))
+    (expt-iter n 1))
+#+end_src
+#+end_quote
+
+*Answer*:
+
+Recursive exponentiation:
+#+begin_src scheme
+  ;; - example: (expt 2 3); initial values:
+  ;;   - register b is set to 2
+  ;;   - register n is set to 3
+
+  (controller
+     (assign continue (label fact-done))
+   expt-loop
+     (test (op =) (reg n) (const 0))
+     (branch (label base-case))
+     (save continue)
+     (save n)
+     ;; no need to save b since it always holds the same val
+     (assign n (op -) (reg n) (const 1))
+     (assign continue (label after-expt))
+     (goto (label expt-loop))
+   after-expt
+     (restore n)
+     (restore continue)
+     (assign val (op *) (reg b) (reg val))
+     (goto continue)
+   base-case
+     (assign val (const 1))
+     (goto (reg continue))
+   expt-done)
+#+end_src
+
+Iterative exponentiation:
+#+begin_src scheme
+  ;; - example: (expt 2 3); initial values:
+  ;;   - register b is set to 2
+  ;;   - register counter is set to 3
+  ;;   - register product is set to 1
+
+  (controller
+   expt-loop
+     (test (op =) (reg counter) (const 0))
+     (branch expt-done)
+     (assign counter (op -) (reg counter) (const 1))
+     (assign product (op *) (reg b) (reg product))
+     (goto expt-loop)
+     expt-done)
+#+end_src
+
+*** Exercise 5.5
+*Exercise*:
+
+#+begin_quote
+Hand-simulate the factorial and Fibonacci machines, using some
+nontrivial input (requiring execution of at least one recursive call).
+Show the contents of the stack at each significant point in the
+execution.
+#+end_quote
+
+*Answer*:
+
+- Relevant contents of the stack when computing the ~factorial~ of ~5~
+  (the stack grows backwards):
+  #+begin_src 
+                                                      []
+                                           [5|fact-done]
+                              [4|after-fact|5|fact-done]
+                 [3|after-fact|4|after-fact|5|fact-done]
+    [2|after-fact|3|after-fact|4|after-fact|5|fact-done]
+                 [3|after-fact|4|after-fact|5|fact-done]
+                              [4|after-fact|5|fact-done]
+                                           [5|fact-done]
+                                                      []
+  #+end_src
+
+- Relevant contents of the stack when computing the ~fib~ of ~2~:
+  #+begin_src 
+              []  (starting point)
+    [2|fib-done]  (when setting up the computation of fib(n-1))
+              []  (before setting up the computation of fib(n-2))
+    [1|fib-done]  (setting up the computation of fib(n-2))
+              []  (before computing fib(n-1) + fib(n-2))
+  #+end_src
