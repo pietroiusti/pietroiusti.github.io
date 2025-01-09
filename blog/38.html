@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-12-24 Tue 00:47 -->
+<!-- 2025-01-09 Thu 21:52 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 5.1 Computing with Register Machines: Designing Register Machines</title>
@@ -198,7 +198,7 @@
 <div id="content" class="content">
 <h1 class="title">SICP 5.1 Computing with Register Machines: Designing Register Machines
 <br />
-<span class="subtitle">2024-12-24 Tue</span>
+<span class="subtitle">2024-12-24 Tue (Updated on 2025-01-09 Thu)</span>
 </h1>
 <ul class="org-ul">
 <li>The book began talking about ``processes''. [Question as an ex
@@ -280,9 +280,9 @@ wasn't that clear.]</li>
 <li>Example: <code>fib</code> (double recursion)</li>
 </ul></li>
 </ul>
-<div id="outline-container-orgb9885c5" class="outline-2">
-<h2 id="orgb9885c5">Exercise 5.1</h2>
-<div class="outline-text-2" id="text-orgb9885c5">
+<div id="outline-container-orgfd15071" class="outline-2">
+<h2 id="orgfd15071">Exercise 5.1</h2>
+<div class="outline-text-2" id="text-orgfd15071">
 <p>
 <b>Exercise</b>:
 </p>
@@ -365,9 +365,9 @@ controller diagrams for this machine.
 </div>
 </div>
 </div>
-<div id="outline-container-orgc8f064d" class="outline-2">
-<h2 id="orgc8f064d">Exercise 5.2</h2>
-<div class="outline-text-2" id="text-orgc8f064d">
+<div id="outline-container-org3355a9f" class="outline-2">
+<h2 id="org3355a9f">Exercise 5.2</h2>
+<div class="outline-text-2" id="text-org3355a9f">
 <p>
 <b>Exercise</b>:
 </p>
@@ -398,9 +398,9 @@ factorial-done)
 </div>
 </div>
 </div>
-<div id="outline-container-orga5b9710" class="outline-2">
-<h2 id="orga5b9710">Exercise 5.3</h2>
-<div class="outline-text-2" id="text-orga5b9710">
+<div id="outline-container-org0f351d3" class="outline-2">
+<h2 id="org0f351d3">Exercise 5.3</h2>
+<div class="outline-text-2" id="text-org0f351d3">
 <p>
 <b>Exercise</b>:
 </p>
@@ -611,9 +611,9 @@ sqrt-done)
 </div>
 </div>
 </div>
-<div id="outline-container-org4a1b93c" class="outline-2">
-<h2 id="org4a1b93c">Exercise 5.4</h2>
-<div class="outline-text-2" id="text-org4a1b93c">
+<div id="outline-container-org7f94bec" class="outline-2">
+<h2 id="org7f94bec">Exercise 5.4</h2>
+<div class="outline-text-2" id="text-org7f94bec">
 <p>
 <b>Exercise</b>:
 </p>
@@ -708,9 +708,9 @@ Iterative exponentiation:
 </div>
 </div>
 </div>
-<div id="outline-container-org1f99011" class="outline-2">
-<h2 id="org1f99011">Exercise 5.5</h2>
-<div class="outline-text-2" id="text-org1f99011">
+<div id="outline-container-org713e0ca" class="outline-2">
+<h2 id="org713e0ca">Exercise 5.5</h2>
+<div class="outline-text-2" id="text-org713e0ca">
 <p>
 <b>Exercise</b>:
 </p>
@@ -760,9 +760,96 @@ Relevant contents of the stack when computing the <code>fib</code> of <code>2</c
 </ul>
 </div>
 </div>
+<div id="outline-container-orgda6137b" class="outline-2">
+<h2 id="orgda6137b">Exercise 5.6</h2>
+<div class="outline-text-2" id="text-orgda6137b">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Ben Bitdiddle observes that the Fibonacci machine's controller
+sequence has an extra `save' and an extra `restore', which can be
+removed to make a faster machine.  Where are these instructions?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+Those two instructions are the <code>(restore continue)</code> and <code>(save
+continue)</code> in <code>after-fib-n-2</code>. Here I create a fib-machine without
+those two instructions and show that it works nonetheless:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">;; racket repl in emacs provided by racket-mode.el
+
+repl.rkt&gt; (define fib-machine
+            (make-machine
+             '(continue n val)
+             (list (list '+ +) (list '&lt; &lt;) (list '- -))
+             '(
+               (assign continue (label fib-done))
+               fib-loop
+               (test (op &lt;) (reg n) (const 2))
+               (branch (label immediate-answer))
+               (save continue)
+               (assign continue (label afterfib-n-1))
+               (save n)
+               (assign n (op -) (reg n) (const 1))
+               (goto (label fib-loop))
+               afterfib-n-1
+               (restore n)
+               ;; (restore continue) &lt;----------------------------------
+               (assign n (op -) (reg n) (const 2))
+               ;; (save continue)    &lt;----------------------------------
+               (assign continue (label afterfib-n-2))
+               (save val)
+               (goto (label fib-loop))
+               afterfib-n-2
+               (assign n (reg val))
+               (restore val)
+               (restore continue)
+               (assign val
+                       (op +) (reg val) (reg n))
+               (goto (reg continue))
+               immediate-answer
+               (assign val (reg n))
+               (goto (reg continue))
+               fib-done)))
+repl.rkt&gt; (set-register-contents! fib-machine 'n 4)
+'done
+repl.rkt&gt; (start fib-machine)
+'done
+repl.rkt&gt; (get-register-contents fib-machine 'val)
+3
+repl.rkt&gt; (set-register-contents! fib-machine 'n 5)
+'done
+repl.rkt&gt; (start fib-machine)
+'done
+repl.rkt&gt; (get-register-contents fib-machine 'val)
+5
+repl.rkt&gt; (set-register-contents! fib-machine 'n 6)
+'done
+repl.rkt&gt; (start fib-machine)
+'done
+repl.rkt&gt; (get-register-contents fib-machine 'val)
+8
+repl.rkt&gt;
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.9)</span></p>
+<p class="author">Author:  (<a href="mailto:gp@host-667">gp@host-667</a>)</p>
+<p class="date">Date: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.9)</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
 </html>
