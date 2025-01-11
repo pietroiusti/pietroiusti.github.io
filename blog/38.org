@@ -74,10 +74,10 @@
 - As an example, they draw the datapaths and controller of a ~GCD~
   machine.
 
-- Authors present a wawy to describe machines in a textual form and
+- Authors present a way to describe machines in a textual form and
   presents a specification of the of the GCD machine.
 
-- Authors introduction the notion of /subroutine/. [What's the def? It
+- Authors introduce the notion of /subroutine/. [What's the def? It
   wasn't that clear.]
 
 - Authors show that we can use a register to hold a label.
