@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-01-11 Sat 18:00 -->
+<!-- 2025-01-30 Thu 23:03 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 5.1 Computing with Register Machines: Designing Register Machines</title>
@@ -198,7 +198,7 @@
 <div id="content" class="content">
 <h1 class="title">SICP 5.1 Computing with Register Machines: Designing Register Machines
 <br />
-<span class="subtitle">2024-12-24 Tue (Updated on 2025-01-09 Thu)</span>
+<span class="subtitle">2024-12-24 Tue (Updated on 2025-01-09 Thu; 2025-01-30 Thu)</span>
 </h1>
 <ul class="org-ul">
 <li>The book began talking about ``processes''. [Question as an ex
@@ -223,7 +223,7 @@ model of evaluation?]</li>
 <li>Much mystery has been cleared away, but important questions have
 been left unanswered.
 <ul class="org-ul">
-<li>The mechanisms of control have not been explained.
+<li>In particular, the mechanisms of control have not been explained.
 <ul class="org-ul">
 <li>How are values returned by the evaluation of subexpressions to
 the expressions that use them?</li>
@@ -254,35 +254,138 @@ machine-language computer programmer'' (492).</li>
 
 <li>To design a register machine, me must design
 <ul class="org-ul">
-<li>its <i>datapaths</i>;</li>
+<li>its <i>data paths</i>;</li>
 <li>its <i>controller</i>.</li>
 </ul></li>
 
 <li>Only one register can be assigned a new value at each step.</li>
 
-<li>Authors present a way to represents datapaths and controllers with
+<li>Authors present a way to represents data paths and controllers with
 diagrams.</li>
 
-<li>As an example, they draw the datapaths and controller of a <code>GCD</code>
+<li>As an example, they draw the data paths and controller of a <code>GCD</code>
 machine.</li>
 
 <li>Authors present a way to describe machines in a textual form and
-presents a specification of the of the GCD machine.</li>
+presents a specification of the GCD machine.</li>
 
 <li>Authors introduce the notion of <i>subroutine</i>. [What's the def? It
 wasn't that clear.]</li>
 
 <li>Authors show that we can use a register to hold a label.</li>
 
-<li>Authors show how to use a stack to implement recursion
+<li>Authors show how to use a stack to implement recursion.
 <ul class="org-ul">
-<li>Example: <code>factorial</code></li>
-<li>Example: <code>fib</code> (double recursion)</li>
+<li>Example: <code>factorial</code>;</li>
+<li><p>
+Example: <code>fib</code> (double recursion). Here is the controller for the
+<code>fib</code> machine with some comments:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(controller
+ <span style="color: #595959;">;; </span><span style="color: #595959;">We are going to to compute `(fib n)`.</span>
+ <span style="color: #595959;">;;</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">When we are done computing it, we have finished.</span>
+ <span style="color: #595959;">;;</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">The `continue` register stores the address of the instruction we</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">have to execute when we are done doing something.</span>
+ <span style="color: #595959;">;;</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">When we are done with computing `(fib n)`, we have nothing left to</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">do. So we set `continue` to `fib-done`.</span>
+
+ (assign continue (label 'fib-done))
+ <span style="color: #595959;">;; </span><span style="color: #595959;">Then we initiate the computation of `(fib n)`. We will come back</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">to this piece of code when, if ever, `n` will have lower values</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">than the initial one; so we use a label.</span>
+
+ fib-loop
+ <span style="color: #595959;">;; </span><span style="color: #595959;">We test whether `(&lt; n 2)`.</span>
+ (test (op &lt;) (reg n) (const 2))
+ (branch (label immediate-answer))
+ <span style="color: #595959;">;; </span><span style="color: #595959;">Either we have the answer for `(fib n)` or we don't. If we do,</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">then we jump to the `immediate-answer` label with the instruction</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">above. If don't, then we need to recur. When we recur, we first</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">compute `(fib (- n 1))`, and then we compute `(fib (- n 2))`, and</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">finally we add the two results.</span>
+ <span style="color: #595959;">;;</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">Since we have to postpone the computation of `(fib n)`, let's save</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">the current values of `n` and `continue` onto the stack, so we can</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">come back to them when we need to do so. Once those values are</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">saved in the stack, we can update `n` and `continue`. We are going</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">to compute `(fib (- n 1))` so we set `n` to `n-1`. Once we are</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">done with that, we will be done computing the `(fib (- n 1))` so</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">we set the the value of the `continue` register to the</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">`after-fib-n-1` label.</span>
+ (save continue)
+ (assign continue (label after-fib-n-1))
+ (assign n (op -) (reg n) (const 1))
+ (save n)
+ <span style="color: #595959;">;; </span><span style="color: #595959;">Now we can start the computation of `(fib (- n 1))` so we loop</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">back to the portion of code which starts the compuation of a fib.</span>
+ (goto (label fib-loop))
+
+ after-fib-n-1
+ <span style="color: #595959;">;; </span><span style="color: #595959;">If we are here, then it means we have just put the value of a</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">`(fib (- n 1))` in the `val` register.</span>
+ <span style="color: #595959;">;;</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">Given the so, we still have to compute the value of the relevant</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">`(fib (- n 2))`, before we can compute the value of the relevant</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">(fib n) --- which, as we have already said, is the sum of `(fib (-</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">n 1))` and `(fib (- n 2))`.</span>
+ (restore n)
+ (restore continue)
+
+ (save continue)
+ (assign continue (label after-fib-n-2))
+
+ <span style="color: #595959;">;; </span><span style="color: #595959;">We want to save the result of `(fib (- n 1))`, which we have</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">stored in val, since val will be used to store the result of `(fib</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">(- n 2))`</span>
+ (save val)
+ (goto (label fib-loop))
+
+ after-fib-n-2
+ <span style="color: #595959;">;; </span><span style="color: #595959;">If we are here, then it means we have just put the value of a</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">`(fib (- n 2))` in the `val` register.</span>
+ <span style="color: #595959;">;;</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">Remember, moreover, that the value of `(fib (- n 1))` is stored at</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">the top of the stack. We want to restore the value of `(fib (- n</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">1))`, but we don't want to overwrite and lose the value currently</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">stored in the `val` register, so we move the value stored in the</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">the `val` register into the `n` register.</span>
+ (assign n (reg val))
+ (restore val)
+ <span style="color: #595959;">;; </span><span style="color: #595959;">we restore `continue` so we know what to do once we have computed</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">`(fib n)`.</span>
+ (restore continue)
+ <span style="color: #595959;">;; </span><span style="color: #595959;">the value of `(fib (- n 1))` is in the `val` register and the</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">value of `(fib (- n 1))` is in the `n` register. We can now add</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">them up to get the value of `(fib n)`</span>
+ (assign val (op +) (reg val) (reg n))
+ (goto (reg continue))
+
+ immediate-answer
+ <span style="color: #595959;">;; </span><span style="color: #595959;">If we are here, then it means that we are computing `(fib n)`</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">where `(&lt; n 2). The result of that is `n`. We put the result into</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">the `val` register.</span>
+ (assign val (reg n))
+ <span style="color: #595959;">;; </span><span style="color: #595959;">now that the result is in the `val` register, we need to know what</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">to do. In order to know what to do, we need to know what result is</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">have computed. There are three possibilities: 1) we are done; 2)</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">we have computed the value of a `(fib (- n 1))` recursion; 3) we</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">have computed the value of a `(fib (- n 2))` recursion. The</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">`continue` register is expected to hold the relevant label to let</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">us know what value we have just finished computing.</span>
+ (goto (reg continue))
+
+ fib-done) <span style="color: #595959;">;; </span><span style="color: #595959;">we are done</span>
+</pre>
+</div></li>
 </ul></li>
 </ul>
-<div id="outline-container-org8d64eb3" class="outline-2">
-<h2 id="org8d64eb3">Exercise 5.1</h2>
-<div class="outline-text-2" id="text-org8d64eb3">
+<div id="outline-container-org5c145ad" class="outline-2">
+<h2 id="org5c145ad">Exercise 5.1</h2>
+<div class="outline-text-2" id="text-org5c145ad">
 <p>
 <b>Exercise</b>:
 </p>
@@ -365,9 +468,9 @@ controller diagrams for this machine.
 </div>
 </div>
 </div>
-<div id="outline-container-orgd6a302a" class="outline-2">
-<h2 id="orgd6a302a">Exercise 5.2</h2>
-<div class="outline-text-2" id="text-orgd6a302a">
+<div id="outline-container-org68852ed" class="outline-2">
+<h2 id="org68852ed">Exercise 5.2</h2>
+<div class="outline-text-2" id="text-org68852ed">
 <p>
 <b>Exercise</b>:
 </p>
@@ -398,9 +501,9 @@ factorial-done)
 </div>
 </div>
 </div>
-<div id="outline-container-org276c195" class="outline-2">
-<h2 id="org276c195">Exercise 5.3</h2>
-<div class="outline-text-2" id="text-org276c195">
+<div id="outline-container-orgf384f96" class="outline-2">
+<h2 id="orgf384f96">Exercise 5.3</h2>
+<div class="outline-text-2" id="text-orgf384f96">
 <p>
 <b>Exercise</b>:
 </p>
@@ -611,9 +714,9 @@ sqrt-done)
 </div>
 </div>
 </div>
-<div id="outline-container-orge0c069c" class="outline-2">
-<h2 id="orge0c069c">Exercise 5.4</h2>
-<div class="outline-text-2" id="text-orge0c069c">
+<div id="outline-container-orgd3c2e26" class="outline-2">
+<h2 id="orgd3c2e26">Exercise 5.4</h2>
+<div class="outline-text-2" id="text-orgd3c2e26">
 <p>
 <b>Exercise</b>:
 </p>
@@ -708,9 +811,9 @@ Iterative exponentiation:
 </div>
 </div>
 </div>
-<div id="outline-container-orgd80cc1f" class="outline-2">
-<h2 id="orgd80cc1f">Exercise 5.5</h2>
-<div class="outline-text-2" id="text-orgd80cc1f">
+<div id="outline-container-org70abef7" class="outline-2">
+<h2 id="org70abef7">Exercise 5.5</h2>
+<div class="outline-text-2" id="text-org70abef7">
 <p>
 <b>Exercise</b>:
 </p>
@@ -760,9 +863,9 @@ Relevant contents of the stack when computing the <code>fib</code> of <code>2</c
 </ul>
 </div>
 </div>
-<div id="outline-container-org84b1e53" class="outline-2">
-<h2 id="org84b1e53">Exercise 5.6</h2>
-<div class="outline-text-2" id="text-org84b1e53">
+<div id="outline-container-org5d4141a" class="outline-2">
+<h2 id="org5d4141a">Exercise 5.6</h2>
+<div class="outline-text-2" id="text-org5d4141a">
 <p>
 <b>Exercise</b>:
 </p>
