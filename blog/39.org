@@ -1,0 +1,1035 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 5.2.1 -- 5.2.3 A Register-Machine Simulator
+#+subtitle: 2025-02-21 Fri
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.93 (<a href="https://orgmode.org">Org</a> mode 9.7.11)
+
+* 
+Authors present a scheme program which simulates the kind of register
+machines described in 5.1.
+
+The highest-level abstraction is the ~make-machine~ procedure, which
+can be used to create a machine. It takes the names of the registers,
+the list of the operations the machine uses, and the controller text.
+
+~Set-register-contents!~ can be used to set the value of a register
+and ~get-register-contents~ to retrieve it. ~Start~ is used to make
+the machine start executing the instructions represented by the
+controller text.
+
+Authors superbly describe the implementation.
+
+** Exercise 5.8
+*Exercise*:
+
+#+begin_quote
+The following register-machine code is ambiguous, because the label
+~here~ is defined more than once:
+
+#+begin_src scheme
+  start
+  (goto (label here))
+  here
+  (assign a (const 3))
+  (goto (label there))
+  here
+  (assign a (const 4))
+  (goto (label there))
+  there
+#+end_src
+
+With the simulator as written, what will the contents of register ~a~
+be when control reaches ~there~?  Modify the ~extract-labels~
+procedure so that the assembler will signal an error if the same label
+name is used to indicate two different locations.
+#+end_quote
+
+*Answer*:
+
+#+begin_quote
+With the simulator as written, what will the contents of register ~a~
+be when control reaches ~there~?
+#+end_quote
+Labels are stored in a list in the same order they are given by the
+controller text. Given the implementation of ~lookup-label~ --- which
+uses ~assoc~ ---, when the same labels appears more than once, the
+first one in the list will be selected. So the answer is ~3~.
+
+#+begin_quote
+Modify the ~extract-labels~ procedure so that the assembler will
+signal an error if the same label name is used to indicate two
+different locations.
+#+end_quote
+
+Here is a modified version of the ~extract-labels~ method shown in
+footnote 4, page 521 (as opposed to the one in the main text).
+
+#+begin_src scheme
+  (define (extract-labels text)
+    (if (null? text)
+        (cons '() '())
+        (let ((result (extract-labels (cdr text))))
+          (let ((insts (car result)) (labels (cdr result)))
+            (let ((next-inst (car text)))
+              (if (symbol? next-inst)
+                  (if (assoc next-inst labels)
+                      (error "Duplicated label:" next-inst)
+                      (cons insts
+                            (cons (make-label-entry next-inst insts) labels)))
+                  (cons (cons (make-instruction next-inst) insts)
+                        labels)))))))
+#+end_src
+
+** Exercise 5.9
+*Exercise*:
+
+#+begin_quote
+The treatment of machine operations above permits them to operate on
+labels as well as on constants and the contents of registers.  Modify
+the expression-processing procedures to enforce the condition that
+operations can be used only with registers and constants.
+#+end_quote
+
+*Answer*:
+
+#+begin_src scheme
+  (define (make-operation-exp exp machine labels operations)
+    (let ((op (lookup-prim (operation-exp-op exp) operations))
+          (aprocs
+           (map (lambda (e)
+                  (if (label-exp? e)
+                      (error "Cannot use labels as operation operands")
+                      (make-primitive-exp e machine labels)))
+                (operation-exp-operands exp))))
+      (lambda ()
+        (apply op (map (lambda (p) (p)) aprocs)))))
+#+end_src
+** Exercise 5.10
+*Exercise*:
+
+#+begin_quote
+Design a new syntax for register-machine instructions and modify the
+simulator to use your new syntax.  Can you implement your new syntax
+without changing any part of the simulator except the syntax
+procedures in this section?
+#+end_quote
+
+*Answer*:
+
+- Syntax changes:
+  - 1.
+    #+begin_src scheme
+      (assign (reg <REGISTER-NAME>) ...)
+    #+end_src
+    instead of
+    #+begin_src scheme
+      (assign <REGISTER-NAME> ...)
+    #+end_src
+  - 2.
+    #+begin_src scheme
+      (op <OPERATION-NAME> <INPUT_1> ... <INPUT_N>)
+    #+end_src
+    instead of
+    #+begin_src scheme
+      ((op <OPERATION-NAME>) <INPUT_1> ... <INPUT_N>))
+    #+end_src
+
+- Changes in the code:
+  #+begin_src scheme
+    ;; redefined procedures:
+
+    (define (assign-reg-name assign-instruction)
+      (cadadr assign-instruction))
+
+    (define (operation-exp? exp)
+      (and (pair? exp) (tagged-list? exp 'op)))
+
+    (define (operation-exp-op operation-exp)
+      (cadr operation-exp))
+
+    (define (operation-exp-operands operation-exp)
+      (cddr operation-exp))
+  #+end_src
+
+- Rephrasing ~the gcd-machine~ given the new syntax:
+    #+begin_src scheme
+      (define gcd-machine
+        (make-machine
+         '(a b t)
+         (list (list 'rem remainder) (list '= =))
+         '(test-b
+           (test op = (reg b) (const 0))
+           (branch (label gcd-done))
+           (assign (reg t) op rem (reg a) (reg b))
+           (assign (reg a) (reg b))
+           (assign (reg b) (reg t))
+           (goto (label test-b))
+           gcd-done)))
+
+      (set-register-contents! gcd-machine 'a 206)
+
+      (set-register-contents! gcd-machine 'b 40)
+
+      (start gcd-machine)
+
+      (get-register-contents gcd-machine 'a)
+    #+end_src
+
+** Exercise 5.11
+
+*Exercise*:
+
+#+begin_quote
+When we introduced ~save~ and ~restore~ in section 5.1.4, we didn't
+specify what would happen if you tried to restore a register that was
+not the last one saved, as in the sequence
+
+#+begin_src scheme
+  (save y)
+  (save x)
+  (restore y)
+#+end_src
+
+There are several reasonable possibilities for the meaning of
+`restore':
+
+a. ~(restore y)~ puts into ~y~ the last value saved on the stack,
+regardless of what register that value came from.  This is the way our
+simulator behaves.  Show how to take advantage of this behavior to
+eliminate one instruction from the Fibonacci machine of section 5.1.4
+(see Figure 5.12).
+
+b. ~(restore y)~ puts into ~y~ the last value saved on the stack, but
+only if that value was saved from ~y~; otherwise, it signals an error.
+Modify the simulator to behave this way.  You will have to change
+~save~ to put the register name on the stack along with the value.
+
+c. ~(restore y)~ puts into ~y~ the last value saved from ~y~
+regardless of what other registers were saved after ~y~ and not
+restored.  Modify the simulator to behave this way.  You will have to
+associate a separate stack with each register.  You should make the
+~initialize-stack~ operation initialize all the register stacks.
+#+end_quote
+*** Answer
+**** a
+#+begin_src scheme
+  (define fib-machine
+    (make-machine
+     '(continue n val)
+     (list (list '+ +) (list '< <) (list '- -))
+     '(
+       (assign continue (label fib-done))
+       fib-loop
+       (test (op <) (reg n) (const 2))
+       (branch (label immediate-answer))
+       (save continue)
+       (assign continue (label afterfib-n-1))
+       (save n)
+       (assign n (op -) (reg n) (const 1))
+       (goto (label fib-loop))
+       afterfib-n-1
+       (restore n)
+       (restore continue)
+       (assign n (op -) (reg n) (const 2))
+       (save continue)
+       (assign continue (label afterfib-n-2))
+       (save val)
+       (goto (label fib-loop))
+       afterfib-n-2
+       ;;(assign n (reg val)) <---------------
+       ;;(restore val)        <---------------
+       (restore n)        ;;  <---------------
+       (restore continue)
+       (assign val
+               (op +) (reg val) (reg n))
+       (goto (reg continue))
+       immediate-answer
+       (assign val (reg n))
+       (goto (reg continue))
+       fib-done)))
+#+end_src
+
+It works. Here is the modified machine running:
+
+#+begin_src scheme
+  repl.rkt> (define fib-machine
+              (make-machine
+               '(continue n val)
+               (list (list '+ +) (list '< <) (list '- -))
+               '(
+                 (assign continue (label fib-done))
+                 fib-loop
+                 (test (op <) (reg n) (const 2))
+                 (branch (label immediate-answer))
+                 (save continue)
+                 (assign continue (label afterfib-n-1))
+                 (save n)
+                 (assign n (op -) (reg n) (const 1))
+                 (goto (label fib-loop))
+                 afterfib-n-1
+                 (restore n)
+                 (restore continue)
+                 (assign n (op -) (reg n) (const 2))
+                 (save continue)
+                 (assign continue (label afterfib-n-2))
+                 (save val)
+                 (goto (label fib-loop))
+                 afterfib-n-2
+                 ;;(assign n (reg val)) <---------------
+                 ;;(restore val)        <---------------
+                 (restore n)        ;;  <---------------
+                 (restore continue)
+                 (assign val
+                         (op +) (reg val) (reg n))
+                 (goto (reg continue))
+                 immediate-answer
+                 (assign val (reg n))
+                 (goto (reg continue))
+                 fib-done)))
+  repl.rkt> (set-register-contents! fib-machine 'n 4)
+  'done
+  repl.rkt> (start fib-machine)
+  'done
+  repl.rkt> (get-register-contents fib-machine 'val)
+  3
+  repl.rkt> (set-register-contents! fib-machine 'n 5)
+  'done
+  repl.rkt> (start fib-machine)
+  'done
+  repl.rkt> (get-register-contents fib-machine 'val)
+  5
+  repl.rkt> (set-register-contents! fib-machine 'n 6)
+  'done
+  repl.rkt> (start fib-machine)
+  'done
+  repl.rkt> (get-register-contents fib-machine 'val)
+  8
+  repl.rkt>
+#+end_src
+**** b
+I have:
+
+- modified the definition of ~push~ within ~make-stack~:
+  #+begin_src scheme
+    (define (make-stack)
+      ;;...
+      (define (push x reg-name)
+        (let ((obj (cons x reg-name)))
+          (set! s (cons obj s))))
+      ;;...
+      ))
+  #+end_src
+
+- modified ~push~:
+  #+begin_src scheme
+    (define (push stack value reg-name)
+      ((stack 'push) value reg-name))
+  #+end_src
+
+- created a couple of helper functions (one to extract the value of
+  the object stored in the stack; the other to extract the name of the
+  corresponding register)
+  #+begin_src scheme
+    (define (stack-obj-value stack-obj)
+      (car stack-obj))
+
+    (define (stack-obj-reg-name stack-obj)
+      (cdr stack-obj))
+  #+end_src
+
+- modified the ~make-save~ and the ~make-restore~ procedures:
+
+  #+begin_src scheme
+    (define (make-save inst machine stack pc)
+      (let ((reg-name (stack-inst-reg-name inst)))
+        (let ((reg (get-register machine reg-name)))
+          (lambda ()
+            (push stack (get-contents reg) reg-name)
+            (advance-pc pc)))))
+  #+end_src
+
+  #+begin_src scheme
+    (define (make-restore inst machine stack pc)
+      (let ((reg (get-register machine
+                               (stack-inst-reg-name inst))))
+        (lambda ()
+          (let ((stack-obj (pop stack)))
+            (let ((stack-val (stack-obj-value stack-obj))
+                  (stack-reg-name (stack-obj-reg-name stack-obj)))
+              (if (not (eq? (stack-inst-reg-name inst)
+                            stack-reg-name))
+                  (error "Cannot restore value in different register. Original register: ...; Attempting to save in ...")
+                  (begin
+                    (set-contents! reg stack-val)
+                    (advance-pc pc))))))))
+  #+end_src
+
+Notice that the error is raised at simulation time.
+
+**** c
+We can treat ~s~ as a list of stacks; each stacks being associated to
+a register.
+
+A register stack in the list can be represented as a list whose ~car~
+is the name of the relevant register and whose ~cdr~ is the list of
+the elements in the stack.
+
+We can establish that if a register ~foo~ has no stack in the list,
+then its stack is empty.
+
+Given so, we can keep the ~initialize-stack~ operation as it is. By
+setting the list of register stacks to an empty list, each register
+will have an empty stack.
+
+When a value ~bar~ for register ~foo~ is saved and there is no ~foo~
+stack in the list of stacks, then a ~foo~ stack is created and ~bar~
+saved into it.
+
+Modified parts of the code:
+#+begin_src scheme
+  (define (make-stack);; actually it's a list of stacks (los) now
+    (let ((s '()))
+      (define (find-reg-stack los name)
+        (cond ((null? los)
+               '())
+              ((eq? (caar los) name) ;; check tag
+               (car los))
+              (else
+               (find-reg-stack (cdr los) name))))
+      (define (push-in-los x reg-name)
+        (display "push-in-los ")
+        (let ((reg-stack (find-reg-stack s reg-name)))
+          (if (null? reg-stack) ;; register stack not found
+              ;; create reg-stack
+              ;; push value
+              ;; add reg-stack to los
+              (let ((new-reg-stack (cons reg-name
+                                         (cons x '()))))
+                (set! s (cons new-reg-stack s)))
+              ;; else
+              ;; push-value in reg-stack
+              (set-cdr! reg-stack (cons x (cdr reg-stack))))))
+      (define (pop-from-los reg-name)
+        (display "pop-from-los ")
+        (let ((reg-stack (find-reg-stack s reg-name)))
+          (if (null? reg-stack) ;; not found
+              (error "Empty stack --- POP")
+              (if (null? (cdr reg-stack))
+                  (error "Empty stack --- POP")
+                  (let ((top (car (cdr reg-stack))))
+                    (set-cdr! reg-stack (cdr (cdr reg-stack)))
+                    top)))))
+      (define (initialize)
+        (set! s '())
+        'done)
+      (define (dispatch message)
+        (cond ((eq? message 'push) push-in-los)
+              ((eq? message 'pop) pop-from-los)
+              ((eq? message 'initialize) (initialize))
+              (else (error "Unknown request -- STACK"
+                           message))))
+      dispatch))
+
+  (define (pop stack reg-name)
+    ((stack 'pop) reg-name))
+
+  (define (push stack value reg-name)
+    ((stack 'push) value reg-name))
+
+  (define (make-save inst machine stack pc)
+    (let ((reg-name (stack-inst-reg-name inst)))
+      (let ((reg (get-register machine
+                               reg-name)))
+        (lambda ()
+          (push stack (get-contents reg) reg-name)
+          (advance-pc pc)))))
+
+  (define (make-restore inst machine stack pc)
+    (let ((reg-name (stack-inst-reg-name inst)))
+      (let ((reg (get-register machine reg-name)))
+        (lambda ()
+          (set-contents! reg (pop stack reg-name))
+          (advance-pc pc)))))
+#+end_src
+** Exercise 5.12
+*Exercise*:
+
+#+begin_quote
+The simulator can be used to help determine the data paths required
+for implementing a machine with a given controller.  Extend the
+assembler to store the following information in the machine model:
+
+- a list of all instructions, with duplicates removed, sorted by
+  instruction type (~assign~, ~goto~, and so on);
+
+- a list (without duplicates) of the registers used to hold entry
+  points (these are the registers referenced by ~goto~ instructions);
+
+- a list (without duplicates) of the registers that are ~save~d or
+  `restore'd;
+
+- for each register, a list (without duplicates) of the sources from
+  which it is assigned (for example, the sources for register ~val~ in
+  the factorial machine of *Note Figure 5-11:: are ~(const 1)~ and ~((op
+  *) (reg n) (reg val))~).
+
+Extend the message-passing interface to the machine to provide access
+to this new information.  To test your analyzer, define the Fibonacci
+machine from Figure 5-12 and examine the lists you constructed.
+#+end_quote
+
+*Answer*:
+
+I've decided to modify ~update-insts!~, since it contains a ~for-each~
+which applies a ~lambda~ to each instruction. Such ~lambda~, instead
+of only updating the sequence of instructions, now it extracts the
+relevant information from each instruction and stores that information
+in the ~reg-sources~, ~entry-point-regs~, ~sorted-instructions~, and
+~saved-restored-regs~ lists. After the the lists are built, we install
+the lists in the model using message-passing.
+
+Here is the code I've modified or added:
+
+#+begin_src racket
+  (require sicp)
+
+  ;; make copy of object
+  ;;
+  ;; I use to it to prevent mutations of the lists stored in the model
+  (define (make-copy obj)
+    (cond ((null? obj)
+           '())
+          ((pair? obj)
+           (cons (make-copy (car obj))
+                 (make-copy (cdr obj))))
+          (else obj)))
+
+  (define (make-new-machine)
+    (let ((pc (make-register 'pc))
+          (flag (make-register 'flag))
+          (stack (make-stack))
+          (the-instruction-sequence '())
+          (sorted-instructions '())
+          (entry-point-regs '())
+          (saved-restored-regs '())
+          (reg-sources '()))
+      (let ((the-ops
+             (list (list 'initialize-stack
+                         (lambda () (stack 'initialize)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
+        (define (allocate-register name)
+          (if (assoc name register-table)
+              (error "Multiply defined register: " name)
+              (set! register-table
+                    (cons (list name (make-register name))
+                          register-table)))
+          'register-allocated)
+        (define (lookup-register name)
+          (let ((val (assoc name register-table)))
+            (if val
+                (cadr val)
+                (error "Unknown register:" name))))
+        (define (execute)
+          (let ((insts (get-contents pc)))
+            (if (null? insts)
+                'done
+                (begin
+                  ((instruction-execution-proc (car insts)))
+                  (execute)))))
+        (define (dispatch message)
+          (cond ((eq? message 'start)
+                 (set-contents! pc the-instruction-sequence)
+                 (execute))
+                ((eq? message 'install-instruction-sequence)
+                 (lambda (seq) (set! the-instruction-sequence seq)))
+                ((eq? message 'allocate-register) allocate-register)
+                ((eq? message 'get-register) lookup-register)
+                ((eq? message 'install-operations)
+                 (lambda (ops) (set! the-ops (append the-ops ops))))
+                ((eq? message 'stack) stack)
+                ((eq? message 'operations) the-ops)
+                ((eq? message 'sorted-instructions) (make-copy sorted-instructions))
+                ((eq? message 'install-sorted-instructions)
+                 (lambda (seq) (set! sorted-instructions seq)))
+                ((eq? message 'entry-point-regs) (make-copy entry-point-regs))
+                ((eq? message 'install-entry-point-regs)
+                 (lambda (seq) (set! entry-point-regs seq)))
+                ((eq? message 'saved-or-restored-regs) (make-copy saved-restored-regs))
+                ((eq? message 'install-saved-or-restored-regs)
+                 (lambda (seq) (set! saved-restored-regs seq)))
+                ((eq? message 'reg-sources) (make-copy reg-sources))
+                ((eq? message 'install-reg-sources)
+                 (lambda (seq) (set! reg-sources seq)))
+                (else (error "Unknown request -- MACHINE" message))))
+        dispatch)))
+
+  ;; I'm using this list to insert alphabetically in the
+  ;; sorted-instructions list
+  (define insts-names-in-order
+    '(assign branch goto perform restore save test))
+
+  ;; compare instructions alphabetically
+  ;; return 0 if i1 = i2
+  ;;        1 if i1 > i2
+  ;;       -1 if i1 < i2
+  (define (inst-alph-cmp i1 i2)
+    (define (iter insts-names-in-order)
+      (cond ((eq? i1 i2)
+             0)
+            ((eq? i1 (car insts-names-in-order))
+             -1)
+            ((eq? i2 (car insts-names-in-order))
+             1)
+            (else
+             (iter (cdr insts-names-in-order)))))
+    (iter insts-names-in-order))
+
+  ;; return true if instruction type i1 comes alphabetically before
+  ;; instruction type i2
+  (define (comes-before? i1 i2)
+    (= (inst-alph-cmp i1 i2) -1))
+
+  ;; return true if instruction type i1 comes alphabetically after
+  ;; instruction type i2
+  (define (comes-after? i1 i2)
+    (= (inst-alph-cmp i1 i2) 1))
+
+  ;; insert inst into current list of sorted insts. In alphabetic
+  ;; order. No duplicates.
+  (define (insert-inst-to-sorted-insts inst-text items)
+    (let ((name (car inst-text)))
+      (cond ((null? items)
+             (cons inst-text items))
+            ((comes-before? name (caar items))
+             (cons inst-text items))
+            ((equal? inst-text (car items)) ;; same inst
+             items)
+            ((eq? name (caar items)) ;; same inst type but not same inst
+             (cons (car items)
+                   (insert-inst-to-sorted-insts inst-text (cdr items))))
+            ((comes-after? name (caar items))
+             (cons (car items)
+                   (insert-inst-to-sorted-insts inst-text (cdr items)))))))
+
+  (define (insert-no-duplicates x items)
+    (cond ((null? items)
+           (cons x items))
+          ((eq? x (car items))
+           items)
+          (else
+           (cons (car items)
+                 (insert-no-duplicates x (cdr items))))))
+
+  (define (update-sorted-instructions inst-text current-list)
+    ;; inst is an inst obj: (text . <#proc>)
+    (insert-inst-to-sorted-insts inst-text current-list))
+
+  (define (update-entry-point-regs inst-text current-list)
+    (if (and (eq? (car inst-text) 'goto)
+             (eq? (caadr inst-text) 'reg))
+        (let ((reg-name (cadadr inst-text)))
+          (insert-no-duplicates reg-name current-list))
+        current-list))
+
+  (define (update-saved-or-restored-regs inst-text current-list)
+    (if (or (eq? (car inst-text) 'save)
+            (eq? (car inst-text) 'restore))
+        (let ((reg-name (cadr inst-text)))
+          (insert-no-duplicates reg-name current-list))
+        current-list))
+
+  (define (insert-no-equal-duplicates x items)
+    (cond ((null? items)
+           (cons x items))
+          ((equal? x (car items))
+           items)
+          (else (cons (car items)
+                      (insert-no-equal-duplicates x (cdr items))))))
+
+  (define (update-reg-sources inst-text current-list)
+    (if (eq? (car inst-text) 'assign)
+        (insert-source inst-text current-list)
+        current-list))
+
+  (define (insert-source inst-text current-list)
+    (let ((reg-name (cadr inst-text))
+          (source (cddr inst-text)))
+      (cond ((null? current-list)
+             (list (list reg-name
+                         source)))
+            ((eq? (caar current-list) reg-name)
+             (cons (cons reg-name
+                         (insert-no-equal-duplicates
+                          source
+                          (cdar current-list)))
+                   (cdr current-list)))
+            (else ;; not the same reg
+             (cons (car current-list)
+                   (insert-source inst-text (cdr current-list)))))))
+
+  (define (update-insts! insts labels machine)
+    (let ((pc (get-register machine 'pc))
+          (flag (get-register machine 'flag))
+          (stack (machine 'stack))
+          (ops (machine 'operations))
+          (sorted-instructions '())
+          (entry-point-regs '())
+          (saved-restored-regs '())
+          (reg-sources '()))
+      (for-each
+       (lambda (inst)
+         (set-instruction-execution-proc!
+          inst
+          (make-execution-procedure
+           (instruction-text inst) labels machine
+           pc flag stack ops))
+         (let ((inst-text (instruction-text inst)))
+           ;; add info into the local lists
+           (set! sorted-instructions
+                 (update-sorted-instructions inst-text sorted-instructions))
+           (set! entry-point-regs
+                 (update-entry-point-regs inst-text entry-point-regs))
+           (set! saved-restored-regs
+                 (update-saved-or-restored-regs inst-text saved-restored-regs))
+           (set! reg-sources
+                 (update-reg-sources inst-text reg-sources))))
+       insts)
+      ;; install lists into the model
+      ((machine 'install-sorted-instructions) sorted-instructions)
+      ((machine 'install-entry-point-regs) entry-point-regs)
+      ((machine 'install-saved-or-restored-regs) saved-restored-regs)
+      ((machine 'install-reg-sources) reg-sources)))
+#+end_src
+
+These are the results using the ~fib-machine~:
+
+#+begin_src racket
+  (define fib-machine
+    (make-machine
+     '(continue n val)
+     (list (list '+ +) (list '< <) (list '- -))
+     '(
+       (assign continue (label fib-done))
+       fib-loop
+       (test (op <) (reg n) (const 2))
+       (branch (label immediate-answer))
+       (save continue)
+       (assign continue (label afterfib-n-1))
+       (save n)
+       (assign n (op -) (reg n) (const 1))
+       (goto (label fib-loop))
+       afterfib-n-1
+       (restore n)
+       (restore continue)
+       (assign n (op -) (reg n) (const 2))
+       (save continue)
+       (assign continue (label afterfib-n-2))
+       (save val)
+       (goto (label fib-loop))
+       afterfib-n-2
+       (assign n (reg val))
+       (restore val)
+       (restore continue)
+       (assign val
+               (op +) (reg val) (reg n))
+       (goto (reg continue))
+       immediate-answer
+       (assign val (reg n))
+       (goto (reg continue))
+       fib-done)))
+
+  (set-register-contents! fib-machine 'n 4)
+  (start fib-machine)
+  (get-register-contents fib-machine 'val)
+
+  (display "\nsorted instructions:\n")
+  (fib-machine 'sorted-instructions)
+
+  (display "\nentry-point-regs:\n")
+  (fib-machine 'entry-point-regs)
+
+  (display "\nsaved-or-restored-regs:\n")
+  (fib-machine 'saved-or-restored-regs)
+
+  (display "\nreg-sources:\n")
+  (fib-machine 'reg-sources)
+#+end_src
+
+#+begin_src scheme
+  done
+  done
+  3
+
+  sorted instructions:
+  ((assign continue (label fib-done))
+   (assign continue (label afterfib-n-1))
+   (assign n (op -) (reg n) (const 1))
+   (assign n (op -) (reg n) (const 2))
+   (assign continue (label afterfib-n-2))
+   (assign n (reg val))
+   (assign val (op +) (reg val) (reg n))
+   (assign val (reg n))
+   (branch (label immediate-answer))
+   (goto (label fib-loop))
+   (goto (reg continue))
+   (restore n)
+   (restore continue)
+   (restore val)
+   (save continue)
+   (save n)
+   (save val)
+   (test (op <) (reg n) (const 2)))
+
+  entry-point-regs:
+  (continue)
+
+  saved-or-restored-regs:
+  (continue n val)
+
+  reg-sources: ;; manually formatted to make structure explicit
+  ((continue
+
+    ((label fib-done))
+
+    ((label afterfib-n-1))
+
+    ((label afterfib-n-2)))
+
+
+   (n
+
+    ((op -) (reg n) (const 1))
+
+    ((op -) (reg n) (const 2))
+
+    ((reg val)))
+
+
+   (val
+
+    ((op +) (reg val) (reg n))
+
+    ((reg n))))
+#+end_src
+
+** Exercise 5.13
+
+*Exercise*:
+
+#+begin_quote
+Modify the simulator so that it uses the controller sequence to
+determine what registers the machine has rather than requiring a list
+of registers as an argument to `make-machine'.  Instead of
+pre-allocating the registers in `make-machine', you can allocate them
+one at a time when they are first seen during assembly of the
+instructions.
+#+end_quote
+
+*Answer*:
+
+- ~Make-machine~ does not take register names anymore:
+  #+begin_src racket
+    (define (make-machine ops controller-text)
+      (let ((machine (make-new-machine)))
+        ((machine 'install-operations) ops)
+        ((machine 'install-instruction-sequence)
+         (assemble controller-text machine))
+        machine))
+  #+end_src
+
+- I've added a ~is-reg-allocated?~ method in the machine ---
+  retrievable by passing a message.
+
+  #+begin_src racket
+    (define (make-new-machine)
+      (let ((pc (make-register 'pc))
+            (flag (make-register 'flag))
+            (stack (make-stack))
+            (the-instruction-sequence '())
+            (sorted-instructions '())
+            (entry-point-regs '())
+            (saved-restored-regs '())
+            (reg-sources '()))
+        (let ((the-ops
+               (list (list 'initialize-stack
+                           (lambda () (stack 'initialize)))))
+              (register-table
+               (list (list 'pc pc) (list 'flag flag))))
+          (define (allocate-register name)
+            (if (assoc name register-table)
+                (error "Multiply defined register: " name)
+                (set! register-table
+                      (cons (list name (make-register name))
+                            register-table)))
+            'register-allocated)
+          (define (is-reg-allocated? name) ;; <-------------------------------------------
+            (assoc name register-table))
+          (define (lookup-register name)
+            (let ((val (assoc name register-table)))
+              (if val
+                  (cadr val)
+                  (error "Unknown register:" name))))
+          (define (execute)
+            (let ((insts (get-contents pc)))
+              (if (null? insts)
+                  'done
+                  (begin
+                    ((instruction-execution-proc (car insts)))
+                    (execute)))))
+          (define (dispatch message)
+            (cond ((eq? message 'start)
+                   (set-contents! pc the-instruction-sequence)
+                   (execute))
+                  ((eq? message 'install-instruction-sequence)
+                   (lambda (seq) (set! the-instruction-sequence seq)))
+                  ((eq? message 'allocate-register) allocate-register)
+                  ((eq? message 'is-reg-allocated?) is-reg-allocated?) ;; <---------------------
+                  ((eq? message 'get-register) lookup-register)
+                  ((eq? message 'install-operations)
+                   (lambda (ops) (set! the-ops (append the-ops ops))))
+                  ((eq? message 'stack) stack)
+                  ((eq? message 'operations) the-ops)
+                  ((eq? message 'sorted-instructions) (make-copy sorted-instructions))
+                  ((eq? message 'install-sorted-instructions)
+                   (lambda (seq) (set! sorted-instructions seq)))
+                  ((eq? message 'entry-point-regs) (make-copy entry-point-regs))
+                  ((eq? message 'install-entry-point-regs)
+                   (lambda (seq) (set! entry-point-regs seq)))
+                  ((eq? message 'saved-or-restored-regs) (make-copy saved-restored-regs))
+                  ((eq? message 'install-saved-or-restored-regs)
+                   (lambda (seq) (set! saved-restored-regs seq)))
+                  ((eq? message 'reg-sources) (make-copy reg-sources))
+                  ((eq? message 'install-reg-sources)
+                   (lambda (seq) (set! reg-sources seq)))
+                  (else (error "Unknown request -- MACHINE" message))))
+          dispatch)))
+  #+end_src
+
+- ~Make-execution-procedure~ is now in charge of allocating the
+  registers.
+
+  #+begin_src racket
+    ;; Take register name. If a register with that name hasn't been
+    ;; allocated yet, then allocate it.
+    (define (allocate-reg-perhaps reg-name machine)
+      (or ((machine 'is-reg-allocated?) reg-name)
+          ((machine 'allocate-register) reg-name)))
+
+    ;; Take a list of expressions and a machine model. For each of the
+    ;; expressions, if it is a register expression, then, if the register
+    ;; of that expression has not been allocated yet, then allocate it.
+    (define (allocate-list-regs-perhaps op-inputs machine)
+      (cond ((null? op-inputs)
+             'done)
+            ((register-exp? (car op-inputs))
+             (begin ;; do we need this begin?
+               (allocate-reg-perhaps (register-exp-reg (car op-inputs)) machine)
+               (allocate-list-regs-perhaps (cdr op-inputs) machine)))
+            (else
+             (allocate-list-regs-perhaps (cdr op-inputs) machine))))
+
+    ;; Take assign instruction. Allocate those registers in it which
+    ;; haven't been allocated yet.
+    (define (allocate-assign-regs-perhaps inst machine)
+      (allocate-reg-perhaps (assign-reg-name inst) machine)
+      (cond ((register-exp? (car (assign-value-exp inst)))
+             (allocate-reg-perhaps (assign-reg-name (car (assign-value-exp inst))) machine))
+            ((operation-exp? (assign-value-exp inst))
+             (allocate-list-regs-perhaps (operation-exp-operands (assign-value-exp inst)) machine))))
+
+    ;; Take test instruction. Find registers in it, if any. Allocate those
+    ;; which haven't been allocated yet.
+    (define (allocate-test-regs-perhaps inst machine)
+      (allocate-list-regs-perhaps (test-condition inst) machine))
+
+    ;; Take save instruction. Allocate the register it refers to, if it
+    ;; hasn't been allocated yet.
+    (define (allocate-save-reg-perhaps inst machine)
+      (allocate-reg-perhaps (cadr inst) machine))
+
+    ;; Take restore instruction. Allocate the register it refers to, if it
+    ;; hasn't been allocated yet.
+    (define (allocate-restore-reg-perhaps inst machine)
+      (allocate-reg-perhaps (cadr inst) machine))
+
+    ;; Take perform instruction. Find registers in it, if any. Allocate
+    ;; those which haven't been allocated yet.
+    (define (allocate-perform-regs-perhaps inst machine)
+      (allocate-list-regs-perhaps (perform-action inst)))
+
+    (define (make-execution-procedure inst labels machine
+                                      pc flag stack ops)
+      (cond ((eq? (car inst) 'assign)
+             (allocate-assign-regs-perhaps inst machine)
+             (make-assign inst machine labels ops pc))
+            ((eq? (car inst) 'test)
+             (allocate-test-regs-perhaps inst machine)
+             (make-test inst machine labels ops flag pc))
+            ((eq? (car inst) 'branch)
+             (make-branch inst machine labels flag pc))
+            ((eq? (car inst) 'goto)
+             (make-goto inst machine labels pc))
+            ((eq? (car inst) 'save)
+             (allocate-save-reg-perhaps inst machine)
+             (make-save inst machine stack pc))
+            ((eq? (car inst) 'restore)
+             (allocate-restore-reg-perhaps inst machine)
+             (make-restore inst machine stack pc))
+            ((eq? (car inst) 'perform)
+             (allocate-perform-regs-perhaps inst machine)
+             (make-perform inst machine labels ops pc))
+            (else (error "Unknown instruction type -- ASSEMBLE"
+                         inst))))
+  #+end_src
+
+- Now a machine can be created without passing the register names. For
+  example:
+
+  #+begin_src racket
+    (define fib-machine
+      (make-machine
+       (list (list '+ +) (list '< <) (list '- -))
+       '(
+         (assign continue (label fib-done))
+         fib-loop
+         (test (op <) (reg n) (const 2))
+         (branch (label immediate-answer))
+         (save continue)
+         (assign continue (label afterfib-n-1))
+         (save n)
+         (assign n (op -) (reg n) (const 1))
+         (goto (label fib-loop))
+         afterfib-n-1
+         (restore n)
+         (restore continue)
+         (assign n (op -) (reg n) (const 2))
+         (save continue)
+         (assign continue (label afterfib-n-2))
+         (save val)
+         (goto (label fib-loop))
+         afterfib-n-2
+         (assign n (reg val))
+         (restore val)
+         (restore continue)
+         (assign val
+                 (op +) (reg val) (reg n))
+         (goto (reg continue))
+         immediate-answer
+         (assign val (reg n))
+         (goto (reg continue))
+         fib-done)))
+  #+end_src

@@ -1,0 +1,1409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2025-02-21 Fri 23:21 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICP 5.2.1 &#x2013; 5.2.3 A Register-Machine Simulator</title>
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">SICP 5.2.1 &#x2013; 5.2.3 A Register-Machine Simulator
+<br />
+<span class="subtitle">2025-02-21 Fri</span>
+</h1>
+<div id="outline-container-org9cccd89" class="outline-2">
+<h2 id="org9cccd89"></h2>
+<div class="outline-text-2" id="text-org9cccd89">
+<p>
+Authors present a scheme program which simulates the kind of register
+machines described in 5.1.
+</p>
+
+<p>
+The highest-level abstraction is the <code>make-machine</code> procedure, which
+can be used to create a machine. It takes the names of the registers,
+the list of the operations the machine uses, and the controller text.
+</p>
+
+<p>
+<code>Set-register-contents!</code> can be used to set the value of a register
+and <code>get-register-contents</code> to retrieve it. <code>Start</code> is used to make
+the machine start executing the instructions represented by the
+controller text.
+</p>
+
+<p>
+Authors superbly describe the implementation.
+</p>
+</div>
+<div id="outline-container-org4265294" class="outline-3">
+<h3 id="org4265294">Exercise 5.8</h3>
+<div class="outline-text-3" id="text-org4265294">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The following register-machine code is ambiguous, because the label
+<code>here</code> is defined more than once:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">start
+(goto (label here))
+here
+(assign a (const 3))
+(goto (label there))
+here
+(assign a (const 4))
+(goto (label there))
+there
+</pre>
+</div>
+
+<p>
+With the simulator as written, what will the contents of register <code>a</code>
+be when control reaches <code>there</code>?  Modify the <code>extract-labels</code>
+procedure so that the assembler will signal an error if the same label
+name is used to indicate two different locations.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<blockquote>
+<p>
+With the simulator as written, what will the contents of register <code>a</code>
+be when control reaches <code>there</code>?
+</p>
+</blockquote>
+<p>
+Labels are stored in a list in the same order they are given by the
+controller text. Given the implementation of <code>lookup-label</code> &#x2014; which
+uses <code>assoc</code> &#x2014;, when the same labels appears more than once, the
+first one in the list will be selected. So the answer is <code>3</code>.
+</p>
+
+<blockquote>
+<p>
+Modify the <code>extract-labels</code> procedure so that the assembler will
+signal an error if the same label name is used to indicate two
+different locations.
+</p>
+</blockquote>
+
+<p>
+Here is a modified version of the <code>extract-labels</code> method shown in
+footnote 4, page 521 (as opposed to the one in the main text).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">extract-labels</span> text)
+  (<span style="color: #531ab6;">if</span> (null? text)
+      (cons '() '())
+      (<span style="color: #531ab6;">let</span> ((result (extract-labels (cdr text))))
+        (<span style="color: #531ab6;">let</span> ((insts (car result)) (labels (cdr result)))
+          (<span style="color: #531ab6;">let</span> ((next-inst (car text)))
+            (<span style="color: #531ab6;">if</span> (symbol? next-inst)
+                (<span style="color: #531ab6;">if</span> (assoc next-inst labels)
+                    (error <span style="color: #3548cf;">"Duplicated label:"</span> next-inst)
+                    (cons insts
+                          (cons (make-label-entry next-inst insts) labels)))
+                (cons (cons (make-instruction next-inst) insts)
+                      labels)))))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0659158" class="outline-3">
+<h3 id="org0659158">Exercise 5.9</h3>
+<div class="outline-text-3" id="text-org0659158">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The treatment of machine operations above permits them to operate on
+labels as well as on constants and the contents of registers.  Modify
+the expression-processing procedures to enforce the condition that
+operations can be used only with registers and constants.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-operation-exp</span> exp machine labels operations)
+  (<span style="color: #531ab6;">let</span> ((op (lookup-prim (operation-exp-op exp) operations))
+        (aprocs
+         (<span style="color: #531ab6;">map</span> (<span style="color: #531ab6;">lambda</span> (e)
+                (<span style="color: #531ab6;">if</span> (label-exp? e)
+                    (error <span style="color: #3548cf;">"Cannot use labels as operation operands"</span>)
+                    (make-primitive-exp e machine labels)))
+              (operation-exp-operands exp))))
+    (<span style="color: #531ab6;">lambda</span> ()
+      (apply op (<span style="color: #531ab6;">map</span> (<span style="color: #531ab6;">lambda</span> (p) (p)) aprocs)))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf308917" class="outline-3">
+<h3 id="orgf308917">Exercise 5.10</h3>
+<div class="outline-text-3" id="text-orgf308917">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Design a new syntax for register-machine instructions and modify the
+simulator to use your new syntax.  Can you implement your new syntax
+without changing any part of the simulator except the syntax
+procedures in this section?
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li>Syntax changes:
+<ul class="org-ul">
+<li><p>
+1.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(assign (reg <span style="color: #005f5f;">&lt;REGISTER-NAME&gt;</span>) ...)
+</pre>
+</div>
+<p>
+instead of
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(assign <span style="color: #005f5f;">&lt;REGISTER-NAME&gt;</span> ...)
+</pre>
+</div></li>
+<li><p>
+2.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(op <span style="color: #005f5f;">&lt;OPERATION-NAME&gt;</span> <span style="color: #005f5f;">&lt;INPUT_1&gt;</span> ... <span style="color: #005f5f;">&lt;INPUT_N&gt;</span>)
+</pre>
+</div>
+<p>
+instead of
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">((op <span style="color: #005f5f;">&lt;OPERATION-NAME&gt;</span>) <span style="color: #005f5f;">&lt;INPUT_1&gt;</span> ... <span style="color: #005f5f;">&lt;INPUT_N&gt;</span>))
+</pre>
+</div></li>
+</ul></li>
+
+<li><p>
+Changes in the code:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">redefined procedures:</span>
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">assign-reg-name</span> assign-instruction)
+  (cadadr assign-instruction))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operation-exp?</span> exp)
+  (<span style="color: #531ab6;">and</span> (pair? exp) (tagged-list? exp 'op)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operation-exp-op</span> operation-exp)
+  (cadr operation-exp))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">operation-exp-operands</span> operation-exp)
+  (cddr operation-exp))
+</pre>
+</div></li>
+
+<li><p>
+Rephrasing <code>the gcd-machine</code> given the new syntax:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">gcd-machine</span>
+  (make-machine
+   '(a b t)
+   (list (list 'rem remainder) (list '= =))
+   '(test-b
+     (test op = (reg b) (const 0))
+     (branch (label gcd-done))
+     (assign (reg t) op rem (reg a) (reg b))
+     (assign (reg a) (reg b))
+     (assign (reg b) (reg t))
+     (goto (label test-b))
+     gcd-done)))
+
+(set-register-contents! gcd-machine 'a 206)
+
+(set-register-contents! gcd-machine 'b 40)
+
+(start gcd-machine)
+
+(get-register-contents gcd-machine 'a)
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgca6625b" class="outline-3">
+<h3 id="orgca6625b">Exercise 5.11</h3>
+<div class="outline-text-3" id="text-orgca6625b">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+When we introduced <code>save</code> and <code>restore</code> in section 5.1.4, we didn't
+specify what would happen if you tried to restore a register that was
+not the last one saved, as in the sequence
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(save y)
+(save x)
+(restore y)
+</pre>
+</div>
+
+<p>
+There are several reasonable possibilities for the meaning of
+`restore':
+</p>
+
+<p>
+a. <code>(restore y)</code> puts into <code>y</code> the last value saved on the stack,
+regardless of what register that value came from.  This is the way our
+simulator behaves.  Show how to take advantage of this behavior to
+eliminate one instruction from the Fibonacci machine of section 5.1.4
+(see Figure 5.12).
+</p>
+
+<p>
+b. <code>(restore y)</code> puts into <code>y</code> the last value saved on the stack, but
+only if that value was saved from <code>y</code>; otherwise, it signals an error.
+Modify the simulator to behave this way.  You will have to change
+<code>save</code> to put the register name on the stack along with the value.
+</p>
+
+<p>
+c. <code>(restore y)</code> puts into <code>y</code> the last value saved from <code>y</code>
+regardless of what other registers were saved after <code>y</code> and not
+restored.  Modify the simulator to behave this way.  You will have to
+associate a separate stack with each register.  You should make the
+<code>initialize-stack</code> operation initialize all the register stacks.
+</p>
+</blockquote>
+</div>
+<div id="outline-container-orgf31c21c" class="outline-4">
+<h4 id="orgf31c21c">Answer</h4>
+<div class="outline-text-4" id="text-orgf31c21c">
+</div>
+<ul class="org-ul">
+<li><a id="orgf420409"></a>a<br />
+<div class="outline-text-5" id="text-orgf420409">
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> <span style="color: #721045;">fib-machine</span>
+  (make-machine
+   '(continue n val)
+   (list (list '+ +) (list '&lt; &lt;) (list '- -))
+   '(
+     (assign continue (label fib-done))
+     fib-loop
+     (test (op &lt;) (reg n) (const 2))
+     (branch (label immediate-answer))
+     (save continue)
+     (assign continue (label afterfib-n-1))
+     (save n)
+     (assign n (op -) (reg n) (const 1))
+     (goto (label fib-loop))
+     afterfib-n-1
+     (restore n)
+     (restore continue)
+     (assign n (op -) (reg n) (const 2))
+     (save continue)
+     (assign continue (label afterfib-n-2))
+     (save val)
+     (goto (label fib-loop))
+     afterfib-n-2
+     <span style="color: #595959;">;;</span><span style="color: #595959;">(assign n (reg val)) &lt;---------------</span>
+     <span style="color: #595959;">;;</span><span style="color: #595959;">(restore val)        &lt;---------------</span>
+     (restore n)        <span style="color: #595959;">;;  </span><span style="color: #595959;">&lt;---------------</span>
+     (restore continue)
+     (assign val
+             (op +) (reg val) (reg n))
+     (goto (reg continue))
+     immediate-answer
+     (assign val (reg n))
+     (goto (reg continue))
+     fib-done)))
+</pre>
+</div>
+
+<p>
+It works. Here is the modified machine running:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">repl.rkt&gt; (<span style="color: #531ab6;">define</span> <span style="color: #721045;">fib-machine</span>
+            (make-machine
+             '(continue n val)
+             (list (list '+ +) (list '&lt; &lt;) (list '- -))
+             '(
+               (assign continue (label fib-done))
+               fib-loop
+               (test (op &lt;) (reg n) (const 2))
+               (branch (label immediate-answer))
+               (save continue)
+               (assign continue (label afterfib-n-1))
+               (save n)
+               (assign n (op -) (reg n) (const 1))
+               (goto (label fib-loop))
+               afterfib-n-1
+               (restore n)
+               (restore continue)
+               (assign n (op -) (reg n) (const 2))
+               (save continue)
+               (assign continue (label afterfib-n-2))
+               (save val)
+               (goto (label fib-loop))
+               afterfib-n-2
+               <span style="color: #595959;">;;</span><span style="color: #595959;">(assign n (reg val)) &lt;---------------</span>
+               <span style="color: #595959;">;;</span><span style="color: #595959;">(restore val)        &lt;---------------</span>
+               (restore n)        <span style="color: #595959;">;;  </span><span style="color: #595959;">&lt;---------------</span>
+               (restore continue)
+               (assign val
+                       (op +) (reg val) (reg n))
+               (goto (reg continue))
+               immediate-answer
+               (assign val (reg n))
+               (goto (reg continue))
+               fib-done)))
+repl.rkt&gt; (set-register-contents! fib-machine 'n 4)
+'done
+repl.rkt&gt; (start fib-machine)
+'done
+repl.rkt&gt; (get-register-contents fib-machine 'val)
+3
+repl.rkt&gt; (set-register-contents! fib-machine 'n 5)
+'done
+repl.rkt&gt; (start fib-machine)
+'done
+repl.rkt&gt; (get-register-contents fib-machine 'val)
+5
+repl.rkt&gt; (set-register-contents! fib-machine 'n 6)
+'done
+repl.rkt&gt; (start fib-machine)
+'done
+repl.rkt&gt; (get-register-contents fib-machine 'val)
+8
+repl.rkt&gt;
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org42a4675"></a>b<br />
+<div class="outline-text-5" id="text-org42a4675">
+<p>
+I have:
+</p>
+
+<ul class="org-ul">
+<li><p>
+modified the definition of <code>push</code> within <code>make-stack</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-stack</span>)
+  <span style="color: #595959;">;;</span><span style="color: #595959;">...</span>
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">push</span> x reg-name)
+    (<span style="color: #531ab6;">let</span> ((obj (cons x reg-name)))
+      (set! s (cons obj s))))
+  <span style="color: #595959;">;;</span><span style="color: #595959;">...</span>
+  ))
+</pre>
+</div></li>
+
+<li><p>
+modified <code>push</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">push</span> stack value reg-name)
+  ((stack 'push) value reg-name))
+</pre>
+</div></li>
+
+<li><p>
+created a couple of helper functions (one to extract the value of
+the object stored in the stack; the other to extract the name of the
+corresponding register)
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stack-obj-value</span> stack-obj)
+  (car stack-obj))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">stack-obj-reg-name</span> stack-obj)
+  (cdr stack-obj))
+</pre>
+</div></li>
+
+<li><p>
+modified the <code>make-save</code> and the <code>make-restore</code> procedures:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-save</span> inst machine stack pc)
+  (<span style="color: #531ab6;">let</span> ((reg-name (stack-inst-reg-name inst)))
+    (<span style="color: #531ab6;">let</span> ((reg (get-register machine reg-name)))
+      (<span style="color: #531ab6;">lambda</span> ()
+        (push stack (get-contents reg) reg-name)
+        (advance-pc pc)))))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-restore</span> inst machine stack pc)
+  (<span style="color: #531ab6;">let</span> ((reg (get-register machine
+                           (stack-inst-reg-name inst))))
+    (<span style="color: #531ab6;">lambda</span> ()
+      (<span style="color: #531ab6;">let</span> ((stack-obj (pop stack)))
+        (<span style="color: #531ab6;">let</span> ((stack-val (stack-obj-value stack-obj))
+              (stack-reg-name (stack-obj-reg-name stack-obj)))
+          (<span style="color: #531ab6;">if</span> (not (eq? (stack-inst-reg-name inst)
+                        stack-reg-name))
+              (error <span style="color: #3548cf;">"Cannot restore value in different register. Original register: ...; Attempting to save in ..."</span>)
+              (<span style="color: #531ab6;">begin</span>
+                (set-contents! reg stack-val)
+                (advance-pc pc))))))))
+</pre>
+</div></li>
+</ul>
+
+<p>
+Notice that the error is raised at simulation time.
+</p>
+</div>
+</li>
+<li><a id="orga6268ab"></a>c<br />
+<div class="outline-text-5" id="text-orga6268ab">
+<p>
+We can treat <code>s</code> as a list of stacks; each stacks being associated to
+a register.
+</p>
+
+<p>
+A register stack in the list can be represented as a list whose <code>car</code>
+is the name of the relevant register and whose <code>cdr</code> is the list of
+the elements in the stack.
+</p>
+
+<p>
+We can establish that if a register <code>foo</code> has no stack in the list,
+then its stack is empty.
+</p>
+
+<p>
+Given so, we can keep the <code>initialize-stack</code> operation as it is. By
+setting the list of register stacks to an empty list, each register
+will have an empty stack.
+</p>
+
+<p>
+When a value <code>bar</code> for register <code>foo</code> is saved and there is no <code>foo</code>
+stack in the list of stacks, then a <code>foo</code> stack is created and <code>bar</code>
+saved into it.
+</p>
+
+<p>
+Modified parts of the code:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-stack</span>)<span style="color: #595959;">;; </span><span style="color: #595959;">actually it's a list of stacks (los) now</span>
+  (<span style="color: #531ab6;">let</span> ((s '()))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">find-reg-stack</span> los name)
+      (<span style="color: #531ab6;">cond</span> ((null? los)
+             '())
+            ((eq? (caar los) name) <span style="color: #595959;">;; </span><span style="color: #595959;">check tag</span>
+             (car los))
+            (<span style="color: #531ab6;">else</span>
+             (find-reg-stack (cdr los) name))))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">push-in-los</span> x reg-name)
+      (display <span style="color: #3548cf;">"push-in-los "</span>)
+      (<span style="color: #531ab6;">let</span> ((reg-stack (find-reg-stack s reg-name)))
+        (<span style="color: #531ab6;">if</span> (null? reg-stack) <span style="color: #595959;">;; </span><span style="color: #595959;">register stack not found</span>
+            <span style="color: #595959;">;; </span><span style="color: #595959;">create reg-stack</span>
+            <span style="color: #595959;">;; </span><span style="color: #595959;">push value</span>
+            <span style="color: #595959;">;; </span><span style="color: #595959;">add reg-stack to los</span>
+            (<span style="color: #531ab6;">let</span> ((new-reg-stack (cons reg-name
+                                       (cons x '()))))
+              (set! s (cons new-reg-stack s)))
+            <span style="color: #595959;">;; </span><span style="color: #595959;">else</span>
+            <span style="color: #595959;">;; </span><span style="color: #595959;">push-value in reg-stack</span>
+            (set-cdr! reg-stack (cons x (cdr reg-stack))))))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">pop-from-los</span> reg-name)
+      (display <span style="color: #3548cf;">"pop-from-los "</span>)
+      (<span style="color: #531ab6;">let</span> ((reg-stack (find-reg-stack s reg-name)))
+        (<span style="color: #531ab6;">if</span> (null? reg-stack) <span style="color: #595959;">;; </span><span style="color: #595959;">not found</span>
+            (error <span style="color: #3548cf;">"Empty stack --- POP"</span>)
+            (<span style="color: #531ab6;">if</span> (null? (cdr reg-stack))
+                (error <span style="color: #3548cf;">"Empty stack --- POP"</span>)
+                (<span style="color: #531ab6;">let</span> ((top (car (cdr reg-stack))))
+                  (set-cdr! reg-stack (cdr (cdr reg-stack)))
+                  top)))))
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">initialize</span>)
+      (set! s '())
+      'done)
+    (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> message)
+      (<span style="color: #531ab6;">cond</span> ((eq? message 'push) push-in-los)
+            ((eq? message 'pop) pop-from-los)
+            ((eq? message 'initialize) (initialize))
+            (<span style="color: #531ab6;">else</span> (error <span style="color: #3548cf;">"Unknown request -- STACK"</span>
+                         message))))
+    dispatch))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">pop</span> stack reg-name)
+  ((stack 'pop) reg-name))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">push</span> stack value reg-name)
+  ((stack 'push) value reg-name))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-save</span> inst machine stack pc)
+  (<span style="color: #531ab6;">let</span> ((reg-name (stack-inst-reg-name inst)))
+    (<span style="color: #531ab6;">let</span> ((reg (get-register machine
+                             reg-name)))
+      (<span style="color: #531ab6;">lambda</span> ()
+        (push stack (get-contents reg) reg-name)
+        (advance-pc pc)))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-restore</span> inst machine stack pc)
+  (<span style="color: #531ab6;">let</span> ((reg-name (stack-inst-reg-name inst)))
+    (<span style="color: #531ab6;">let</span> ((reg (get-register machine reg-name)))
+      (<span style="color: #531ab6;">lambda</span> ()
+        (set-contents! reg (pop stack reg-name))
+        (advance-pc pc)))))
+</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org44418cb" class="outline-3">
+<h3 id="org44418cb">Exercise 5.12</h3>
+<div class="outline-text-3" id="text-org44418cb">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+The simulator can be used to help determine the data paths required
+for implementing a machine with a given controller.  Extend the
+assembler to store the following information in the machine model:
+</p>
+
+<ul class="org-ul">
+<li>a list of all instructions, with duplicates removed, sorted by
+instruction type (<code>assign</code>, <code>goto</code>, and so on);</li>
+
+<li>a list (without duplicates) of the registers used to hold entry
+points (these are the registers referenced by <code>goto</code> instructions);</li>
+
+<li>a list (without duplicates) of the registers that are ~save~d or
+`restore'd;</li>
+
+<li>for each register, a list (without duplicates) of the sources from
+which it is assigned (for example, the sources for register <code>val</code> in
+the factorial machine of *Note Figure 5-11:: are <code>(const 1)</code> and <code>((op
+  *) (reg n) (reg val))</code>).</li>
+</ul>
+
+<p>
+Extend the message-passing interface to the machine to provide access
+to this new information.  To test your analyzer, define the Fibonacci
+machine from Figure 5-12 and examine the lists you constructed.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<p>
+I've decided to modify <code>update-insts!</code>, since it contains a <code>for-each</code>
+which applies a <code>lambda</code> to each instruction. Such <code>lambda</code>, instead
+of only updating the sequence of instructions, now it extracts the
+relevant information from each instruction and stores that information
+in the <code>reg-sources</code>, <code>entry-point-regs</code>, <code>sorted-instructions</code>, and
+<code>saved-restored-regs</code> lists. After the the lists are built, we install
+the lists in the model using message-passing.
+</p>
+
+<p>
+Here is the code I've modified or added:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket">(<span style="color: #531ab6;">require</span> sicp)
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">make copy of object</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">I use to it to prevent mutations of the lists stored in the model</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-copy</span> obj)
+  (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">null?</span> obj)
+         '())
+        ((<span style="color: #8f0075;">pair?</span> obj)
+         (<span style="color: #8f0075;">cons</span> (make-copy (<span style="color: #8f0075;">car</span> obj))
+               (make-copy (<span style="color: #8f0075;">cdr</span> obj))))
+        (<span style="color: #531ab6;">else</span> obj)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-new-machine</span>)
+  (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">pc</span> (make-register <span style="color: #0000b0;">'pc</span>))
+        (<span style="color: #005e8b;">flag</span> (make-register <span style="color: #0000b0;">'flag</span>))
+        (<span style="color: #005e8b;">stack</span> (make-stack))
+        (<span style="color: #005e8b;">the-instruction-sequence</span> '())
+        (<span style="color: #005e8b;">sorted-instructions</span> '())
+        (<span style="color: #005e8b;">entry-point-regs</span> '())
+        (<span style="color: #005e8b;">saved-restored-regs</span> '())
+        (<span style="color: #005e8b;">reg-sources</span> '()))
+    (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">the-ops</span>
+           (<span style="color: #8f0075;">list</span> (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'initialize-stack</span>
+                       (<span style="color: #531ab6;">lambda</span> () (stack <span style="color: #0000b0;">'initialize</span>)))))
+          (<span style="color: #005e8b;">register-table</span>
+           (<span style="color: #8f0075;">list</span> (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'pc</span> pc) (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'flag</span> flag))))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-register</span> name)
+        (<span style="color: #531ab6;">if</span> (<span style="color: #8f0075;">assoc</span> name register-table)
+            (<span style="color: #8f0075;">error</span> <span style="color: #3548cf;">"Multiply defined register: "</span> name)
+            (<span style="color: #531ab6;">set!</span> register-table
+                  (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">list</span> name (make-register name))
+                        register-table)))
+        <span style="color: #0000b0;">'register-allocated</span>)
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup-register</span> name)
+        (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">val</span> (<span style="color: #8f0075;">assoc</span> name register-table)))
+          (<span style="color: #531ab6;">if</span> val
+              (<span style="color: #8f0075;">cadr</span> val)
+              (<span style="color: #8f0075;">error</span> <span style="color: #3548cf;">"Unknown register:"</span> name))))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">execute</span>)
+        (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">insts</span> (get-contents pc)))
+          (<span style="color: #531ab6;">if</span> (<span style="color: #8f0075;">null?</span> insts)
+              <span style="color: #0000b0;">'done</span>
+              (<span style="color: #531ab6;">begin</span>
+                ((instruction-execution-proc (<span style="color: #8f0075;">car</span> insts)))
+                (execute)))))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> message)
+        (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'start</span>)
+               (set-contents! pc the-instruction-sequence)
+               (execute))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-instruction-sequence</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> the-instruction-sequence seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'allocate-register</span>) allocate-register)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'get-register</span>) lookup-register)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-operations</span>)
+               (<span style="color: #531ab6;">lambda</span> (ops) (<span style="color: #531ab6;">set!</span> the-ops (<span style="color: #8f0075;">append</span> the-ops ops))))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'stack</span>) stack)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'operations</span>) the-ops)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'sorted-instructions</span>) (make-copy sorted-instructions))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-sorted-instructions</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> sorted-instructions seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'entry-point-regs</span>) (make-copy entry-point-regs))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-entry-point-regs</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> entry-point-regs seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'saved-or-restored-regs</span>) (make-copy saved-restored-regs))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-saved-or-restored-regs</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> saved-restored-regs seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'reg-sources</span>) (make-copy reg-sources))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-reg-sources</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> reg-sources seq)))
+              (<span style="color: #531ab6;">else</span> (<span style="color: #8f0075;">error</span> <span style="color: #3548cf;">"Unknown request -- MACHINE"</span> message))))
+      dispatch)))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">I'm using this list to insert alphabetically in the</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">sorted-instructions list</span>
+(<span style="color: #531ab6;">define</span> <span style="color: #005e8b;">insts-names-in-order</span>
+  '(assign branch goto perform restore save test))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">compare instructions alphabetically</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">return 0 if i1 = i2</span>
+<span style="color: #595959;">;;        </span><span style="color: #595959;">1 if i1 &gt; i2</span>
+<span style="color: #595959;">;;       </span><span style="color: #595959;">-1 if i1 &lt; i2</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">inst-alph-cmp</span> i1 i2)
+  (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">iter</span> insts-names-in-order)
+    (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">eq?</span> i1 i2)
+           <span style="color: #0000b0;">0</span>)
+          ((<span style="color: #8f0075;">eq?</span> i1 (<span style="color: #8f0075;">car</span> insts-names-in-order))
+           <span style="color: #0000b0;">-1</span>)
+          ((<span style="color: #8f0075;">eq?</span> i2 (<span style="color: #8f0075;">car</span> insts-names-in-order))
+           <span style="color: #0000b0;">1</span>)
+          (<span style="color: #531ab6;">else</span>
+           (iter (<span style="color: #8f0075;">cdr</span> insts-names-in-order)))))
+  (iter insts-names-in-order))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">return true if instruction type i1 comes alphabetically before</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">instruction type i2</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">comes-before?</span> i1 i2)
+  (<span style="color: #8f0075;">=</span> (inst-alph-cmp i1 i2) <span style="color: #0000b0;">-1</span>))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">return true if instruction type i1 comes alphabetically after</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">instruction type i2</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">comes-after?</span> i1 i2)
+  (<span style="color: #8f0075;">=</span> (inst-alph-cmp i1 i2) <span style="color: #0000b0;">1</span>))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">insert inst into current list of sorted insts. In alphabetic</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">order. No duplicates.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">insert-inst-to-sorted-insts</span> inst-text items)
+  (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">name</span> (<span style="color: #8f0075;">car</span> inst-text)))
+    (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">null?</span> items)
+           (<span style="color: #8f0075;">cons</span> inst-text items))
+          ((comes-before? name (<span style="color: #8f0075;">caar</span> items))
+           (<span style="color: #8f0075;">cons</span> inst-text items))
+          ((<span style="color: #8f0075;">equal?</span> inst-text (<span style="color: #8f0075;">car</span> items)) <span style="color: #595959;">;; </span><span style="color: #595959;">same inst</span>
+           items)
+          ((<span style="color: #8f0075;">eq?</span> name (<span style="color: #8f0075;">caar</span> items)) <span style="color: #595959;">;; </span><span style="color: #595959;">same inst type but not same inst</span>
+           (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">car</span> items)
+                 (insert-inst-to-sorted-insts inst-text (<span style="color: #8f0075;">cdr</span> items))))
+          ((comes-after? name (<span style="color: #8f0075;">caar</span> items))
+           (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">car</span> items)
+                 (insert-inst-to-sorted-insts inst-text (<span style="color: #8f0075;">cdr</span> items)))))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">insert-no-duplicates</span> x items)
+  (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">null?</span> items)
+         (<span style="color: #8f0075;">cons</span> x items))
+        ((<span style="color: #8f0075;">eq?</span> x (<span style="color: #8f0075;">car</span> items))
+         items)
+        (<span style="color: #531ab6;">else</span>
+         (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">car</span> items)
+               (insert-no-duplicates x (<span style="color: #8f0075;">cdr</span> items))))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">update-sorted-instructions</span> inst-text current-list)
+  <span style="color: #595959;">;; </span><span style="color: #595959;">inst is an inst obj: (text . &lt;#proc&gt;)</span>
+  (insert-inst-to-sorted-insts inst-text current-list))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">update-entry-point-regs</span> inst-text current-list)
+  (<span style="color: #531ab6;">if</span> (<span style="color: #531ab6;">and</span> (<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> inst-text) <span style="color: #0000b0;">'goto</span>)
+           (<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">caadr</span> inst-text) <span style="color: #0000b0;">'reg</span>))
+      (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">reg-name</span> (<span style="color: #8f0075;">cadadr</span> inst-text)))
+        (insert-no-duplicates reg-name current-list))
+      current-list))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">update-saved-or-restored-regs</span> inst-text current-list)
+  (<span style="color: #531ab6;">if</span> (<span style="color: #531ab6;">or</span> (<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> inst-text) <span style="color: #0000b0;">'save</span>)
+          (<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> inst-text) <span style="color: #0000b0;">'restore</span>))
+      (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">reg-name</span> (<span style="color: #8f0075;">cadr</span> inst-text)))
+        (insert-no-duplicates reg-name current-list))
+      current-list))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">insert-no-equal-duplicates</span> x items)
+  (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">null?</span> items)
+         (<span style="color: #8f0075;">cons</span> x items))
+        ((<span style="color: #8f0075;">equal?</span> x (<span style="color: #8f0075;">car</span> items))
+         items)
+        (<span style="color: #531ab6;">else</span> (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">car</span> items)
+                    (insert-no-equal-duplicates x (<span style="color: #8f0075;">cdr</span> items))))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">update-reg-sources</span> inst-text current-list)
+  (<span style="color: #531ab6;">if</span> (<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> inst-text) <span style="color: #0000b0;">'assign</span>)
+      (insert-source inst-text current-list)
+      current-list))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">insert-source</span> inst-text current-list)
+  (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">reg-name</span> (<span style="color: #8f0075;">cadr</span> inst-text))
+        (<span style="color: #005e8b;">source</span> (<span style="color: #8f0075;">cddr</span> inst-text)))
+    (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">null?</span> current-list)
+           (<span style="color: #8f0075;">list</span> (<span style="color: #8f0075;">list</span> reg-name
+                       source)))
+          ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">caar</span> current-list) reg-name)
+           (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">cons</span> reg-name
+                       (insert-no-equal-duplicates
+                        source
+                        (<span style="color: #8f0075;">cdar</span> current-list)))
+                 (<span style="color: #8f0075;">cdr</span> current-list)))
+          (<span style="color: #531ab6;">else</span> <span style="color: #595959;">;; </span><span style="color: #595959;">not the same reg</span>
+           (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">car</span> current-list)
+                 (insert-source inst-text (<span style="color: #8f0075;">cdr</span> current-list)))))))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">update-insts!</span> insts labels machine)
+  (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">pc</span> (get-register machine <span style="color: #0000b0;">'pc</span>))
+        (<span style="color: #005e8b;">flag</span> (get-register machine <span style="color: #0000b0;">'flag</span>))
+        (<span style="color: #005e8b;">stack</span> (machine <span style="color: #0000b0;">'stack</span>))
+        (<span style="color: #005e8b;">ops</span> (machine <span style="color: #0000b0;">'operations</span>))
+        (<span style="color: #005e8b;">sorted-instructions</span> '())
+        (<span style="color: #005e8b;">entry-point-regs</span> '())
+        (<span style="color: #005e8b;">saved-restored-regs</span> '())
+        (<span style="color: #005e8b;">reg-sources</span> '()))
+    (<span style="color: #8f0075;">for-each</span>
+     (<span style="color: #531ab6;">lambda</span> (<span style="color: #8f0075;">inst</span>)
+       (set-instruction-execution-proc!
+        <span style="color: #8f0075;">inst</span>
+        (make-execution-procedure
+         (instruction-text <span style="color: #8f0075;">inst</span>) labels machine
+         pc flag stack ops))
+       (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">inst-text</span> (instruction-text <span style="color: #8f0075;">inst</span>)))
+         <span style="color: #595959;">;; </span><span style="color: #595959;">add info into the local lists</span>
+         (<span style="color: #531ab6;">set!</span> sorted-instructions
+               (update-sorted-instructions inst-text sorted-instructions))
+         (<span style="color: #531ab6;">set!</span> entry-point-regs
+               (update-entry-point-regs inst-text entry-point-regs))
+         (<span style="color: #531ab6;">set!</span> saved-restored-regs
+               (update-saved-or-restored-regs inst-text saved-restored-regs))
+         (<span style="color: #531ab6;">set!</span> reg-sources
+               (update-reg-sources inst-text reg-sources))))
+     insts)
+    <span style="color: #595959;">;; </span><span style="color: #595959;">install lists into the model</span>
+    ((machine <span style="color: #0000b0;">'install-sorted-instructions</span>) sorted-instructions)
+    ((machine <span style="color: #0000b0;">'install-entry-point-regs</span>) entry-point-regs)
+    ((machine <span style="color: #0000b0;">'install-saved-or-restored-regs</span>) saved-restored-regs)
+    ((machine <span style="color: #0000b0;">'install-reg-sources</span>) reg-sources)))
+</pre>
+</div>
+
+<p>
+These are the results using the <code>fib-machine</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket">(<span style="color: #531ab6;">define</span> <span style="color: #005e8b;">fib-machine</span>
+  (make-machine
+   '(continue n val)
+   (<span style="color: #8f0075;">list</span> (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'+</span> <span style="color: #8f0075;">+</span>) (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'&lt;</span> <span style="color: #8f0075;">&lt;</span>) (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'-</span> <span style="color: #8f0075;">-</span>))
+   '(
+     (assign continue (label fib-done))
+     fib-loop
+     (test (op <span style="color: #8f0075;">&lt;</span>) (reg n) (<span style="color: #8f0075;">const</span> <span style="color: #0000b0;">2</span>))
+     (branch (label immediate-answer))
+     (save continue)
+     (assign continue (label afterfib-n-1))
+     (save n)
+     (assign n (op <span style="color: #8f0075;">-</span>) (reg n) (<span style="color: #8f0075;">const</span> <span style="color: #0000b0;">1</span>))
+     (goto (label fib-loop))
+     afterfib-n-1
+     (restore n)
+     (restore continue)
+     (assign n (op <span style="color: #8f0075;">-</span>) (reg n) (<span style="color: #8f0075;">const</span> <span style="color: #0000b0;">2</span>))
+     (save continue)
+     (assign continue (label afterfib-n-2))
+     (save val)
+     (goto (label fib-loop))
+     afterfib-n-2
+     (assign n (reg val))
+     (restore val)
+     (restore continue)
+     (assign val
+             (op <span style="color: #8f0075;">+</span>) (reg val) (reg n))
+     (goto (reg continue))
+     immediate-answer
+     (assign val (reg n))
+     (goto (reg continue))
+     fib-done)))
+
+(set-register-contents! fib-machine <span style="color: #0000b0;">'n</span> <span style="color: #0000b0;">4</span>)
+(start fib-machine)
+(get-register-contents fib-machine <span style="color: #0000b0;">'val</span>)
+
+(<span style="color: #8f0075;">display</span> <span style="color: #3548cf;">"\nsorted instructions:\n"</span>)
+(fib-machine <span style="color: #0000b0;">'sorted-instructions</span>)
+
+(<span style="color: #8f0075;">display</span> <span style="color: #3548cf;">"\nentry-point-regs:\n"</span>)
+(fib-machine <span style="color: #0000b0;">'entry-point-regs</span>)
+
+(<span style="color: #8f0075;">display</span> <span style="color: #3548cf;">"\nsaved-or-restored-regs:\n"</span>)
+(fib-machine <span style="color: #0000b0;">'saved-or-restored-regs</span>)
+
+(<span style="color: #8f0075;">display</span> <span style="color: #3548cf;">"\nreg-sources:\n"</span>)
+(fib-machine <span style="color: #0000b0;">'reg-sources</span>)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme">done
+done
+3
+
+sorted instructions:
+((assign continue (label fib-done))
+ (assign continue (label afterfib-n-1))
+ (assign n (op -) (reg n) (const 1))
+ (assign n (op -) (reg n) (const 2))
+ (assign continue (label afterfib-n-2))
+ (assign n (reg val))
+ (assign val (op +) (reg val) (reg n))
+ (assign val (reg n))
+ (branch (label immediate-answer))
+ (goto (label fib-loop))
+ (goto (reg continue))
+ (restore n)
+ (restore continue)
+ (restore val)
+ (save continue)
+ (save n)
+ (save val)
+ (test (op &lt;) (reg n) (const 2)))
+
+entry-point-regs:
+(continue)
+
+saved-or-restored-regs:
+(continue n val)
+
+reg-sources: <span style="color: #595959;">;; </span><span style="color: #595959;">manually formatted to make structure explicit</span>
+((continue
+
+  ((label fib-done))
+
+  ((label afterfib-n-1))
+
+  ((label afterfib-n-2)))
+
+
+ (n
+
+  ((op -) (reg n) (const 1))
+
+  ((op -) (reg n) (const 2))
+
+  ((reg val)))
+
+
+ (val
+
+  ((op +) (reg val) (reg n))
+
+  ((reg n))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org90201f2" class="outline-3">
+<h3 id="org90201f2">Exercise 5.13</h3>
+<div class="outline-text-3" id="text-org90201f2">
+<p>
+<b>Exercise</b>:
+</p>
+
+<blockquote>
+<p>
+Modify the simulator so that it uses the controller sequence to
+determine what registers the machine has rather than requiring a list
+of registers as an argument to `make-machine'.  Instead of
+pre-allocating the registers in `make-machine', you can allocate them
+one at a time when they are first seen during assembly of the
+instructions.
+</p>
+</blockquote>
+
+<p>
+<b>Answer</b>:
+</p>
+
+<ul class="org-ul">
+<li><p>
+<code>Make-machine</code> does not take register names anymore:
+</p>
+<div class="org-src-container">
+<pre class="src src-racket">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-machine</span> ops controller-text)
+  (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">machine</span> (make-new-machine)))
+    ((machine <span style="color: #0000b0;">'install-operations</span>) ops)
+    ((machine <span style="color: #0000b0;">'install-instruction-sequence</span>)
+     (assemble controller-text machine))
+    machine))
+</pre>
+</div></li>
+
+<li><p>
+I've added a <code>is-reg-allocated?</code> method in the machine &#x2014;
+retrievable by passing a message.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-new-machine</span>)
+  (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">pc</span> (make-register <span style="color: #0000b0;">'pc</span>))
+        (<span style="color: #005e8b;">flag</span> (make-register <span style="color: #0000b0;">'flag</span>))
+        (<span style="color: #005e8b;">stack</span> (make-stack))
+        (<span style="color: #005e8b;">the-instruction-sequence</span> '())
+        (<span style="color: #005e8b;">sorted-instructions</span> '())
+        (<span style="color: #005e8b;">entry-point-regs</span> '())
+        (<span style="color: #005e8b;">saved-restored-regs</span> '())
+        (<span style="color: #005e8b;">reg-sources</span> '()))
+    (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">the-ops</span>
+           (<span style="color: #8f0075;">list</span> (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'initialize-stack</span>
+                       (<span style="color: #531ab6;">lambda</span> () (stack <span style="color: #0000b0;">'initialize</span>)))))
+          (<span style="color: #005e8b;">register-table</span>
+           (<span style="color: #8f0075;">list</span> (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'pc</span> pc) (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'flag</span> flag))))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-register</span> name)
+        (<span style="color: #531ab6;">if</span> (<span style="color: #8f0075;">assoc</span> name register-table)
+            (<span style="color: #8f0075;">error</span> <span style="color: #3548cf;">"Multiply defined register: "</span> name)
+            (<span style="color: #531ab6;">set!</span> register-table
+                  (<span style="color: #8f0075;">cons</span> (<span style="color: #8f0075;">list</span> name (make-register name))
+                        register-table)))
+        <span style="color: #0000b0;">'register-allocated</span>)
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">is-reg-allocated?</span> name) <span style="color: #595959;">;; </span><span style="color: #595959;">&lt;-------------------------------------------</span>
+        (<span style="color: #8f0075;">assoc</span> name register-table))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">lookup-register</span> name)
+        (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">val</span> (<span style="color: #8f0075;">assoc</span> name register-table)))
+          (<span style="color: #531ab6;">if</span> val
+              (<span style="color: #8f0075;">cadr</span> val)
+              (<span style="color: #8f0075;">error</span> <span style="color: #3548cf;">"Unknown register:"</span> name))))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">execute</span>)
+        (<span style="color: #531ab6;">let</span> ((<span style="color: #005e8b;">insts</span> (get-contents pc)))
+          (<span style="color: #531ab6;">if</span> (<span style="color: #8f0075;">null?</span> insts)
+              <span style="color: #0000b0;">'done</span>
+              (<span style="color: #531ab6;">begin</span>
+                ((instruction-execution-proc (<span style="color: #8f0075;">car</span> insts)))
+                (execute)))))
+      (<span style="color: #531ab6;">define</span> (<span style="color: #721045;">dispatch</span> message)
+        (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'start</span>)
+               (set-contents! pc the-instruction-sequence)
+               (execute))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-instruction-sequence</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> the-instruction-sequence seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'allocate-register</span>) allocate-register)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'is-reg-allocated?</span>) is-reg-allocated?) <span style="color: #595959;">;; </span><span style="color: #595959;">&lt;---------------------</span>
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'get-register</span>) lookup-register)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-operations</span>)
+               (<span style="color: #531ab6;">lambda</span> (ops) (<span style="color: #531ab6;">set!</span> the-ops (<span style="color: #8f0075;">append</span> the-ops ops))))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'stack</span>) stack)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'operations</span>) the-ops)
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'sorted-instructions</span>) (make-copy sorted-instructions))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-sorted-instructions</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> sorted-instructions seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'entry-point-regs</span>) (make-copy entry-point-regs))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-entry-point-regs</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> entry-point-regs seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'saved-or-restored-regs</span>) (make-copy saved-restored-regs))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-saved-or-restored-regs</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> saved-restored-regs seq)))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'reg-sources</span>) (make-copy reg-sources))
+              ((<span style="color: #8f0075;">eq?</span> message <span style="color: #0000b0;">'install-reg-sources</span>)
+               (<span style="color: #531ab6;">lambda</span> (seq) (<span style="color: #531ab6;">set!</span> reg-sources seq)))
+              (<span style="color: #531ab6;">else</span> (<span style="color: #8f0075;">error</span> <span style="color: #3548cf;">"Unknown request -- MACHINE"</span> message))))
+      dispatch)))
+</pre>
+</div></li>
+
+<li><p>
+<code>Make-execution-procedure</code> is now in charge of allocating the
+registers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #595959;">;; </span><span style="color: #595959;">Take register name. If a register with that name hasn't been</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">allocated yet, then allocate it.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-reg-perhaps</span> reg-name machine)
+  (<span style="color: #531ab6;">or</span> ((machine <span style="color: #0000b0;">'is-reg-allocated?</span>) reg-name)
+      ((machine <span style="color: #0000b0;">'allocate-register</span>) reg-name)))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Take a list of expressions and a machine model. For each of the</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">expressions, if it is a register expression, then, if the register</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">of that expression has not been allocated yet, then allocate it.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-list-regs-perhaps</span> op-inputs machine)
+  (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">null?</span> op-inputs)
+         <span style="color: #0000b0;">'done</span>)
+        ((register-exp? (<span style="color: #8f0075;">car</span> op-inputs))
+         (<span style="color: #531ab6;">begin</span> <span style="color: #595959;">;; </span><span style="color: #595959;">do we need this begin?</span>
+           (allocate-reg-perhaps (register-exp-reg (<span style="color: #8f0075;">car</span> op-inputs)) machine)
+           (allocate-list-regs-perhaps (<span style="color: #8f0075;">cdr</span> op-inputs) machine)))
+        (<span style="color: #531ab6;">else</span>
+         (allocate-list-regs-perhaps (<span style="color: #8f0075;">cdr</span> op-inputs) machine))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Take assign instruction. Allocate those registers in it which</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">haven't been allocated yet.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-assign-regs-perhaps</span> <span style="color: #8f0075;">inst</span> machine)
+  (allocate-reg-perhaps (assign-reg-name <span style="color: #8f0075;">inst</span>) machine)
+  (<span style="color: #531ab6;">cond</span> ((register-exp? (<span style="color: #8f0075;">car</span> (assign-value-exp <span style="color: #8f0075;">inst</span>)))
+         (allocate-reg-perhaps (assign-reg-name (<span style="color: #8f0075;">car</span> (assign-value-exp <span style="color: #8f0075;">inst</span>))) machine))
+        ((operation-exp? (assign-value-exp <span style="color: #8f0075;">inst</span>))
+         (allocate-list-regs-perhaps (operation-exp-operands (assign-value-exp <span style="color: #8f0075;">inst</span>)) machine))))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Take test instruction. Find registers in it, if any. Allocate those</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">which haven't been allocated yet.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-test-regs-perhaps</span> <span style="color: #8f0075;">inst</span> machine)
+  (allocate-list-regs-perhaps (test-condition <span style="color: #8f0075;">inst</span>) machine))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Take save instruction. Allocate the register it refers to, if it</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">hasn't been allocated yet.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-save-reg-perhaps</span> <span style="color: #8f0075;">inst</span> machine)
+  (allocate-reg-perhaps (<span style="color: #8f0075;">cadr</span> <span style="color: #8f0075;">inst</span>) machine))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Take restore instruction. Allocate the register it refers to, if it</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">hasn't been allocated yet.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-restore-reg-perhaps</span> <span style="color: #8f0075;">inst</span> machine)
+  (allocate-reg-perhaps (<span style="color: #8f0075;">cadr</span> <span style="color: #8f0075;">inst</span>) machine))
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">Take perform instruction. Find registers in it, if any. Allocate</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">those which haven't been allocated yet.</span>
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">allocate-perform-regs-perhaps</span> <span style="color: #8f0075;">inst</span> machine)
+  (allocate-list-regs-perhaps (perform-action <span style="color: #8f0075;">inst</span>)))
+
+(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">make-execution-procedure</span> <span style="color: #8f0075;">inst</span> labels machine
+                                  pc flag stack ops)
+  (<span style="color: #531ab6;">cond</span> ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> <span style="color: #8f0075;">inst</span>) <span style="color: #0000b0;">'assign</span>)
+         (allocate-assign-regs-perhaps <span style="color: #8f0075;">inst</span> machine)
+         (make-assign <span style="color: #8f0075;">inst</span> machine labels ops pc))
+        ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> <span style="color: #8f0075;">inst</span>) <span style="color: #0000b0;">'test</span>)
+         (allocate-test-regs-perhaps <span style="color: #8f0075;">inst</span> machine)
+         (make-test <span style="color: #8f0075;">inst</span> machine labels ops flag pc))
+        ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> <span style="color: #8f0075;">inst</span>) <span style="color: #0000b0;">'branch</span>)
+         (make-branch <span style="color: #8f0075;">inst</span> machine labels flag pc))
+        ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> <span style="color: #8f0075;">inst</span>) <span style="color: #0000b0;">'goto</span>)
+         (make-goto <span style="color: #8f0075;">inst</span> machine labels pc))
+        ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> <span style="color: #8f0075;">inst</span>) <span style="color: #0000b0;">'save</span>)
+         (allocate-save-reg-perhaps <span style="color: #8f0075;">inst</span> machine)
+         (make-save <span style="color: #8f0075;">inst</span> machine stack pc))
+        ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> <span style="color: #8f0075;">inst</span>) <span style="color: #0000b0;">'restore</span>)
+         (allocate-restore-reg-perhaps <span style="color: #8f0075;">inst</span> machine)
+         (make-restore <span style="color: #8f0075;">inst</span> machine stack pc))
+        ((<span style="color: #8f0075;">eq?</span> (<span style="color: #8f0075;">car</span> <span style="color: #8f0075;">inst</span>) <span style="color: #0000b0;">'perform</span>)
+         (allocate-perform-regs-perhaps <span style="color: #8f0075;">inst</span> machine)
+         (make-perform <span style="color: #8f0075;">inst</span> machine labels ops pc))
+        (<span style="color: #531ab6;">else</span> (<span style="color: #8f0075;">error</span> <span style="color: #3548cf;">"Unknown instruction type -- ASSEMBLE"</span>
+                     <span style="color: #8f0075;">inst</span>))))
+</pre>
+</div></li>
+
+<li><p>
+Now a machine can be created without passing the register names. For
+example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket">(<span style="color: #531ab6;">define</span> <span style="color: #005e8b;">fib-machine</span>
+  (make-machine
+   (<span style="color: #8f0075;">list</span> (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'+</span> <span style="color: #8f0075;">+</span>) (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'&lt;</span> <span style="color: #8f0075;">&lt;</span>) (<span style="color: #8f0075;">list</span> <span style="color: #0000b0;">'-</span> <span style="color: #8f0075;">-</span>))
+   '(
+     (assign continue (label fib-done))
+     fib-loop
+     (test (op <span style="color: #8f0075;">&lt;</span>) (reg n) (<span style="color: #8f0075;">const</span> <span style="color: #0000b0;">2</span>))
+     (branch (label immediate-answer))
+     (save continue)
+     (assign continue (label afterfib-n-1))
+     (save n)
+     (assign n (op <span style="color: #8f0075;">-</span>) (reg n) (<span style="color: #8f0075;">const</span> <span style="color: #0000b0;">1</span>))
+     (goto (label fib-loop))
+     afterfib-n-1
+     (restore n)
+     (restore continue)
+     (assign n (op <span style="color: #8f0075;">-</span>) (reg n) (<span style="color: #8f0075;">const</span> <span style="color: #0000b0;">2</span>))
+     (save continue)
+     (assign continue (label afterfib-n-2))
+     (save val)
+     (goto (label fib-loop))
+     afterfib-n-2
+     (assign n (reg val))
+     (restore val)
+     (restore continue)
+     (assign val
+             (op <span style="color: #8f0075;">+</span>) (reg val) (reg n))
+     (goto (reg continue))
+     immediate-answer
+     (assign val (reg n))
+     (goto (reg continue))
+     fib-done)))
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.93 (<a href="https://orgmode.org">Org</a> mode 9.7.11)</span></p>
+</div>
+</body>
+</html>
