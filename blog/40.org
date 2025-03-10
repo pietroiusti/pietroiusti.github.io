@@ -1,0 +1,882 @@
+#+options: html-link-use-abs-url:nil html-postamble:t
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t toc:nil num:nil
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
+#+html_head_extra:
+#+title: SICP 5.2.4 Monitoring Machine Performance
+#+subtitle: 2025-03-10 Mon
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.1.50 (<a href="https://orgmode.org">Org</a> mode 9.7.11)
+
+Authors point out that simulation is useful not only for verifying
+correctness but also for measuring performance. They show a way to
+measure the number of stack operations in a computation. The
+statistics can be printed by passing a message to the machine.
+
+#+begin_src scheme
+  ;; modified make-new-machine
+  (define (make-new-machine)
+    (let ((pc (make-register 'pc))
+          (flag (make-register 'flag))
+          (stack (make-stack))
+          (the-instruction-sequence '()))
+      (let ((the-ops
+             (list (list 'initialize-stack
+                         (lambda () (stack 'initialize)))
+                   (list 'print-stack-statistics
+                         (lambda () (stack 'print-statistics)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
+        (define (allocate-register name)
+          (if (assoc name register-table)
+              (error "Multiply defined register: " name)
+              (set! register-table
+                    (cons (list name (make-register name))
+                          register-table)))
+          'register-allocated)
+        (define (lookup-register name)
+          (let ((val (assoc name register-table)))
+            (if val
+                (cadr val)
+                (error "Unknown register:" name))))
+        (define (execute)
+          (let ((insts (get-contents pc)))
+            (if (null? insts)
+                'done
+                (begin
+                  ((instruction-execution-proc (car insts)))
+                  (execute)))))
+        (define (dispatch message)
+          (cond ((eq? message 'start)
+                 (set-contents! pc the-instruction-sequence)
+                 (execute))
+                ((eq? message 'install-instruction-sequence)
+                 (lambda (seq) (set! the-instruction-sequence seq)))
+                ((eq? message 'allocate-register) allocate-register)
+                ((eq? message 'get-register) lookup-register)
+                ((eq? message 'install-operations)
+                 (lambda (ops) (set! the-ops (append the-ops ops))))
+                ((eq? message 'stack) stack)
+                ((eq? message 'operations) the-ops)
+                (else (error "Unknown request -- MACHINE" message))))
+        dispatch)))
+
+  ;; new make-stack procedure
+  (define (make-stack)
+    (let ((s '())
+          (number-pushes 0)
+          (max-depth 0)
+          (current-depth 0))
+      (define (push x)
+        (set! s (cons x s))
+        (set! number-pushes (+ 1 number-pushes))
+        (set! current-depth (+ 1 current-depth))
+        (set! max-depth (max current-depth max-depth)))
+      (define (pop)
+        (if (null? s)
+            (error "Empty stack -- POP")
+            (let ((top (car s)))
+              (set! s (cdr s))
+              (set! current-depth (- current-depth 1))
+              top)))
+      (define (initialize)
+        (set! s '())
+        (set! number-pushes 0)
+        (set! max-depth 0)
+        (set! current-depth 0)
+        'done)
+      (define (print-statistics)
+        (newline)
+        (display (list 'total-pushes  '= number-pushes
+                       'maximum-depth '= max-depth)))
+      (define (dispatch message)
+        (cond ((eq? message 'push) push)
+              ((eq? message 'pop) (pop))
+              ((eq? message 'initialize) (initialize))
+              ((eq? message 'print-statistics)
+               (print-statistics))
+              (else
+               (error "Unknown request -- STACK" message))))
+      dispatch))
+#+end_src
+
+
+** Exercise 5.15
+*Exercise*:
+
+#+begin_quote
+Add counting "instruction counting" to the register machine
+simulation.  That is, have the machine model keep track of the number
+of instructions executed.  Extend the machine model's interface to
+accept a new message that prints the value of the instruction count
+and resets the count to zero.
+#+end_quote
+
+*Answer*:
+
+#+begin_src racket
+  (define (make-new-machine)
+    (let ((pc (make-register 'pc))
+          (flag (make-register 'flag))
+          (stack (make-stack))
+          (the-instruction-sequence '())
+          (insts-counter 0)) ;; <---
+      (let ((the-ops
+             (list (list 'initialize-stack
+                         (lambda () (stack 'initialize)))
+                   (list 'print-stack-statistics
+                         (lambda () (stack 'print-statistics)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
+        (define (allocate-register name)
+          (if (assoc name register-table)
+              (error "Multiply defined register: " name)
+              (set! register-table
+                    (cons (list name (make-register name))
+                          register-table)))
+          'register-allocated)
+        (define (lookup-register name)
+          (let ((val (assoc name register-table)))
+            (if val
+                (cadr val)
+                (error "Unknown register:" name))))
+        (define (execute)
+          (let ((insts (get-contents pc)))
+            (if (null? insts)
+                'done
+                (begin
+                  ((instruction-execution-proc (car insts)))
+                  (set! insts-counter (+ insts-counter 1)) ;; <---
+                  (execute)))))
+        (define (print-and-reset-insts-counter) ;; <---
+          (display (list 'insts-counter '= insts-counter))
+          (set! insts-counter 0))
+        (define (dispatch message)
+          (cond ((eq? message 'start)
+                 (set-contents! pc the-instruction-sequence)
+                 (execute))
+                ((eq? message 'install-instruction-sequence)
+                 (lambda (seq) (set! the-instruction-sequence seq)))
+                ((eq? message 'allocate-register) allocate-register)
+                ((eq? message 'get-register) lookup-register)
+                ((eq? message 'install-operations)
+                 (lambda (ops) (set! the-ops (append the-ops ops))))
+                ((eq? message 'stack) stack)
+                ((eq? message 'operations) the-ops)
+                ((eq? message 'print-insts-counter) (print-and-reset-insts-counter)) ;; <---
+                (else (error "Unknown request -- MACHINE" message))))
+        dispatch)))
+#+end_src
+** Exercise 5.16
+*Exercise*:
+
+#+begin_quote
+Augment the simulator to provide for "instruction tracing".  That is,
+before each instruction is executed, the simulator should print the
+text of the instruction.  Make the machine model accept `trace-on' and
+`trace-off' messages to turn tracing on and off.
+#+end_quote
+
+*Answer*:
+
+#+begin_src racket
+  (define (make-new-machine)
+    (let ((pc (make-register 'pc))
+          (flag (make-register 'flag))
+          (stack (make-stack))
+          (the-instruction-sequence '())
+          (trace-on false)) ;; <---
+      (let ((the-ops
+             (list (list 'initialize-stack
+                         (lambda () (stack 'initialize)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
+        (define (allocate-register name)
+          (if (assoc name register-table)
+              (error "Multiply defined register: " name)
+              (set! register-table
+                    (cons (list name (make-register name))
+                          register-table)))
+          'register-allocated)
+        (define (lookup-register name)
+          (let ((val (assoc name register-table)))
+            (if val
+                (cadr val)
+                (error "Unknown register:" name))))
+        (define (execute)
+          (let ((insts (get-contents pc)))
+            (if (null? insts)
+                'done
+                (begin
+                  ((instruction-execution-proc (car insts)))
+                  (and trace-on ;; <---
+                       (begin
+                         (display "Executed: ")
+                         (display (instruction-text (car insts)))
+                         (display "\n")))
+                  (execute)))))
+        (define (dispatch message)
+          (cond ((eq? message 'start)
+                 (set-contents! pc the-instruction-sequence)
+                 (execute))
+                ((eq? message 'install-instruction-sequence)
+                 (lambda (seq) (set! the-instruction-sequence seq)))
+                ((eq? message 'allocate-register) allocate-register)
+                ((eq? message 'get-register) lookup-register)
+                ((eq? message 'install-operations)
+                 (lambda (ops) (set! the-ops (append the-ops ops))))
+                ((eq? message 'stack) stack)
+                ((eq? message 'operations) the-ops)
+                ((eq? message 'trace-on) ;; <---
+                 (set! trace-on true))
+                ((eq? message 'trace-off) ;; <---
+                 (set! trace-on false))
+                (else (error "Unknown request -- MACHINE" message))))
+        dispatch)))
+#+end_src
+
+** Exercise 5.17
+*Exercise*:
+
+#+begin_quote
+Extend the instruction tracing of Exercise 5.16 so that before
+printing an instruction, the simulator prints any labels that
+immediately precede that instruction in the controller sequence.  Be
+careful to do this in a way that does not interfere with instruction
+counting (Exercise 5.15).  You will have to make the simulator retain
+the necessary label information.
+#+end_quote
+
+*Answer*:
+
+I've modified the machine and the assembler so that the latter stores
+the list of labels in the former. (Remember that a label is pair whose
+car is the label name and whose cdr is a list of instructions).
+
+Now, when we print the instruction text, we additionally check whether
+such instruction is the cdr of one or more of the labels in the labels
+list.
+
+#+begin_src racket
+  (define (assemble controller-text machine)
+    (let ((result (extract-labels controller-text)))
+      (let ((insts (car result)) (labels (cdr result)))
+        (update-insts! insts labels machine)
+        ((machine 'store-labels) labels)
+        insts)))
+
+  (define (make-new-machine)
+    (let ((pc (make-register 'pc))
+          (flag (make-register 'flag))
+          (stack (make-stack))
+          (the-instruction-sequence '())
+          (labels-list '())
+          (trace-on false))
+      (let ((the-ops
+             (list (list 'initialize-stack
+                         (lambda () (stack 'initialize)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
+        (define (allocate-register name)
+          (if (assoc name register-table)
+              (error "Multiply defined register: " name)
+              (set! register-table
+                    (cons (list name (make-register name))
+                          register-table)))
+          'register-allocated)
+        (define (lookup-register name)
+          (let ((val (assoc name register-table)))
+            (if val
+                (cadr val)
+                (error "Unknown register:" name))))
+        (define (execute)
+          (let ((insts (get-contents pc)))
+            (if (null? insts)
+                'done
+                (begin
+                  ((instruction-execution-proc (car insts)))
+                  (and trace-on
+                       (begin
+                         (display "Executing: ")
+                         (display (instruction-text (car insts)))
+                         (display "\n")
+                         (display "Labels preceding it: ")
+                         (for-each (lambda (label)
+                                     (cond ((eq? (cdr label) insts)
+                                            (display (car label)))))
+                                   labels-list)
+                         (display "\n")
+                         (display "\n")))
+                  (execute)))))
+        (define (dispatch message)
+          (cond ((eq? message 'start)
+                 (set-contents! pc the-instruction-sequence)
+                 (execute))
+                ((eq? message 'install-instruction-sequence)
+                 (lambda (seq) (set! the-instruction-sequence seq)))
+                ((eq? message 'allocate-register) allocate-register)
+                ((eq? message 'get-register) lookup-register)
+                ((eq? message 'install-operations)
+                 (lambda (ops) (set! the-ops (append the-ops ops))))
+                ((eq? message 'stack) stack)
+                ((eq? message 'operations) the-ops)
+                ((eq? message 'trace-on)
+                 (set! trace-on true))
+                ((eq? message 'trace-off)
+                 (set! trace-on false))
+                ((eq? message 'store-labels)
+                 (lambda (labels) (set! labels-list labels)))
+                ((eq? message 'get-labels-list)
+                 labels-list)
+                (else (error "Unknown request -- MACHINE" message))))
+        dispatch)))
+#+end_src
+
+Example:
+
+#+begin_src racket
+  (define fib-machine
+    (make-machine
+     '(continue n val)
+     (list (list '+ +) (list '< <) (list '- -))
+     '(
+       (assign continue (label fib-done))
+       fib-loop
+       (test (op <) (reg n) (const 2))
+       (branch (label immediate-answer))
+       (save continue)
+       (assign continue (label afterfib-n-1))
+       (save n)
+       (assign n (op -) (reg n) (const 1))
+       (goto (label fib-loop))
+       afterfib-n-1
+       (restore n)
+       (restore continue)
+       (assign n (op -) (reg n) (const 2))
+       (save continue)
+       (assign continue (label afterfib-n-2))
+       (save val)
+       (goto (label fib-loop))
+       afterfib-n-2
+       (assign n (reg val))
+       (restore val)
+       (restore continue)
+       (assign val
+               (op +) (reg val) (reg n))
+       (goto (reg continue))
+       immediate-answer
+       (assign val (reg n))
+       (goto (reg continue))
+       fib-done)))
+
+  (fib-machine 'trace-on)
+
+  (set-register-contents! fib-machine 'n 3)
+
+  (start fib-machine)
+
+  (get-register-contents fib-machine 'val)
+
+  ;; done
+  ;; Executing: (assign continue (label fib-done))
+  ;; Labels preceding it:
+
+  ;; Executing: (test (op <) (reg n) (const 2))
+  ;; Labels preceding it: fib-loop
+
+  ;; Executing: (branch (label immediate-answer))
+  ;; Labels preceding it:
+
+  ;; Executing: (save continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign continue (label afterfib-n-1))
+  ;; Labels preceding it:
+
+  ;; Executing: (save n)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign n (op -) (reg n) (const 1))
+  ;; Labels preceding it:
+
+  ;; Executing: (goto (label fib-loop))
+  ;; Labels preceding it:
+
+  ;; Executing: (test (op <) (reg n) (const 2))
+  ;; Labels preceding it: fib-loop
+
+  ;; Executing: (branch (label immediate-answer))
+  ;; Labels preceding it:
+
+  ;; Executing: (save continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign continue (label afterfib-n-1))
+  ;; Labels preceding it:
+
+  ;; Executing: (save n)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign n (op -) (reg n) (const 1))
+  ;; Labels preceding it:
+
+  ;; Executing: (goto (label fib-loop))
+  ;; Labels preceding it:
+
+  ;; Executing: (test (op <) (reg n) (const 2))
+  ;; Labels preceding it: fib-loop
+
+  ;; Executing: (branch (label immediate-answer))
+  ;; Labels preceding it:
+
+  ;; Executing: (assign val (reg n))
+  ;; Labels preceding it: immediate-answer
+
+  ;; Executing: (goto (reg continue))
+  ;; Labels preceding it:
+
+  ;; Executing: (restore n)
+  ;; Labels preceding it: afterfib-n-1
+
+  ;; Executing: (restore continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign n (op -) (reg n) (const 2))
+  ;; Labels preceding it:
+
+  ;; Executing: (save continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign continue (label afterfib-n-2))
+  ;; Labels preceding it:
+
+  ;; Executing: (save val)
+  ;; Labels preceding it:
+
+  ;; Executing: (goto (label fib-loop))
+  ;; Labels preceding it:
+
+  ;; Executing: (test (op <) (reg n) (const 2))
+  ;; Labels preceding it: fib-loop
+
+  ;; Executing: (branch (label immediate-answer))
+  ;; Labels preceding it:
+
+  ;; Executing: (assign val (reg n))
+  ;; Labels preceding it: immediate-answer
+
+  ;; Executing: (goto (reg continue))
+  ;; Labels preceding it:
+
+  ;; Executing: (assign n (reg val))
+  ;; Labels preceding it: afterfib-n-2
+
+  ;; Executing: (restore val)
+  ;; Labels preceding it:
+
+  ;; Executing: (restore continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign val (op +) (reg val) (reg n))
+  ;; Labels preceding it:
+
+  ;; Executing: (goto (reg continue))
+  ;; Labels preceding it:
+
+  ;; Executing: (restore n)
+  ;; Labels preceding it: afterfib-n-1
+
+  ;; Executing: (restore continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign n (op -) (reg n) (const 2))
+  ;; Labels preceding it:
+
+  ;; Executing: (save continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign continue (label afterfib-n-2))
+  ;; Labels preceding it:
+
+  ;; Executing: (save val)
+  ;; Labels preceding it:
+
+  ;; Executing: (goto (label fib-loop))
+  ;; Labels preceding it:
+
+  ;; Executing: (test (op <) (reg n) (const 2))
+  ;; Labels preceding it: fib-loop
+
+  ;; Executing: (branch (label immediate-answer))
+  ;; Labels preceding it:
+
+  ;; Executing: (assign val (reg n))
+  ;; Labels preceding it: immediate-answer
+
+  ;; Executing: (goto (reg continue))
+  ;; Labels preceding it:
+
+  ;; Executing: (assign n (reg val))
+  ;; Labels preceding it: afterfib-n-2
+
+  ;; Executing: (restore val)
+  ;; Labels preceding it:
+
+  ;; Executing: (restore continue)
+  ;; Labels preceding it:
+
+  ;; Executing: (assign val (op +) (reg val) (reg n))
+  ;; Labels preceding it:
+
+  ;; Executing: (goto (reg continue))
+  ;; Labels preceding it:
+
+  ;; done
+  ;; 2
+#+end_src
+
+** Exercise 5.18
+*Exercise*:
+
+#+begin_quote
+Modify the `make-register' procedure of section 5-2-1 so that
+registers can be traced.  Registers should accept messages that turn
+tracing on and off.  When a register is traced, assigning a value to
+the register should print the name of the register, the old contents
+of the register, and the new contents being assigned.  Extend the
+interface to the machine model to permit you to turn tracing on and
+off for designated machine registers.
+#+end_quote
+
+*Answer*:
+
+#+begin_src racket
+  (define (make-register name)
+    (let ((contents '*unassigned*)
+          (tracer 'off))
+      (define (dispatch message)
+        (cond ((eq? message 'get) contents)
+              ((eq? message 'set)
+               (lambda (value)
+                 (and (eq? tracer 'on)
+                      (begin
+                        (display "setting value of ")(display name)(display "\n")
+                        (display "old value: ")(display contents)(display "\n")
+                        (display "new value: ")(display value)(display "\n")
+                        (display "\n")))
+                 (set! contents value)))
+              ((eq? message 'tracer-on)
+               (set! tracer 'on))
+              ((eq? message 'tracer-off)
+               (set! tracer 'off))
+              (else
+               (error "Unknown request -- REGISTER" message))))
+      dispatch))
+
+  (define (make-new-machine)
+    (let ((pc (make-register 'pc))
+          (flag (make-register 'flag))
+          (stack (make-stack))
+          (the-instruction-sequence '()))
+      (let ((the-ops
+             (list (list 'initialize-stack
+                         (lambda () (stack 'initialize)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
+        (define (allocate-register name)
+          (if (assoc name register-table)
+              (error "Multiply defined register: " name)
+              (set! register-table
+                    (cons (list name (make-register name))
+                          register-table)))
+          'register-allocated)
+        (define (lookup-register name)
+          (let ((val (assoc name register-table)))
+            (if val
+                (cadr val)
+                (error "Unknown register:" name))))
+        (define (execute)
+          (let ((insts (get-contents pc)))
+            (if (null? insts)
+                'done
+                (begin
+                  ((instruction-execution-proc (car insts)))
+                  (execute)))))
+        (define (dispatch message)
+          (cond ((eq? message 'start)
+                 (set-contents! pc the-instruction-sequence)
+                 (execute))
+                ((eq? message 'install-instruction-sequence)
+                 (lambda (seq) (set! the-instruction-sequence seq)))
+                ((eq? message 'allocate-register) allocate-register)
+                ((eq? message 'get-register) lookup-register)
+                ((eq? message 'install-operations)
+                 (lambda (ops) (set! the-ops (append the-ops ops))))
+                ((eq? message 'stack) stack)
+                ((eq? message 'operations) the-ops)
+                ((eq? message 'set-reg-tracer-on)
+                 (lambda (name)
+                   (let ((reg (lookup-register name)))
+                     (reg 'tracer-on))))
+                ((eq? message 'set-reg-tracer-off)
+                 (lambda (name)
+                   (let ((reg (lookup-register name)))
+                     (reg 'tracer-off))))
+                (else (error "Unknown request -- MACHINE" message))))
+        dispatch)))
+#+end_src
+
+Usage example:
+#+begin_src racket
+  (define gcd-machine
+    (make-machine
+     '(a b t)
+     (list (list 'rem remainder) (list '= =))
+     '(test-b
+       (test (op =) (reg b) (const 0))
+       (branch (label gcd-done))
+       (assign t (op rem) (reg a) (reg b))
+       (assign a (reg b))
+       (assign b (reg t))
+       (goto (label test-b))
+       gcd-done)))
+
+
+  ((gcd-machine 'set-reg-tracer-on) 'b)
+
+  (set-register-contents! gcd-machine 'a 206)
+  (set-register-contents! gcd-machine 'b 40)
+  (start gcd-machine) ;; => done
+  (get-register-contents gcd-machine 'a)
+
+  ;; done
+  ;; setting value of b
+  ;; old value: *unassigned*
+  ;; new value: 40
+
+  ;; done
+  ;; setting value of b
+  ;; old value: 40
+  ;; new value: 6
+
+  ;; setting value of b
+  ;; old value: 6
+  ;; new value: 4
+
+  ;; setting value of b
+  ;; old value: 4
+  ;; new value: 2
+
+  ;; setting value of b
+  ;; old value: 2
+  ;; new value: 0
+
+  ;; done
+  ;; 2
+#+end_src
+
+** Exercise 5.19
+*Exercise*:
+
+#+begin_quote
+Alyssa P. Hacker wants a "breakpoint" feature in the simulator to help
+her debug her machine designs.  You have been hired to install this
+feature for her.  She wants to be able to specify a place in the
+controller sequence where the simulator will stop and allow her to
+examine the state of the machine.  You are to implement a procedure
+
+#+begin_src scheme
+  (set-breakpoint <MACHINE> <LABEL> <N>)
+#+end_src
+
+that sets a breakpoint just before the nth instruction after the
+given label.  For example,
+
+#+begin_src scheme
+  (set-breakpoint gcd-machine 'test-b 4)
+#+end_src
+
+installs a breakpoint in `gcd-machine' just before the assignment
+to register `a'.  When the simulator reaches the breakpoint it
+should print the label and the offset of the breakpoint and stop
+executing instructions.  Alyssa can then use
+`get-register-contents' and `set-register-contents!' to manipulate
+the state of the simulated machine.  She should then be able to
+continue execution by saying
+
+#+begin_src scheme
+  (proceed-machine <MACHINE>)
+#+end_src
+
+She should also be able to remove a specific breakpoint by means of
+
+#+begin_src scheme
+  (cancel-breakpoint <MACHINE> <LABEL> <N>)
+#+end_src
+
+or to remove all breakpoints by means of
+
+#+begin_src scheme
+  (cancel-all-breakpoints <MACHINE>)
+#+end_src
+#+end_quote
+
+*Answer*:
+
+- I'm implementing breakpoints by changing the representation of
+  instructions:
+  - previously an element in the instruction sequence was represented
+    as: ~( instruction-text . <procedure> )~;
+  - now: ~( ( instruction-text . <procedure> ). <BREAKPOINT-INFO> )~.
+
+    The ~<BREAKPOINT-INFO>~ tells us whether there is a breakpoint
+    there. It can either be ~false~, which means there is no
+    breakpoint, or a pair whose car and cdr are, respectively, the
+    label and offset used by the user to set the breakpoint.
+
+- ~execute~ now takes boolean;
+  - if we pass ~false~, ~execute~ will stop if the next instruction to
+    execute has a breakpoint;
+  - if we pass ~true~, ~execute~ will set the breakpoint of the next
+    instruction to execute to ~false~, and continue execution;
+  - Accordingly:
+    - ~starts~ applies ~execute~ to ~false~;
+    - ~proceed-machine~ applies ~execute~ to ~true~.
+
+- I'm storing the labels in the machine as I did in Exercise
+  5.17. This facilitates the implementation of ~set-breakpoint~ and
+  ~cancel-breakpoint~.
+
+Added/modified code:
+
+#+begin_src racket
+  (define (make-new-machine)
+    (let ((pc (make-register 'pc))
+          (flag (make-register 'flag))
+          (stack (make-stack))
+          (the-instruction-sequence '())
+          (labels-list '()))
+      (let ((the-ops
+             (list (list 'initialize-stack
+                         (lambda () (stack 'initialize)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
+        (define (allocate-register name)
+          (if (assoc name register-table)
+              (error "Multiply defined register: " name)
+              (set! register-table
+                    (cons (list name (make-register name))
+                          register-table)))
+          'register-allocated)
+        (define (lookup-register name)
+          (let ((val (assoc name register-table)))
+            (if val
+                (cadr val)
+                (error "Unknown register:" name))))
+        (define (execute force) ;; force is used to unset a breakpoint and continue
+          (let ((insts (get-contents pc)))
+            (if (null? insts)
+                'done
+                (cond (force
+                       (set-cdr! (car insts) false) ;; unset breakpoint
+                       ((instruction-execution-proc (car insts)))
+                       (execute false))
+                      ((cdr (car insts))
+                       (display "stopped at a breakpoint!\n")
+                       (display (cdr (car insts)))
+                       (display "\n"))
+                      (else
+                       ((instruction-execution-proc (car insts)))
+                       (execute false))))))
+        (define (set-breakpoint label-name n)
+          (let ((insts (lookup-label labels-list label-name)))
+            (let ((inst (list-ref2 insts n)))
+              (set-cdr! inst (cons label-name n)))))
+        (define (cancel-breakpoint label-name n)
+          (let ((insts (lookup-label labels-list label-name)))
+            (let ((inst (list-ref2 insts n)))
+              (set-cdr! inst false))))
+        (define (cancel-all-breakpoints insts)
+          (if (null? insts)
+              'done
+              (begin
+                (set-cdr! (car insts) false) ;; unset breakpoint
+                (cancel-all-breakpoints (cdr insts)))))
+        (define (dispatch message)
+          (cond ((eq? message 'start)
+                 (set-contents! pc the-instruction-sequence)
+                 (execute false))
+                ((eq? message 'install-instruction-sequence)
+                 (lambda (seq) (set! the-instruction-sequence seq)))
+                ((eq? message 'allocate-register) allocate-register)
+                ((eq? message 'get-register) lookup-register)
+                ((eq? message 'install-operations)
+                 (lambda (ops) (set! the-ops (append the-ops ops))))
+                ((eq? message 'stack) stack)
+                ((eq? message 'operations) the-ops)
+                ((eq? message 'store-labels)
+                 (lambda (labels) (set! labels-list labels)))
+                ((eq? message 'set-breakpoint)
+                 set-breakpoint)
+                ((eq? message 'cancel-breakpoint)
+                 cancel-breakpoint)
+                ((eq? message 'cancel-all-breakpoints)
+                 (cancel-all-breakpoints the-instruction-sequence))
+                ((eq? message 'proceed-machine)
+                 (execute true))
+                ((eq? message 'get-labels)
+                 labels-list)
+                ((eq? message 'get-insts)
+                 the-instruction-sequence)
+                (else (error "Unknown request -- MACHINE" message))))
+        dispatch)))
+
+  ;; a modified version of list-ref in the book
+  (define (list-ref2 items n)
+    (cond ((null? items)
+           '())
+          ((= n 0)
+           (car items))
+          (else
+           (list-ref (cdr items) (- n 1)))))
+
+  (define (set-breakpoint machine label n)
+    ((machine 'set-breakpoint) label n))
+
+  (define (proceed-machine machine)
+    (machine 'proceed-machine))
+
+  (define (cancel-breakpoint machine label n)
+    ((machine 'cancel-breakpoint) label n))
+
+  (define (cancel-all-breakpoints machine)
+    (machine 'cancel-all-breakpoints))
+
+  (define (assemble controller-text machine)
+    (let ((result (extract-labels controller-text)))
+      (let ((insts (car result)) (labels (cdr result)))
+        (update-insts! insts labels machine)
+        ((machine 'store-labels) labels)
+        insts)))
+
+  (define (make-instruction text)
+    (cons (cons text '()) false))
+
+  (define (instruction-text inst)
+    (caar inst))
+
+  (define (instruction-execution-proc inst)
+    (cdar inst))
+
+  (define (set-instruction-execution-proc! inst proc)
+    (set-cdr! (car inst) proc))
+#+end_src
