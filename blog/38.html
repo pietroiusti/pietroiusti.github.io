@@ -3,10 +3,11 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-01-30 Thu 23:03 -->
+<!-- 2025-06-29 Sun 14:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 5.1 Computing with Register Machines: Designing Register Machines</title>
+<meta name="author" content="Giulio" />
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -201,11 +202,7 @@
 <span class="subtitle">2024-12-24 Tue (Updated on 2025-01-09 Thu; 2025-01-30 Thu)</span>
 </h1>
 <ul class="org-ul">
-<li>The book began talking about ``processes''. [Question as an ex
-philosophy student: can we say that processes are to procedures what
-semantic content is to linguistic expressions? If the answer is yes,
-we might want to avoid saying that procedures <i>describe</i>
-processes&#x2026;]</li>
+<li>The book began talking about ``processes''. <sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup></li>
 
 <li>We have described processes in terms of procedures written in Lisp.</li>
 
@@ -214,11 +211,8 @@ by using ``models of evaluations'':
 <ul class="org-ul">
 <li>the substitution model (chapter 1);</li>
 <li>the environment model (chapter 3);</li>
-<li>the metacircular evaluator (chapter 4).</li>
+<li>the metacircular evaluator (chapter 4).<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup></li>
 </ul></li>
-
-<li>[Q: doesn't the metacircular evaluator implement an environment
-model of evaluation?]</li>
 
 <li>Much mystery has been cleared away, but important questions have
 been left unanswered.
@@ -228,7 +222,7 @@ been left unanswered.
 <li>How are values returned by the evaluation of subexpressions to
 the expressions that use them?</li>
 <li>Why some recursive procedures generate iterative process (that
-is, processes whose growth complexity in space is constant) and
+is, processes whose space growth complexity is constant) and
 some recursive procedures generate recursive processes?</li>
 </ul></li>
 </ul></li>
@@ -269,8 +263,7 @@ machine.</li>
 <li>Authors present a way to describe machines in a textual form and
 presents a specification of the GCD machine.</li>
 
-<li>Authors introduce the notion of <i>subroutine</i>. [What's the def? It
-wasn't that clear.]</li>
+<li>Authors introduce the notion of <i>subroutine</i>.<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup></li>
 
 <li>Authors show that we can use a register to hold a label.</li>
 
@@ -383,9 +376,9 @@ Example: <code>fib</code> (double recursion). Here is the controller for the
 </div></li>
 </ul></li>
 </ul>
-<div id="outline-container-org5c145ad" class="outline-2">
-<h2 id="org5c145ad">Exercise 5.1</h2>
-<div class="outline-text-2" id="text-org5c145ad">
+<div id="outline-container-org2d399ae" class="outline-2">
+<h2 id="org2d399ae">Exercise 5.1</h2>
+<div class="outline-text-2" id="text-org2d399ae">
 <p>
 <b>Exercise</b>:
 </p>
@@ -468,9 +461,9 @@ controller diagrams for this machine.
 </div>
 </div>
 </div>
-<div id="outline-container-org68852ed" class="outline-2">
-<h2 id="org68852ed">Exercise 5.2</h2>
-<div class="outline-text-2" id="text-org68852ed">
+<div id="outline-container-orge12c11d" class="outline-2">
+<h2 id="orge12c11d">Exercise 5.2</h2>
+<div class="outline-text-2" id="text-orge12c11d">
 <p>
 <b>Exercise</b>:
 </p>
@@ -501,9 +494,9 @@ factorial-done)
 </div>
 </div>
 </div>
-<div id="outline-container-orgf384f96" class="outline-2">
-<h2 id="orgf384f96">Exercise 5.3</h2>
-<div class="outline-text-2" id="text-orgf384f96">
+<div id="outline-container-org57dc840" class="outline-2">
+<h2 id="org57dc840">Exercise 5.3</h2>
+<div class="outline-text-2" id="text-org57dc840">
 <p>
 <b>Exercise</b>:
 </p>
@@ -714,9 +707,9 @@ sqrt-done)
 </div>
 </div>
 </div>
-<div id="outline-container-orgd3c2e26" class="outline-2">
-<h2 id="orgd3c2e26">Exercise 5.4</h2>
-<div class="outline-text-2" id="text-orgd3c2e26">
+<div id="outline-container-org98f5b3c" class="outline-2">
+<h2 id="org98f5b3c">Exercise 5.4</h2>
+<div class="outline-text-2" id="text-org98f5b3c">
 <p>
 <b>Exercise</b>:
 </p>
@@ -811,9 +804,9 @@ Iterative exponentiation:
 </div>
 </div>
 </div>
-<div id="outline-container-org70abef7" class="outline-2">
-<h2 id="org70abef7">Exercise 5.5</h2>
-<div class="outline-text-2" id="text-org70abef7">
+<div id="outline-container-org539419c" class="outline-2">
+<h2 id="org539419c">Exercise 5.5</h2>
+<div class="outline-text-2" id="text-org539419c">
 <p>
 <b>Exercise</b>:
 </p>
@@ -863,9 +856,9 @@ Relevant contents of the stack when computing the <code>fib</code> of <code>2</c
 </ul>
 </div>
 </div>
-<div id="outline-container-org5d4141a" class="outline-2">
-<h2 id="org5d4141a">Exercise 5.6</h2>
-<div class="outline-text-2" id="text-org5d4141a">
+<div id="outline-container-org8a136cf" class="outline-2">
+<h2 id="org8a136cf">Exercise 5.6</h2>
+<div class="outline-text-2" id="text-org8a136cf">
 <p>
 <b>Exercise</b>:
 </p>
@@ -947,7 +940,26 @@ repl.rkt&gt;
 </div>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Question as an ex
+philosophy student: can we say that processes are to procedures what
+semantic contents are to linguistic expressions? If the answer is
+yes, we might want to avoid saying that procedures <i>describe</i>
+processes&#x2026;</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Question: doesn't the
+metacircular evaluator implement the environment model of
+evaluation?</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">What's the def? It
+wasn't that clear.</p></div></div>
+
+
 </div>
+</div></div>
 <div id="postamble" class="status">
 <div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.9)</span></p>
 </div>

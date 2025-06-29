@@ -17,10 +17,10 @@
 #+infojs_opt:
 #+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.9)
 
-- The book began talking about ``processes''. [Question as an ex
+- The book began talking about ``processes''. [fn::Question as an ex
   philosophy student: can we say that processes are to procedures what
-  semantic content is to linguistic expressions? If the answer is yes,
-  we might want to avoid saying that procedures /describe/
+  semantic contents are to linguistic expressions? If the answer is
+  yes, we might want to avoid saying that procedures /describe/
   processes...]
 
 - We have described processes in terms of procedures written in Lisp.
@@ -29,10 +29,9 @@
   by using ``models of evaluations'':
   - the substitution model (chapter 1);
   - the environment model (chapter 3);
-  - the metacircular evaluator (chapter 4).
-
-- [Q: doesn't the metacircular evaluator implement an environment
-  model of evaluation?]
+  - the metacircular evaluator (chapter 4).[fn::Question: doesn't the
+    metacircular evaluator implement the environment model of
+    evaluation?]
 
 - Much mystery has been cleared away, but important questions have
   been left unanswered.
@@ -40,7 +39,7 @@
     - How are values returned by the evaluation of subexpressions to
       the expressions that use them?
     - Why some recursive procedures generate iterative process (that
-      is, processes whose growth complexity in space is constant) and
+      is, processes whose space growth complexity is constant) and
       some recursive procedures generate recursive processes?
 
 - The reason such important questions remain unanswered is that the
@@ -77,7 +76,7 @@
 - Authors present a way to describe machines in a textual form and
   presents a specification of the GCD machine.
 
-- Authors introduce the notion of /subroutine/. [What's the def? It
+- Authors introduce the notion of /subroutine/.[fn::What's the def? It
   wasn't that clear.]
 
 - Authors show that we can use a register to hold a label.
