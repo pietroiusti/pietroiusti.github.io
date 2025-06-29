@@ -13,9 +13,9 @@
 #+html_head: <link rel="stylesheet" type="text/css" href="./style.css"/>
 #+html_head_extra:
 #+title: SICP 4.1.4 Running the Evaluator as a Program
-#+subtitle: 2024-07-02 Tue
+#+subtitle: 2024-07-02 Tue (updated on 2025-06-29 Sun)
 #+infojs_opt:
-#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.5)
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 31.0.50 (<a href="https://orgmode.org">Org</a> mode 9.7.11)
 
 The evaluator provides a description of the process to evaluate a Lisp
 expression.  Such a description is in a programming language (Lisp),
@@ -478,6 +478,98 @@ apply-in-underlying-scheme apply)~), telling me that I cannot use
 
   (driver-loop)
 #+end_src
+
+** A summary of how the evaluator works
+
+Here is a summary of how the evaluator works.
+
+The evaluator works is a repl fashion. The repl is started by calling
+~driver-loop~. ~Driver-loop~ waits for the user input, evaluates it,
+prints the result, and waits again.
+
+The evaluation process is performed by ~eval~ in the global
+environment, which contains one frame containing the primitive
+bindings.
+
+For an expression to be executed in an environment it means that
+variable resolution --- finding the value of a variable --- is
+performed by looking at the last-created frame and, if not found, in
+the following frame, etc.
+
+The global environment is a list that contains a list (which
+represents the uniquely present frame):
+#+begin_src 
+GE: [ GE-frame ]
+#+end_src
+
+Any other environment will be a list which contains more than one
+list, and whose last element is the frame uniquely contained by the
+global environment:
+
+#+begin_src 
+nonGE: [ frameA frameB ... GE-frame ]
+#+end_src
+
+That is the way Author chose to implement what we saw in Chapter 3:
+the environment model of evaluation.
+
+For example,
+#+begin_src scheme
+  (define (foo a b)
+    (lambda (c d)
+      1))
+  (define my-fun (foo 1 1))
+  (my-fun 00)
+#+end_src
+
+will lead (at some point in the evaluation) to the existence of three
+frames --- the frame created by applying ~my-fun~, the frame created
+by applying ~foo~, and the global environment's frame.
+
+Procedure objects are represented as compound objects which contain i)
+a list of parameters, ii) the sequence of statements that constitute
+their body, and iii) a pointer to an environment.
+
+This latter environment[fn::This is the environment in which the
+procedure object was created.] is used as a base to create the
+environment in which the statements of the body are evaluated.
+
+~Eval~ is the procedure that evaluates an expression. It distinguishes
+ten cases:
+1. Self-evaluating expressions. E.g.: ~1~. The value of
+   self-evaluating expression is the expression itself.
+2. Variables. E.g.: ~foo~. The value of a variable has to be looked
+   for in the relevant environment.
+3. Quotations. E.g.: ~'hola~. The value of a quoted expression is the
+   quoted text.
+4. Assignments. E.g.: ~(set! foo 5)~. Evaluating an assignment
+   consists in finding the variable name in the environment and set
+   the value bound to it.
+   # (The evaluation of assignments is recursive...)
+5. Definitions. E.g.: ~(define foo 5)~. The evaluation of a definition
+   consists in creating a new variable in the environment and setting
+   its value. If a variable with that name already exists, then we
+   just set its value.
+   # (The evaluation of definitions is recursive...)
+6. Ifs. E.g.: ~(if foo bar)~. We evaluate the predicate. If true we
+   evaluate the then-expression, otherwise we evaluate the
+   else-expression.
+7. Lambdas. E.g.: ~(lambda (a) a)~. The evaluation of a lambda creates
+   a procedure object.
+8. Begins. E.g.: ~(begin foo bar baz)~. The evaluation of a ~begin~
+   consists in the ordered evaluation of a sequence of expressions. We
+   just iterate over the expressions and apply ~eval~ to each.
+9. Conds. E.g.: ~(cond ((pred1 (do-something))) (else
+   (do-something-else)))~. Conds are derived expressions: we can just
+   translate them into equivalent if expressions and evaluate those.
+10. Procedure applications. E.g.: ~(add 1 2)~. If the procedure is
+    primitive, then we apply it to the arguments using the underlying
+    scheme's ~apply~. If the procedure is not primitive, then its
+    application requires i) evaluating the operator, ii) evaluting the
+    operands, iii) creating a new environment the way described above,
+    iv) evaluating the sequence of expressions in the body within the
+    newly created environment.    
+
 ** Exercise 4.14
 *Exercise*:
 #+begin_quote

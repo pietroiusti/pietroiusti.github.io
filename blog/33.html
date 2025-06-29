@@ -3,10 +3,11 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-02 Tue 16:00 -->
+<!-- 2025-06-29 Sun 12:21 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SICP 4.1.4 Running the Evaluator as a Program</title>
+<meta name="author" content="Giulio" />
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -198,7 +199,7 @@
 <div id="content" class="content">
 <h1 class="title">SICP 4.1.4 Running the Evaluator as a Program
 <br />
-<span class="subtitle">2024-07-02 Tue</span>
+<span class="subtitle">2024-07-02 Tue (updated on 2025-06-29 Sun)</span>
 </h1>
 <p>
 The evaluator provides a description of the process to evaluate a Lisp
@@ -685,9 +686,128 @@ apply-in-underlying-scheme apply)</code>), telling me that I cannot use
 (driver-loop)
 </pre>
 </div>
-<div id="outline-container-orgf50666f" class="outline-2">
-<h2 id="orgf50666f">Exercise 4.14</h2>
-<div class="outline-text-2" id="text-orgf50666f">
+<div id="outline-container-org20bbb3f" class="outline-2">
+<h2 id="org20bbb3f">A summary of how the evaluator works</h2>
+<div class="outline-text-2" id="text-org20bbb3f">
+<p>
+Here is a summary of how the evaluator works.
+</p>
+
+<p>
+The evaluator works is a repl fashion. The repl is started by calling
+<code>driver-loop</code>. <code>Driver-loop</code> waits for the user input, evaluates it,
+prints the result, and waits again.
+</p>
+
+<p>
+The evaluation process is performed by <code>eval</code> in the global
+environment, which contains one frame containing the primitive
+bindings.
+</p>
+
+<p>
+For an expression to be executed in an environment it means that
+variable resolution &#x2014; finding the value of a variable &#x2014; is
+performed by looking at the last-created frame and, if not found, in
+the following frame, etc.
+</p>
+
+<p>
+The global environment is a list that contains a list (which
+represents the uniquely present frame):
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">GE: [ GE-frame ]
+</pre>
+</div>
+
+<p>
+Any other environment will be a list which contains more than one
+list, and whose last element is the frame uniquely contained by the
+global environment:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">nonGE: [ frameA frameB ... GE-frame ]
+</pre>
+</div>
+
+<p>
+That is the way Author chose to implement what we saw in Chapter 3:
+the environment model of evaluation.
+</p>
+
+<p>
+For example,
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #531ab6;">define</span> (<span style="color: #721045;">foo</span> a b)
+  (<span style="color: #531ab6;">lambda</span> (c d)
+    1))
+(<span style="color: #531ab6;">define</span> <span style="color: #721045;">my-fun</span> (foo 1 1))
+(my-fun 00)
+</pre>
+</div>
+
+<p>
+will lead (at some point in the evaluation) to the existence of three
+frames &#x2014; the frame created by applying <code>my-fun</code>, the frame created
+by applying <code>foo</code>, and the global environment's frame.
+</p>
+
+<p>
+Procedure objects are represented as compound objects which contain i)
+a list of parameters, ii) the sequence of statements that constitute
+their body, and iii) a pointer to an environment.
+</p>
+
+<p>
+This latter environment<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> is used as a base to create the
+environment in which the statements of the body are evaluated.
+</p>
+
+<p>
+<code>Eval</code> is the procedure that evaluates an expression. It distinguishes
+ten cases:
+</p>
+<ol class="org-ol">
+<li>Self-evaluating expressions. E.g.: <code>1</code>. The value of
+self-evaluating expression is the expression itself.</li>
+<li>Variables. E.g.: <code>foo</code>. The value of a variable has to be looked
+for in the relevant environment.</li>
+<li>Quotations. E.g.: <code>'hola</code>. The value of a quoted expression is the
+quoted text.</li>
+<li>Assignments. E.g.: <code>(set! foo 5)</code>. Evaluating an assignment
+consists in finding the variable name in the environment and set
+the value bound to it.</li>
+<li>Definitions. E.g.: <code>(define foo 5)</code>. The evaluation of a definition
+consists in creating a new variable in the environment and setting
+its value. If a variable with that name already exists, then we
+just set its value.</li>
+<li>Ifs. E.g.: <code>(if foo bar)</code>. We evaluate the predicate. If true we
+evaluate the then-expression, otherwise we evaluate the
+else-expression.</li>
+<li>Lambdas. E.g.: <code>(lambda (a) a)</code>. The evaluation of a lambda creates
+a procedure object.</li>
+<li>Begins. E.g.: <code>(begin foo bar baz)</code>. The evaluation of a <code>begin</code>
+consists in the ordered evaluation of a sequence of expressions. We
+just iterate over the expressions and apply <code>eval</code> to each.</li>
+<li>Conds. E.g.: <code>(cond ((pred1 (do-something))) (else
+   (do-something-else)))</code>. Conds are derived expressions: we can just
+translate them into equivalent if expressions and evaluate those.</li>
+<li>Procedure applications. E.g.: <code>(add 1 2)</code>. If the procedure is
+primitive, then we apply it to the arguments using the underlying
+scheme's <code>apply</code>. If the procedure is not primitive, then its
+application requires i) evaluating the operator, ii) evaluting the
+operands, iii) creating a new environment the way described above,
+iv) evaluating the sequence of expressions in the body within the
+newly created environment.</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgcc05d4c" class="outline-2">
+<h2 id="orgcc05d4c">Exercise 4.14</h2>
+<div class="outline-text-2" id="text-orgcc05d4c">
 <p>
 <b>Exercise</b>:
 </p>
@@ -718,9 +838,18 @@ procedure object (whatever Scheme natively uses).
 </p>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This is the environment in which the
+procedure object was created.</p></div></div>
+
+
 </div>
+</div></div>
 <div id="postamble" class="status">
-<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.60 (<a href="https://orgmode.org">Org</a> mode 9.7.5)</span></p>
+<div style="text-align: center;"><a href="./posts.html">←</a></div><p>Send me an <a href="mailto:giulio.pietroiusti@gmail.com">email</a> for comments.</p> <p>Created with <span class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 31.0.50 (<a href="https://orgmode.org">Org</a> mode 9.7.11)</span></p>
 </div>
 </body>
 </html>
